@@ -1,0 +1,72 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb" // or "postgresql" if using PostgreSQL
+  url      = env("MONGO_URI")
+}
+// prisma/schema.prisma
+
+model User {
+  id              String        @id @default(auto()) @map("_id") @db.ObjectId
+  name            String
+  email           String        @unique
+  passwordHash    String
+  role            Role          // ADMIN, TEACHER, or STUDENT
+  profilePicture  String?       // Cloudinary URL
+  isEmailVerified Boolean       @default(false)
+  createdAt       DateTime      @default(now())
+  
+  // Relations
+  teacher         Teacher?
+  student         Student?
+}
+
+model Teacher {
+  id              String        @id @default(auto()) @map("_id") @db.ObjectId
+  userId          String        @unique @db.ObjectId
+  user            User          @relation(fields: [userId], references: [id])
+  qualification   String?
+  hourlyRate      Float?
+  classes         Class[]
+}
+model Admin {
+   id              String        @id @default(auto()) @map("_id") @db.ObjectId
+  name            String
+  email           String        @unique
+  passwordHash    String
+  profilePicture  String?       // Cloudinary URL
+  isEmailVerified Boolean       @default(false)
+  createdAt       DateTime      @default(now())
+}
+
+model Student {
+  id              String        @id @default(auto()) @map("_id") @db.ObjectId
+  userId          String        @unique @db.ObjectId
+  user            User          @relation(fields: [userId], references: [id])
+  parentEmail     String?
+  bookedClasses   Class[]
+}
+
+model Class {
+  id              String        @id @default(auto()) @map("_id") @db.ObjectId
+  startTime       DateTime
+  endTime         DateTime
+  teacher         Teacher       @relation(fields: [teacherId], references: [id])
+  teacherId       String        @db.ObjectId
+  student         Student       @relation(fields: [studentId], references: [id])
+  studentId       String        @db.ObjectId
+  status          ClassStatus   @default(SCHEDULED)
+}
+
+enum Role {
+  ADMIN
+  TEACHER
+  STUDENT
+  }
+enum ClassStatus { 
+  SCHEDULED
+  COMPLETED
+  CANCELLED
+  }
