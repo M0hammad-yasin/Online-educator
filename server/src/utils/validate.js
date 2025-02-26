@@ -1,7 +1,9 @@
 import { z } from "zod";
 
 // Common Email & Password Validations
-const emailSchema = z.string().email({ message: "Invalid email format" });
+export const emailSchema = z
+  .string()
+  .email({ message: "Invalid email format" });
 const passwordSchema = z
   .string()
   .min(6, { message: "Password must be at least 6 characters long" });
@@ -11,6 +13,10 @@ export const userSchema = z.object({
   name: z
     .string()
     .min(3, { message: "Name must be at least 3 characters long" }),
+  email: emailSchema,
+  password: passwordSchema,
+});
+export const loginSchema = z.object({
   email: emailSchema,
   password: passwordSchema,
 });

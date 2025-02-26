@@ -2,13 +2,16 @@
 import express from "express";
 import {
   createUser,
-  getAllUsers,
   getUser,
+  loginUser,
 } from "../controllers/user.controller.js";
 import { validate } from "../middleware/validate.middleware.js";
-import { userSchema } from "../utils/validate.js";
+import { userSchema, loginSchema, emailSchema } from "../utils/validate.js";
+import auth from "../middleware/auth.js";
 const router = express.Router();
 
 router.post("/register", validate(userSchema), createUser);
+router.post("/login", validate(loginSchema), loginUser);
+router.get("/me", validate(emailSchema), auth, getUser);
 
 export default router;
