@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import morgan from "morgan";
 import config from "./config/config.js";
-import prisma from "./utils/prisma.client.js";
+import prisma from "./Prisma/prisma.client.js";
 import userRoutes from "./routes/user.route.js";
 
 const app = express();

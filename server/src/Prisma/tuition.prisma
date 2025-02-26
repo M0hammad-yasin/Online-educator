@@ -7,29 +7,26 @@ datasource db {
   url      = env("MONGO_URI")
 }
 // prisma/schema.prisma
-
 model User {
-  id              String        @id @default(auto()) @map("_id") @db.ObjectId
-  name            String
-  email           String        @unique
-  passwordHash    String
-  role            Role          // ADMIN, TEACHER, or STUDENT
-  profilePicture  String?       // Cloudinary URL
-  isEmailVerified Boolean       @default(false)
-  createdAt       DateTime      @default(now())
-  
-  // Relations
-  teacher         Teacher?
-  student         Student?
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
 }
-
 model Teacher {
   id              String        @id @default(auto()) @map("_id") @db.ObjectId
+  profilePicture  String?       // Cloudinary URL
+  name            String
+  email           String        @unique
   userId          String        @unique @db.ObjectId
-  user            User          @relation(fields: [userId], references: [id])
   qualification   String?
-  hourlyRate      Float?
+  classRate       Int?
   classes         Class[]
+  role            Role          // ADMIN, TEACHER, or STUDENT
+  passwordHash    String
+  isEmailVerified Boolean       @default(false)
+  createdAt       DateTime      @default(now()) 
 }
 model Admin {
    id              String        @id @default(auto()) @map("_id") @db.ObjectId
@@ -44,8 +41,14 @@ model Admin {
 model Student {
   id              String        @id @default(auto()) @map("_id") @db.ObjectId
   userId          String        @unique @db.ObjectId
-  user            User          @relation(fields: [userId], references: [id])
+  name            String
+  email           String        @unique
+  profilePicture  String?       // Cloudinary URL
   parentEmail     String?
+  passwordHash    String
+  role            Role          // ADMIN, TEACHER, or STUDENT
+  isEmailVerified Boolean       @default(false)
+  createdAt       DateTime      @default(now())   
   bookedClasses   Class[]
 }
 
@@ -61,7 +64,6 @@ model Class {
 }
 
 enum Role {
-  ADMIN
   TEACHER
   STUDENT
   }
