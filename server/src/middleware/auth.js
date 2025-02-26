@@ -1,5 +1,4 @@
-import jwt from "jsonwebtoken";
-import config from "../config/config.js";
+import { verifyToken } from "../utils/jwt.user.js";
 
 const auth = (req, res, next) => {
   const token = req.header("Authorization");
@@ -7,8 +6,9 @@ const auth = (req, res, next) => {
     return res.status(401).json({ error: "Access denied. No token provided." });
 
   try {
-    const decoded = jwt.verify(token, config.jwtSecret);
+    const decoded = verifyToken(token);
     req.user = decoded;
+    console.log(decoded);
     next();
   } catch (error) {
     res.status(401).json({ error: "Invalid token" });

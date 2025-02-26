@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-
+import config from "../config/config.js";
 // Generate JWT Token
 export const generateToken = (user) => {
   return jwt.sign(
@@ -11,5 +11,5 @@ export const generateToken = (user) => {
 
 // Verify JWT Token
 export const verifyToken = (token) => {
-  return jwt.verify(token, process.env.JWT_SECRET);
+  return jwt.verify(token, config.jwtSecret);
 };

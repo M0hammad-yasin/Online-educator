@@ -48,15 +48,10 @@ const createUser = asyncWrapper(async (req, res) => {
   res.status(201).json(_(user).omit("password"));
 });
 
-const getAllUsers = asyncWrapper(async (req, res) => {
-  const users = await prisma.user.findMany();
-  res.status(200).json(users);
-});
-
 const getUser = asyncWrapper(async (req, res) => {
   const user = await prisma.user.findUnique({
     where: {
-      id: parseInt(req.user.userId),
+      id: req.user.userId,
     },
   });
 
@@ -64,7 +59,7 @@ const getUser = asyncWrapper(async (req, res) => {
     return res.status(404).json({ message: "User not found" });
   }
 
-  res.status(200).json(user);
+  res.status(200).json(_(user).omit("password"));
 });
 
-export { createUser, getAllUsers, getUser, loginUser };
+export { createUser, getUser, loginUser };

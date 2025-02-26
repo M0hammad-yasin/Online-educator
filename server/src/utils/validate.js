@@ -3,6 +3,7 @@ import { z } from "zod";
 // Common Email & Password Validations
 export const emailSchema = z
   .string()
+  .min(3)
   .email({ message: "Invalid email format" });
 const passwordSchema = z
   .string()
@@ -16,6 +17,7 @@ export const userSchema = z.object({
   email: emailSchema,
   password: passwordSchema,
 });
+
 export const loginSchema = z.object({
   email: emailSchema,
   password: passwordSchema,
@@ -25,25 +27,35 @@ export const loginSchema = z.object({
 export const teacherSchema = z.object({
   name: z.string().min(3),
   email: emailSchema,
-  userId: z.string().length(24, { message: "Invalid userId format" }), // ObjectId format check
   qualification: z.string().min(2, { message: "Qualification is required" }),
   hourlyRate: z
     .number()
-    .min(10, { message: "Hourly rate must be at least $10" }),
-  passwordHash: passwordSchema,
-  role: z.enum(["TEACHER"]),
-  isEmailVerified: z.boolean().default(false),
+    .min(300, { message: "Hourly rate must be at least 300" }),
+  password: passwordSchema,
+  role: z.enum(["TEACHER"], { message: "Role must be 'STUDENT' only" }),
+  isEmailVerified: z
+    .boolean()
+    .default(false)
+    .refine((val) => typeof val === "boolean", {
+      message: "isEmailVerified must be a boolean value",
+    }),
 });
 
 // ✅ Student Validation Schema
 export const studentSchema = z.object({
-  name: z.string().min(3),
+  name: z
+    .string()
+    .min(3, { message: "Name must be at least 3 characters long" }),
   email: emailSchema,
-  userId: z.string().length(24),
   parentEmail: emailSchema.optional(),
   passwordHash: passwordSchema,
-  role: z.enum(["STUDENT"]),
-  isEmailVerified: z.boolean().default(false),
+  role: z.enum(["STUDENT"], { message: "Role must be 'STUDENT' only" }),
+  isEmailVerified: z
+    .boolean()
+    .default(false)
+    .refine((val) => typeof val === "boolean", {
+      message: "isEmailVerified must be a boolean value",
+    }),
 });
 
 // ✅ Admin Validation Schema

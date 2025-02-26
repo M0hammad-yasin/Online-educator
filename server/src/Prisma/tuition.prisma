@@ -19,7 +19,6 @@ model Teacher {
   profilePicture  String?       // Cloudinary URL
   name            String
   email           String        @unique
-  userId          String        @unique @db.ObjectId
   qualification   String?
   classRate       Int?
   classes         Class[]
@@ -40,7 +39,6 @@ model Admin {
 
 model Student {
   id              String        @id @default(auto()) @map("_id") @db.ObjectId
-  userId          String        @unique @db.ObjectId
   name            String
   email           String        @unique
   profilePicture  String?       // Cloudinary URL
@@ -54,6 +52,9 @@ model Student {
 
 model Class {
   id              String        @id @default(auto()) @map("_id") @db.ObjectId
+  classId         String        @unique
+  subject         String
+  scheduledAt     DateTime
   startTime       DateTime
   endTime         DateTime
   teacher         Teacher       @relation(fields: [teacherId], references: [id])
@@ -72,3 +73,4 @@ enum ClassStatus {
   COMPLETED
   CANCELLED
   }
+//mongod --replSet rs0 --bind_ip localhost

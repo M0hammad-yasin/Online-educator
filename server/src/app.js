@@ -3,8 +3,7 @@ import cors from "cors";
 import morgan from "morgan";
 import config from "./config/config.js";
 import prisma from "./Prisma/prisma.client.js";
-import userRoutes from "./routes/user.route.js";
-
+import initializeRoutes from "./route.js";
 const app = express();
 
 // Middleware
@@ -13,21 +12,9 @@ app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Basic route
-app.get("/", (req, res) => {
-  res.json({ message: "Welcome to the Online-educator API" });
-});
-app.use("/api/user", userRoutes);
-// Error handling middleware
-app.use((err, req, res, next) => {
-  const statusCode = err.statusCode || 500;
-  res.status(statusCode).json({
-    error: err.message,
-    stack: process.env.NODE_ENV === "development" ? err.stack : undefined,
-  });
-});
+initializeRoutes(app);
+
 const PORT = config.port || 5000;
-// Start server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   prisma.$connect().then(() => {
