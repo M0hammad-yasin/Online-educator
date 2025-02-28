@@ -43,6 +43,7 @@ model Student {
   email           String        @unique
   profilePicture  String?       // Cloudinary URL
   parentEmail     String?
+  grade           Int
   passwordHash    String
   role            Role          // ADMIN, TEACHER, or STUDENT
   isEmailVerified Boolean       @default(false)
@@ -55,12 +56,16 @@ model Class {
   classId         String        @unique
   subject         String
   scheduledAt     DateTime
-  startTime       DateTime
+  startTime       DateTime 
+  title           String?    
   endTime         DateTime
   teacher         Teacher       @relation(fields: [teacherId], references: [id])
   teacherId       String        @db.ObjectId
   student         Student       @relation(fields: [studentId], references: [id])
   studentId       String        @db.ObjectId
+  createdAt       DateTime      @default(now()) 
+  classLink       String?
+  duration        String 
   status          ClassStatus   @default(SCHEDULED)
 }
 
@@ -71,6 +76,7 @@ enum Role {
 enum ClassStatus { 
   SCHEDULED
   COMPLETED
+  IN_PROGRESS
   CANCELLED
   }
 //mongod --replSet rs0 --bind_ip localhost

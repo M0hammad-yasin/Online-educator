@@ -6,11 +6,12 @@ import {
   getTeacher,
 } from "../controllers/teacher.controller.js";
 import auth from "../middleware/auth.js";
-import { validate } from "../middleware/validate.middleware.js";
+import { validateBody } from "../middleware/validate.middleware.js";
 
 const router = express.Router();
 
-router.post("/register", validate(teacherSchema), registerTeacher);
-router.post("/login", validate(loginSchema), loginTeacher);
+router.post("/register", validateBody(teacherSchema), registerTeacher);
+router.post("/login", validateBody(loginSchema), loginTeacher);
 router.get("/me", auth, getTeacher);
+router.get("/:id", getTeacher);
 export default router;

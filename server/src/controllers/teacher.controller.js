@@ -33,7 +33,8 @@ export const registerTeacher = asyncWrapper(async (req, res) => {
 // Teacher Login
 export const loginTeacher = asyncWrapper(async (req, res) => {
   const { email, password } = req.body;
-
+  console.log(req.body);
+  console.log(req.body.email);
   // Check if teacher exists
   const teacher = await prisma.teacher.findUnique({ where: { email } });
   if (!teacher) {
@@ -54,8 +55,14 @@ export const loginTeacher = asyncWrapper(async (req, res) => {
 
 // Get Teacher Profile
 export const getTeacher = asyncWrapper(async (req, res) => {
+  const filter = {};
+  if (req.query.id) {
+    filter.id = req.query.id;
+  } else {
+    filter.id = req.params.id;
+  }
   const teacher = await prisma.teacher.findUnique({
-    where: { id: req.user.userId },
+    where: filter,
   });
 
   if (!teacher) {

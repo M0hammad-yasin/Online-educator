@@ -6,12 +6,12 @@ import {
   getStudent,
 } from "../controllers/student.controller.js";
 import auth from "../middleware/auth.js";
-import { validate } from "../middleware/validate.middleware.js";
+import { validateBody } from "../middleware/validate.middleware.js";
 
 const router = express.Router();
 
-router.post("/register", validate(studentSchema), registerStudent);
-router.post("/login", loginStudent);
+router.post("/register", validateBody(studentSchema), registerStudent);
+router.post("/login", validateBody(loginSchema), loginStudent);
 router.get("/me", auth, getStudent);
 
 export default router;

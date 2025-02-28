@@ -1,3 +1,7 @@
+import {
+  AuthenticationError,
+  AuthorizationError,
+} from "../lib/custom.error.js";
 import { verifyToken } from "../utils/jwt.user.js";
 
 const auth = (req, res, next) => {
@@ -11,7 +15,7 @@ const auth = (req, res, next) => {
     console.log(decoded);
     next();
   } catch (error) {
-    res.status(401).json({ error: "Invalid token" });
+    throw new AuthorizationError("Invalid token", error);
   }
 };
 

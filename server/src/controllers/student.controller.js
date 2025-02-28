@@ -13,6 +13,7 @@ export const registerStudent = asyncWrapper(async (req, res) => {
   const student = await prisma.student.create({
     data: {
       name: req.body.name,
+      grade: req.body.grade,
       email: req.body.email,
       passwordHash: hashedPassword,
       parentEmail: req.body?.parentEmail,
