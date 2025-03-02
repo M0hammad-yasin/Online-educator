@@ -4,7 +4,7 @@ import {
   registerTeacher,
   loginTeacher,
   getTeacher,
-} from "../controllers/teacher.controller.js";
+} from "../controllers/TeacherController/teacher.controller.js";
 import auth from "../middleware/auth.js";
 import { validateBody } from "../middleware/validate.middleware.js";
 

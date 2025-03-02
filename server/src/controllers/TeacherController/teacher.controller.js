@@ -1,7 +1,7 @@
-import prisma from "../Prisma/prisma.client.js";
-import asyncWrapper from "../utils/asyncWrapper.js";
-import { hashPassword, comparePassword } from "../utils/bcrypt.js";
-import { generateToken } from "../utils/jwt.user.js";
+import prisma from "../../Prisma/prisma.client.js";
+import asyncWrapper from "../../utils/asyncWrapper.js";
+import { hashPassword, comparePassword } from "../../utils/bcrypt.js";
+import { generateToken } from "../../utils/jwt.user.js";
 import _ from "lodash";
 // Register Teacher
 export const registerTeacher = asyncWrapper(async (req, res) => {

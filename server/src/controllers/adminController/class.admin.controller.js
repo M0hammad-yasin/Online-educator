@@ -170,25 +170,6 @@ export const updateClass = asyncWrapper(async (req, res) => {
     where: { id },
     data: updateData,
   });
-
-  //   export const sendSuccess = (res, options = {}) => {
-  //     const {
-  //       statusCode = 200,
-  //       message = "Operation successful",
-  //       data = null,
-  //       metadata = null,
-  //     } = options;
-
-  //     const response = {
-  //       status: "success",
-  //       message,
-  //     };
-
-  //     if (data) response.data = data;
-  //     if (metadata) response.metadata = metadata;
-
-  //     return res.status(statusCode).json(response);
-  //   };
   sendSuccess(res, {
     statusCode: 201,
     message: "class updated Successfully",
@@ -208,9 +189,39 @@ export const deleteClass = asyncWrapper(async (req, res) => {
   });
 });
 export const getClass = asyncWrapper(async (req, res) => {
-  const { id } = req.query;
+  const { classId } = req.params;
+  if (!classId) throw new BadRequestError("classId is required");
   const classData = await prisma.class.findUnique({
-    where: { id },
+    where: { classId },
+    select: {
+      id: true,
+      title: true,
+      classId: true,
+      teacherId: true,
+      studentId: true,
+      subject: true,
+      scheduledAt: true,
+      startTime: true,
+      endTime: true,
+      status: true,
+      grade: true,
+      duration: true,
+      classLink: true,
+      teacher: {
+        select: {
+          name: true,
+          email: true,
+          profilePicture: true,
+        },
+      },
+      student: {
+        select: {
+          name: true,
+          email: true,
+          profilePicture: true,
+        },
+      },
+    },
   });
   sendSuccess(res, {
     statusCode: 201,
@@ -266,20 +277,11 @@ export const getGroupedClasses = asyncWrapper(async (req, res) => {
   console.log(req.query);
   const parsedLimit = Math.min(100, Math.max(1, parseInt(limit)));
   const skip = (parsedPage - 1) * parsedLimit;
-
-  const validSortFields = ["startTime", "endTime", "status"];
-  const isValidSort =
-    validSortFields.includes(sortBy) &&
-    ["asc", "desc"].includes(order.toLowerCase());
-  ["asc", "desc"].includes(order.toLowerCase());
-  if (!isValidSort) {
-    throw new BadRequestError("Invalid sort parameters");
-  }
   // Build the class filter from query if provided.
   // We assume the client sends a JSON string in ?filter=
   const classFilter = {};
   if (startDate || endDate) {
-    classFilter.startDate = {
+    classFilter.startTime = {
       gte: new Date(startDate),
       lte: new Date(endDate),
     };
@@ -307,6 +309,7 @@ export const getGroupedClasses = asyncWrapper(async (req, res) => {
         startTime: true,
         endTime: true,
         status: true,
+        grade: true,
         duration: true,
         classLink: true,
         teacher: {
@@ -333,10 +336,19 @@ export const getGroupedClasses = asyncWrapper(async (req, res) => {
     throw new NotFoundError("No classes found");
   }
   //grouping
-  const validGroupBys = ["day", "hour", "month"];
   let groupedData = null;
   if (groupBy) groupedData = classes;
-  if (groupBy && validGroupBys.includes(groupBy.toLowerCase())) {
+  if (groupBy === "grade") {
+    groupedData = classes.reduce((acc, cls) => {
+      // Use scheduledAt for grouping. We are formatting it but not reducing the original field.
+      const groupKey = cls.grade;
+      if (!acc[groupKey]) {
+        acc[groupKey] = [];
+      }
+      acc[groupKey].push(cls);
+      return acc;
+    }, {});
+  } else if (groupBy) {
     const groupKeyFormat =
       groupBy.toLowerCase() === "day"
         ? "yyyy-MM-dd"
@@ -373,111 +385,4 @@ export const getGroupedClasses = asyncWrapper(async (req, res) => {
   });
 });
 
-export const getUsersWithClasses = asyncWrapper(async (req, res) => {
-  // Extract pagination parameters (defaults: page 1, 10 items per page)
-  const {
-    startDate,
-    endDate,
-    sortBy = "startTime",
-    order = "asc",
-    page = 1,
-    user,
-    limit = 11,
-  } = req.query;
-  if (!["teacher", "student"].includes(user)) {
-    throw new BadRequestError(
-      "Invalid user type. Must be 'teacher' or 'student'."
-    );
-  }
-  const userClass = user === "teacher" ? "classes" : "bookedClasses";
-  const { status } = req.params;
-  const parsedPage = Math.max(1, parseInt(page));
-  const parsedLimit = Math.min(100, Math.max(1, parseInt(limit)));
-  const skip = (parsedPage - 1) * parsedLimit;
-
-  const validSortFields = ["startTime", "endTime", "status"];
-  const isValidSort =
-    validSortFields.includes(sortBy) &&
-    ["asc", "desc"].includes(order.toLowerCase());
-  if (!isValidSort) {
-    throw new BadRequestError("Invalid sort parameters");
-  }
-  // Build the class filter from query if provided.
-  // We assume the client sends a JSON string in ?filter=
-  const classFilter = {};
-
-  if (status) classFilter.status = status;
-
-  if (startDate || endDate) {
-    classFilter.startTime = {};
-
-    if (startDate) {
-      classFilter.startTime.gte = new Date(`${startDate}T00:00:00.000Z`);
-    }
-    if (endDate) {
-      classFilter.startTime.lte = new Date(`${endDate}T23:59:59.999Z`);
-    }
-  }
-
-  console.log(classFilter);
-
-  // Fetch teachers with pagination and include:
-  // - classes (filtered by classFilter)
-  const [users, totalUsers] = await Promise.all([
-    prisma[user].findMany({
-      skip,
-      take: parsedLimit,
-
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        profilePicture: true,
-        [userClass]: {
-          where: { ...classFilter },
-        },
-        _count: {
-          select: {
-            [userClass]: {
-              where: { ...classFilter },
-            },
-          },
-        },
-      },
-    }),
-    prisma[user].count(),
-  ]);
-  //
-
-  // Calculate pagination metadata
-  const from = skip + 1;
-  const to = Math.min(skip + users.length, totalUsers);
-
-  const metadata = {
-    total: totalUsers,
-    range: `${from} to ${to} of ${totalUsers}`,
-    currentPage: page,
-    pageSize: limit,
-  };
-
-  return sendSuccess(res, {
-    statusCode: 200,
-    message: `${user} fetched successfully!`,
-    data: users,
-    metadata,
-  });
-});
-
 // Get teachers for admin dropdown
-export const getTeachersForSelection = asyncWrapper(async (req, res) => {
-  const teachers = await prisma.teacher.findMany({
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      profilePicture: true,
-      qualification: true,
-    },
-  });
-  res.status(200).json(teachers);
-});

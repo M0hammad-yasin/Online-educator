@@ -8,8 +8,6 @@
 
 import { ZodError } from "zod";
 import { sendError } from "../lib/api.response.js";
-import { ValidationError } from "../lib/custom.error.js";
-// };
 export const validateBody = (schema) => (req, res, next) => {
   try {
     schema.parse(req.body);

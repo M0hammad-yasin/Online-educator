@@ -6,12 +6,22 @@ datasource db {
   provider = "mongodb" // or "postgresql" if using PostgreSQL
   url      = env("MONGO_URI")
 }
+model Admin {
+   id              String        @id @default(auto()) @map("_id") @db.ObjectId
+  name            String
+  email           String        @unique
+  passwordHash    String
+  role            String          @default("ADMIN")
+  profilePicture  String?       // Cloudinary URL
+  isEmailVerified Boolean       @default(false)
+  createdAt       DateTime      @default(now())
+}
 // prisma/schema.prisma
 model User {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   name      String
   email     String   @unique
-  password  String
+  passwordHash  String
   createdAt DateTime @default(now())
 }
 model Teacher {
@@ -22,19 +32,12 @@ model Teacher {
   qualification   String?
   classRate       Int?
   classes         Class[]
-  role            Role          // ADMIN, TEACHER, or STUDENT
+  role            Role        @default(TEACHER)  // ADMIN, TEACHER, or STUDENT
   passwordHash    String
+  address         String?
+  accessControl   AccessControl?
   isEmailVerified Boolean       @default(false)
   createdAt       DateTime      @default(now()) 
-}
-model Admin {
-   id              String        @id @default(auto()) @map("_id") @db.ObjectId
-  name            String
-  email           String        @unique
-  passwordHash    String
-  profilePicture  String?       // Cloudinary URL
-  isEmailVerified Boolean       @default(false)
-  createdAt       DateTime      @default(now())
 }
 
 model Student {
@@ -45,10 +48,12 @@ model Student {
   parentEmail     String?
   grade           Int
   passwordHash    String
-  role            Role          // ADMIN, TEACHER, or STUDENT
+  address         String?
+  role            Role          @default(STUDENT)// ADMIN, TEACHER, or STUDENT
   isEmailVerified Boolean       @default(false)
   createdAt       DateTime      @default(now())   
   bookedClasses   Class[]
+  region          String?
 }
 
 model Class {
@@ -66,12 +71,51 @@ model Class {
   createdAt       DateTime      @default(now()) 
   classLink       String?
   duration        String 
+  
   status          ClassStatus   @default(SCHEDULED)
 }
+model Moderator{
+  id              String        @id @default(auto()) @map("_id") @db.ObjectId
+  name            String
+  email           String        @unique
+  passwordHash    String
+  address         String?
+  accessControl   AccessControl?
+  role            String          @default("MODERATOR")
+  profilePicture  String?       // Cloudinary URL
+  isEmailVerified Boolean       @default(false)
+  createdAt       DateTime      @default(now())
+}
+model AccessControl {
+  id              String        @id @default(auto()) @map("_id") @db.ObjectId
+  moderator       Moderator     @relation(fields: [moderatorId], references: [id])
+  moderatorId     String        @db.ObjectId @unique
+  teacherId   String  @db.ObjectId @unique
+  teacher         Teacher   @relation(fields: [teacherId], references: [id])
+  createdAt       DateTime      @default(now())
+  canSeeClass     Boolean       @default(false)
+  canAddClass     Boolean       @default(false)
+  canUpdateClass  Boolean       @default(false)
+  canDeleteClass  Boolean       @default(false)
+  canSeeUser      Boolean       @default(false)
+  canAddUser      Boolean       @default(false)
+  canDeleteUser   Boolean       @default(false)
+  canUpdateUser   Boolean       @default(false)
+  canSeeTeacher   Boolean       @default(false)
+  canAddTeacher   Boolean       @default(false)
+  canDeleteTeacher   Boolean       @default(false)
+  canUpdateTeacher   Boolean       @default(false)
+  canSeeStudent   Boolean       @default(false)
+  canAddStudent   Boolean       @default(false)
+  canDeleteStudent   Boolean       @default(false)
+  canUpdateStudent   Boolean       @default(false)
+}
+
 
 enum Role {
   TEACHER
   STUDENT
+  MODERATOR
   }
 enum ClassStatus { 
   SCHEDULED

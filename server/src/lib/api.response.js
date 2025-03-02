@@ -22,7 +22,7 @@ export const sendSuccess = (res, options = {}) => {
 export const sendError = (res, error) => {
   // Use the error's statusCode if provided, default to 500 (Server Error)
   const statusCode = error.statusCode || 500;
-
+  console.log("error response data", error);
   // Construct the error response using a similar pattern to sendSuccess
   const response = {
     status: "error",
