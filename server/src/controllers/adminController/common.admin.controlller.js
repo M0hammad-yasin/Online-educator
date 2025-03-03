@@ -1,8 +1,7 @@
-import { z } from "zod";
-import { sendSuccess } from "../../lib/api.response";
-import { BadRequestError } from "../../lib/custom.error";
-import prisma from "../../Prisma/prisma.client";
-import asyncWrapper from "../../utils/asyncWrapper";
+import { sendSuccess } from "../../lib/api.response.js";
+import { BadRequestError } from "../../lib/custom.error.js";
+import prisma from "../../Prisma/prisma.client.js";
+import asyncWrapper from "../../utils/asyncWrapper.js";
 
 export const modifyAccess = asyncWrapper(async (req, res) => {
   const {
@@ -56,7 +55,7 @@ export const modifyAccess = asyncWrapper(async (req, res) => {
   sendSuccess(res, {
     statusCode: 201,
     message: "User access modified Successfully",
-    data: updatedUser,
+    data: { updatedUserAccess: updatedUser },
   });
 });
 export const getUsersWithClasses = asyncWrapper(async (req, res) => {
@@ -64,10 +63,11 @@ export const getUsersWithClasses = asyncWrapper(async (req, res) => {
   const {
     startDate,
     endDate,
-    sortBy = "startTime",
+    sortBy = "name",
     order = "asc",
     page = 1,
     user,
+    status = "all-classes",
     limit = 11,
   } = req.query;
   if (!["teacher", "student"].includes(user)) {
@@ -76,7 +76,6 @@ export const getUsersWithClasses = asyncWrapper(async (req, res) => {
     );
   }
   const userClass = user === "teacher" ? "classes" : "bookedClasses";
-  const { status } = req.params;
   const parsedPage = Math.max(1, parseInt(page));
   const parsedLimit = Math.min(100, Math.max(1, parseInt(limit)));
   const skip = (parsedPage - 1) * parsedLimit;
@@ -97,15 +96,12 @@ export const getUsersWithClasses = asyncWrapper(async (req, res) => {
     }
   }
 
-  console.log(classFilter);
-
   // Fetch teachers with pagination and include:
   // - classes (filtered by classFilter)
   const [users, totalUsers] = await Promise.all([
     prisma[user].findMany({
       skip,
       take: parsedLimit,
-
       select: {
         id: true,
         name: true,
@@ -140,8 +136,8 @@ export const getUsersWithClasses = asyncWrapper(async (req, res) => {
 
   return sendSuccess(res, {
     statusCode: 200,
-    message: `${user} fetched successfully!`,
-    data: users,
+    message: `${user}s fetched successfully!`,
+    data: { [`${user}s`]: users },
     metadata,
   });
 });

@@ -1,6 +1,6 @@
-import { BadRequestError, ServerError } from "../lib/custom.error";
-import prisma from "../Prisma/prisma.client";
-import { comparePassword, hashPassword } from "../utils/bcrypt";
+import { BadRequestError, ServerError } from "../lib/custom.error.js";
+import prisma from "../Prisma/prisma.client.js";
+import { comparePassword, hashPassword } from "../utils/bcrypt.js";
 
 export default async (req, res, next) => {
   const { existingPassword, password, confirmPassword } = req.body;

@@ -5,7 +5,6 @@ import { format, isAfter, isDate, isBefore } from "date-fns";
 // Function to check if a teacher or student has a scheduling conflict
 export default async (userId, role, newStartTime, newEndTime, id = null) => {
   const filter = { [role]: userId };
-  console.log(isBefore(newStartTime, newEndTime));
   if (id) filter.id = { not: id };
   const conflict = await prisma.class.findFirst({
     where: {
@@ -31,7 +30,6 @@ export default async (userId, role, newStartTime, newEndTime, id = null) => {
       ],
     },
   });
-  console.log(conflict);
   if (conflict)
     throw new ConflictError(
       `${role.slice(0, -2)} is already scheduled at ${format(

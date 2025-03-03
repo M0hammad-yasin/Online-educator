@@ -1,6 +1,7 @@
-import { sendSuccess } from "../lib/api.response";
-import prisma from "../Prisma/prisma.client";
-import asyncWrapper from "../utils/asyncWrapper";
+import { sendSuccess } from "../lib/api.response.js";
+import prisma from "../Prisma/prisma.client.js";
+import asyncWrapper from "../utils/asyncWrapper.js";
+import _ from "lodash";
 export const updatePassword = asyncWrapper(async (req, res) => {
   const { password, model } = req.body;
   const userId = req.user.userId;
@@ -11,7 +12,7 @@ export const updatePassword = asyncWrapper(async (req, res) => {
   sendSuccess(res, {
     statusCode: 201,
     message: "Password updated Successfully",
-    data: updatedUser,
+    data: { [model]: _.omit(updatedUser, "passwordHash") || updatedUser },
   });
 });
 export const getCalendarClasses = asyncWrapper(async (req, res) => {
@@ -83,6 +84,6 @@ export const getCalendarClasses = asyncWrapper(async (req, res) => {
   sendSuccess(res, {
     statusCode: 200,
     message: "Classes fetched successfully",
-    data: calendarData,
+    data: { classCalenderData: calendarData },
   });
 });

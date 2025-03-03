@@ -5,6 +5,9 @@ import asyncWrapper from "../../utils/asyncWrapper";
 
 export const getAllUsers = asyncWrapper(async (req, res) => {
   const { page = 1, limit = 10 } = req.query;
+  if (page < 1) throw new BadRequestError("page should be greater than 0");
+  if (limit < 1) throw new BadRequestError("limit should be greater than 0");
+
   const parsedPage = Math.max(1, parseInt(page));
   const parsedLimit = Math.min(100, Math.max(1, parseInt(limit)));
   const skip = (parsedPage - 1) * parsedLimit;
@@ -21,6 +24,6 @@ export const getAllUsers = asyncWrapper(async (req, res) => {
   sendSuccess(res, {
     statusCode: 200,
     message: "Users fetched Successfully",
-    data: users,
+    data: { users },
   });
 });

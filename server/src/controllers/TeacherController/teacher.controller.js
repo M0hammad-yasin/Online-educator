@@ -1,3 +1,5 @@
+import { sendSuccess } from "../../lib/api.response.js";
+import { NotFoundError } from "../../lib/custom.error.js";
 import prisma from "../../Prisma/prisma.client.js";
 import asyncWrapper from "../../utils/asyncWrapper.js";
 import { hashPassword, comparePassword } from "../../utils/bcrypt.js";
@@ -5,12 +7,12 @@ import { generateToken } from "../../utils/jwt.user.js";
 import _ from "lodash";
 // Register Teacher
 export const registerTeacher = asyncWrapper(async (req, res) => {
-  console.log(req.body);
+  // Check if teacher already exists
   let teacher = await prisma.teacher.findUnique({
     where: { email: req.body.email },
   });
   if (teacher) {
-    return res.status(400).json({ error: "Teacher already exists" });
+    throw new BadRequestError("Email is already registered");
   }
   // Hash Password
   const hashedPassword = await hashPassword(req.body.password);
@@ -26,19 +28,20 @@ export const registerTeacher = asyncWrapper(async (req, res) => {
       role: "TEACHER",
     },
   });
-
-  res.status(201).json({ message: "Teacher registered successfully", teacher });
+  sendSuccess(res, {
+    statusCode: 201,
+    message: "Teacher created successfully",
+    data: { teacher: _.omit(teacher, ["passwordHash"]) },
+  });
 });
 
 // Teacher Login
 export const loginTeacher = asyncWrapper(async (req, res) => {
   const { email, password } = req.body;
-  console.log(req.body);
-  console.log(req.body.email);
   // Check if teacher exists
   const teacher = await prisma.teacher.findUnique({ where: { email } });
   if (!teacher) {
-    return res.status(401).json({ error: "Invalid email or password" });
+    throw new NotFoundError("Email is not registered");
   }
 
   // Compare password
@@ -49,25 +52,65 @@ export const loginTeacher = asyncWrapper(async (req, res) => {
 
   // Generate JWT token
   const token = generateToken(teacher);
-
-  res.status(200).json({ message: "Login successful", token });
+  sendSuccess(res, {
+    statusCode: 200,
+    message: "Login successful",
+    data: { token },
+  });
 });
+// Update Teacher Profile
+export const updateTeacher = asyncWrapper(async (req, res) => {
+  const { profilePicture, name, email, qualification, classRate, address } =
+    req.body;
+  const id = String(req.query.id);
+  const check = await prisma.teacher.findUnique({ where: { id } });
+  if (!check) {
+    throw new NotFoundError("teacher not found");
+  }
+  if (email) {
+    const existTeacher = await prisma.teacher.findUnique({ where: { email } });
+    if (existTeacher) {
+      throw new BadRequestError("email is already registered");
+    }
+  }
+  const data = {
+    ...(profilePicture && { profilePicture }),
+    ...(name && { name }),
+    ...(email && { email }),
+    ...(qualification && { qualification }),
+    ...(classRate && { classRate }),
+    ...(address && { address }),
+  };
 
+  if (Object.keys(data).length === 0) {
+    throw new BadRequestError("No data to update");
+  }
+
+  const teacher = await prisma.teacher.update({ where: { id }, data });
+  sendSuccess(res, {
+    statusCode: 200,
+    message: "Teacher updated Successfully",
+    data: { updatedTeacher: _.omit(teacher, ["passwordHash"]) },
+  });
+});
 // Get Teacher Profile
 export const getTeacher = asyncWrapper(async (req, res) => {
   const filter = {};
-  if (req.query.id) {
-    filter.id = req.query.id;
-  } else {
+  if (req.params.id) {
     filter.id = req.params.id;
+  } else {
+    filter.id = req.user.userId;
   }
   const teacher = await prisma.teacher.findUnique({
     where: filter,
   });
 
   if (!teacher) {
-    return res.status(404).json({ error: "Teacher not found" });
+    throw new NotFoundError("Teacher not found");
   }
-
-  res.status(200).json(_(teacher).omit(["passwordHash"]));
+  sendSuccess(res, {
+    statusCode: 200,
+    message: "Teacher found Successfully",
+    data: { teacher: _.omit(teacher, ["passwordHash"]) },
+  });
 });

@@ -1,15 +1,20 @@
-import prisma from "../Prisma/prisma.client.js";
-import asyncWrapper from "../utils/asyncWrapper.js";
-import { hashPassword, comparePassword } from "../utils/bcrypt.js";
-import { generateToken } from "../utils/jwt.user.js";
+import asyncWrapper from "../../utils/asyncWrapper.js";
+import { comparePassword, hashPassword } from "../../utils/bcrypt.js";
+import { generateToken } from "../../utils/jwt.user.js";
+import prisma from "../../Prisma/prisma.client.js";
 import _ from "lodash";
+import { BadRequestError, NotFoundError } from "../../lib/custom.error.js";
+import { sendSuccess } from "../../lib/api.response.js";
 // Register Student
 export const registerStudent = asyncWrapper(async (req, res) => {
-  console.log(req.body);
-
   // Hash Password
-  const hashedPassword = await hashPassword(req.body.passwordHash);
-
+  const hashedPassword = await hashPassword(req.body.password);
+  const existingStudent = await prisma.student.findUnique({
+    where: { email: req.body.email },
+  });
+  if (existingStudent) {
+    throw new BadRequestError("email already registered");
+  }
   const student = await prisma.student.create({
     data: {
       name: req.body.name,
@@ -27,35 +32,72 @@ export const registerStudent = asyncWrapper(async (req, res) => {
 
 // Student Login
 export const loginStudent = asyncWrapper(async (req, res) => {
-  const { email, passwordHash } = req.body;
+  const { email, password } = req.body;
 
   // Check if student exists
   const student = await prisma.student.findUnique({ where: { email } });
   if (!student) {
-    return res.status(401).json({ error: "Invalid email or password" });
+    throw new NotFoundError("email is not registered");
   }
 
   // Compare password
-  const isMatch = await comparePassword(passwordHash, student.passwordHash);
+  const isMatch = await comparePassword(password, student.passwordHash);
   if (!isMatch) {
-    return res.status(401).json({ error: "Invalid email or password" });
+    throw new BadRequestError("Invalid password");
   }
 
   // Generate JWT token
   const token = generateToken(student);
 
-  res.status(200).json({ message: "Login successful", token });
+  sendSuccess(res, {
+    statusCode: 200,
+    message: "Login successful",
+    data: { token },
+  });
 });
 
 // Get Student Profile
 export const getStudent = asyncWrapper(async (req, res) => {
+  const filter = { id: req.params.id ? req.params.id : req.user.userId };
   const student = await prisma.student.findUnique({
-    where: { id: req.user.userId },
+    where: filter,
   });
 
   if (!student) {
-    return res.status(404).json({ error: "Student not found" });
+    throw new NotFoundError("Student not found");
   }
 
-  res.status(200).json(_(student).omit("passwordHash"));
+  sendSuccess(res, {
+    statusCode: 200,
+    message: "Student fetched Successfully",
+    data: { student: _(student).omit(["passwordHash"]) },
+  });
+});
+export const getStudentsForSelection = asyncWrapper(async (req, res) => {
+  const { page = 1, limit = 10 } = req.query;
+  if (page < 1) {
+    throw new BadRequestError("paeg should be greater than 0");
+  }
+  if (limit < 1) {
+    throw new BadRequestError("limit should be greater than 0");
+  }
+  const parsedPage = Math.max(1, parseInt(page));
+  const parsedLimit = Math.min(100, Math.max(1, parseInt(limit)));
+  const skip = (parsedPage - 1) * parsedLimit;
+  const students = await prisma.student.findMany({
+    skip,
+    take: parsedLimit,
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      profilePicture: true,
+      qualification: true,
+    },
+  });
+  sendSuccess(res, {
+    statusCode: 200,
+    message: "Teachers fetched Successfully",
+    data: { students },
+  });
 });

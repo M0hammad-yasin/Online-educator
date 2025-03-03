@@ -1,3 +1,5 @@
+import { AuthorizationError } from "../lib/custom.error";
+
 // Middleware for role-based access
 export const checkRole = (roles) => (req, res, next) => {
   if (!roles.includes(req.user.role)) {
@@ -15,7 +17,7 @@ export const checkClassOwnership = async (req, res, next) => {
   if (!classData) return res.status(404).json({ error: "Class not found" });
 
   if (req.user.role === "TEACHER" && classData.teacherId !== req.user.userId) {
-    return res.status(403).json({ error: "Not authorized" });
+    throw new AuthorizationError("you are not owner of this class");
   }
 
   req.classData = classData;

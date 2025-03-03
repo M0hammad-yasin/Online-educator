@@ -84,7 +84,7 @@ export const createClass = asyncWrapper(async (req, res) => {
   sendSuccess(res, {
     statusCode: 201,
     message: "class created Successfully",
-    data: newClass,
+    data: { class: newClass },
   });
 });
 
@@ -156,24 +156,33 @@ export const updateClass = asyncWrapper(async (req, res) => {
     ...(status && { status }),
     ...(title && { title }),
   };
-  // if (title) updateData.title = title;
-  // if (duration) updateData.duration = duration;
-  // if (studentIdStr) updateData.studentId = studentIdStr;
-  // if (teacherIdStr) updateData.teacherId = teacherIdStr;
-  // if (subject) updateData.subject = subject;
-  // if (scheduledAt) updateData.scheduledAt = new Date(scheduledAt);
-  // if (startTime) updateData.startTime = new Date(startTime);
-  // if (endTime) updateData.endTime = new Date(endTime);
-  // if (status) updateData.status = status;
 
   const updatedClass = await prisma.class.update({
     where: { id },
     data: updateData,
+    include: {
+      teacher: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          profilePicture: true,
+        },
+      },
+      student: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          profilePicture: true,
+        },
+      },
+    },
   });
   sendSuccess(res, {
     statusCode: 201,
     message: "class updated Successfully",
-    data: updatedClass,
+    data: { updatedClass },
   });
 });
 
@@ -185,7 +194,7 @@ export const deleteClass = asyncWrapper(async (req, res) => {
   sendSuccess(res, {
     statusCode: 201,
     message: "class deleted Successfully",
-    data: deletedClass,
+    data: { deletedClass },
   });
 });
 export const getClass = asyncWrapper(async (req, res) => {
@@ -193,22 +202,10 @@ export const getClass = asyncWrapper(async (req, res) => {
   if (!classId) throw new BadRequestError("classId is required");
   const classData = await prisma.class.findUnique({
     where: { classId },
-    select: {
-      id: true,
-      title: true,
-      classId: true,
-      teacherId: true,
-      studentId: true,
-      subject: true,
-      scheduledAt: true,
-      startTime: true,
-      endTime: true,
-      status: true,
-      grade: true,
-      duration: true,
-      classLink: true,
+    include: {
       teacher: {
         select: {
+          id: true,
           name: true,
           email: true,
           profilePicture: true,
@@ -216,6 +213,7 @@ export const getClass = asyncWrapper(async (req, res) => {
       },
       student: {
         select: {
+          id: true,
           name: true,
           email: true,
           profilePicture: true,
@@ -226,7 +224,7 @@ export const getClass = asyncWrapper(async (req, res) => {
   sendSuccess(res, {
     statusCode: 201,
     message: "class fetched Successfully",
-    data: classData,
+    data: { class: classData },
   });
 });
 export const countAllClasses = asyncWrapper(async (req, res) => {
@@ -234,7 +232,7 @@ export const countAllClasses = asyncWrapper(async (req, res) => {
   sendSuccess(res, {
     statusCode: 201,
     message: "class fetched Successfully",
-    data: count,
+    data: { classCount: count },
   });
 });
 export const countClassesByFilter = asyncWrapper(async (req, res) => {
@@ -255,10 +253,14 @@ export const countClassesByFilter = asyncWrapper(async (req, res) => {
   const count = await prisma.class.count({
     where: { ...filter },
   });
+  const metadata = {
+    ...filter,
+  };
   sendSuccess(res, {
     statusCode: 201,
     message: "class fetched Successfully",
-    data: count,
+    data: { classCount: count },
+    metadata,
   });
 });
 export const getGroupedClasses = asyncWrapper(async (req, res) => {
@@ -298,22 +300,10 @@ export const getGroupedClasses = asyncWrapper(async (req, res) => {
       orderBy: {
         [sortBy]: order,
       },
-      select: {
-        id: true,
-        title: true,
-        classId: true,
-        teacherId: true,
-        studentId: true,
-        subject: true,
-        scheduledAt: true,
-        startTime: true,
-        endTime: true,
-        status: true,
-        grade: true,
-        duration: true,
-        classLink: true,
+      include: {
         teacher: {
           select: {
+            id: true,
             name: true,
             email: true,
             profilePicture: true,
@@ -321,8 +311,10 @@ export const getGroupedClasses = asyncWrapper(async (req, res) => {
         },
         student: {
           select: {
+            id: true,
             name: true,
             email: true,
+            grade: true,
             profilePicture: true,
           },
         },
@@ -341,7 +333,7 @@ export const getGroupedClasses = asyncWrapper(async (req, res) => {
   if (groupBy === "grade") {
     groupedData = classes.reduce((acc, cls) => {
       // Use scheduledAt for grouping. We are formatting it but not reducing the original field.
-      const groupKey = cls.grade;
+      const groupKey = cls.student.grade;
       if (!acc[groupKey]) {
         acc[groupKey] = [];
       }
@@ -380,7 +372,7 @@ export const getGroupedClasses = asyncWrapper(async (req, res) => {
   sendSuccess(res, {
     statusCode: 200,
     message: "class fetched successfully",
-    data: groupBy ? groupedData : classes,
+    data: { ...(groupBy ? { groupedClassData: groupedData } : { classes }) },
     metadata,
   });
 });

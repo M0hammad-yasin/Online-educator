@@ -4,7 +4,7 @@ import {
   registerStudent,
   loginStudent,
   getStudent,
-} from "../controllers/student.controller.js";
+} from "../controllers/StudentController/student.controller.js";
 import auth from "../middleware/auth.js";
 import { validateBody } from "../middleware/validate.middleware.js";
 

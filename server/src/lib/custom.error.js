@@ -7,7 +7,7 @@ export class ValidationError extends Error {
 }
 
 export class AuthenticationError extends Error {
-  constructor(message = "Unauthorized") {
+  constructor(message = "unautenticated") {
     super(message);
     this.name = "AuthenticationError";
     this.statusCode = 401;

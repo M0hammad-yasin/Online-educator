@@ -1,4 +1,3 @@
-import { add } from "lodash";
 import { z } from "zod";
 
 // Common Email & Password Validations
@@ -25,6 +24,7 @@ export const userSchema = z.object({
   email: emailSchema,
   password: passwordSchema,
 });
+export const userUpdateSchema = userSchema.partial();
 
 export const loginSchema = z.object({
   email: emailSchema,
@@ -59,7 +59,7 @@ export const studentSchema = z.object({
     .min(3, { message: "Name must be at least 3 characters long" }),
   email: emailSchema,
   parentEmail: emailSchema.optional(),
-  passwordHash: passwordSchema,
+  password: passwordSchema,
   role: z.enum(["STUDENT"], { message: "Role must be 'STUDENT' only" }),
   isEmailVerified: z
     .boolean()
@@ -77,11 +77,8 @@ export const studentUpdateSchema = studentSchema.partial();
 export const adminSchema = z.object({
   name: z.string().min(3),
   email: emailSchema,
-  passwordHash: passwordSchema
-    ._addCheck(
-      (val) => val.length >= 12,
-      "Password must be at least 12 characters long"
-    )
+  password: z
+    .string()
     .regex(
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{12,}$/,
       "Password must contain at least one lowercase letter, one uppercase letter, one digit, and one special character"
@@ -170,7 +167,10 @@ export const classFilterQuerySchema = z.object({
   order: z
     .enum(["asc", "desc"], { message: "order must be 'asc' or 'desc'" })
     .optional(),
-  studentId: mongoIdSchema.optional(),
+  studentId: z
+    .string({ message: "id must be string" })
+    .min(24, { message: "id should be 24 characters" })
+    .optional(),
   groupBy: z
     .enum([
       "teacher",
@@ -186,11 +186,43 @@ export const classFilterQuerySchema = z.object({
     ])
     .optional(),
   status: z
-    .enum(["SCHEDULED", "LIVE", "CANCELLED", "COMPLETED", "IN_PROGRESS"])
+    .enum(
+      [
+        "SCHEDULED",
+        "LIVE",
+        "CANCELLED",
+        "COMPLETED",
+        "IN_PROGRESS",
+        "all-classes",
+      ],
+      {
+        message:
+          "Status must be one of: SCHEDULED, IN_PROGRESS, CANCELLED,COMPLETED, LIVE, all-classes",
+      }
+    )
     .optional(),
-  teacherId: mongoIdSchema.optional(),
-  page: z.number().int().positive().optional(),
-  limit: z.number().int().positive().optional(),
+  teacherId: z
+    .string({ message: "id must be string" })
+    .min(24, { message: "id should be 24 characters" })
+    .optional(),
+  page: z
+    .string()
+    .refine(
+      (val) => {
+        return /^\d+$/.test(val) && parseInt(val, 10) > 1;
+      },
+      { message: "Page number must be a greater than 1" }
+    )
+    .optional(),
+  limit: z
+    .string()
+    .refine(
+      (val) => {
+        return /^\d+$/.test(val) && parseInt(val, 10) > 1;
+      },
+      { message: "Limit must be a greater than 1" }
+    )
+    .optional(),
 });
 export const updateClassSchema = classSchema.partial();
 // ✅ mongoId Validation Schema
@@ -202,11 +234,9 @@ export const mongoIdSchema = z.object({
 
 // ✅ access control Validation Schema
 export const accessControlSchema = z.object({
-  model: z
-    .string({ message: "model is required" })
-    .enum(["teacher", "moderator"], {
-      message: "model should be either 'Teacher' or 'Moderator'",
-    }),
+  model: z.enum(["teacher", "moderator"], {
+    message: "model should be either 'Teacher' or 'Moderator'",
+  }),
   canSeeUser: z.boolean({ message: "canSeeUser is required" }).optional(),
   canAddUser: z.boolean().optional(),
   canDeleteUser: z.boolean().optional(),

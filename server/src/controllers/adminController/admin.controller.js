@@ -1,11 +1,12 @@
 //create admin crud operation
 import { comparePassword, hashPassword } from "../../utils/bcrypt.js";
 import prisma from "../../Prisma/prisma.client.js";
-import { BadRequestError } from "../../lib/custom.error";
-import { sendSuccess } from "../../lib/api.response";
+import { BadRequestError } from "../../lib/custom.error.js";
+import { sendSuccess } from "../../lib/api.response.js";
 import { generateToken } from "../../utils/jwt.user.js";
+import asyncWrapper from "../../utils/asyncWrapper.js";
 export const createAdmin = asyncWrapper(async (req, res) => {
-  const hashedPassword = await hashPassword(req.body.passwordHash);
+  const hashedPassword = await hashPassword(req.body.password);
   const data = {
     name: req.body?.name,
     email: req.body?.email,
@@ -31,7 +32,7 @@ export const createAdmin = asyncWrapper(async (req, res) => {
   sendSuccess(res, {
     statusCode: 201,
     message: "Admin created Successfully",
-    data: admin,
+    data: { admin },
   });
 });
 
@@ -49,7 +50,7 @@ export const getAdmin = asyncWrapper(async (req, res) => {
   sendSuccess(res, {
     statusCode: 201,
     message: "Admin fetched Successfully",
-    data: admin,
+    data: { admin },
   });
 });
 export const updateAdmin = asyncWrapper(async (req, res) => {
@@ -66,11 +67,18 @@ export const updateAdmin = asyncWrapper(async (req, res) => {
   const admin = await prisma.admin.update({
     where: { id: req.user.userId },
     data,
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      profilePicture: true,
+      isEmailVerified: true,
+    },
   });
   sendSuccess(res, {
     statusCode: 201,
     message: "Admin updated Successfully",
-    data: admin,
+    data: { updatedAdmin: admin },
   });
 });
 export const updatePassword = asyncWrapper(async (req, res) => {
@@ -80,11 +88,18 @@ export const updatePassword = asyncWrapper(async (req, res) => {
     data: {
       passwordHash: hashedPassword,
     },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      profilePicture: true,
+      isEmailVerified: true,
+    },
   });
   sendSuccess(res, {
     statusCode: 201,
     message: "Password updated Successfully",
-    data: admin,
+    data: { updatedAdmin: admin },
   });
 });
 export const loginAdmin = asyncWrapper(async (req, res) => {
@@ -105,6 +120,6 @@ export const loginAdmin = asyncWrapper(async (req, res) => {
   sendSuccess(res, {
     statusCode: 201,
     message: "Admin logged in Successfully",
-    data: token,
+    data: { token },
   });
 });

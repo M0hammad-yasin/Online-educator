@@ -1,7 +1,7 @@
-import { sendSuccess } from "../../lib/api.response";
-import { BadRequestError } from "../../lib/custom.error";
-import prisma from "../../Prisma/prisma.client";
-import asyncWrapper from "../../utils/asyncWrapper";
+import { sendSuccess } from "../../lib/api.response.js";
+import { BadRequestError } from "../../lib/custom.error.js";
+import prisma from "../../Prisma/prisma.client.js";
+import asyncWrapper from "../../utils/asyncWrapper.js";
 
 export const updateStudentByAdmin = asyncWrapper(async (req, res) => {
   const { profilePicture, name, email, parentEmail, grade, address, region } =

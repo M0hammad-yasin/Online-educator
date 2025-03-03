@@ -1,13 +1,13 @@
-import { sendSuccess } from "../../lib/api.response";
-import { BadRequestError } from "../../lib/custom.error";
-import prisma from "../../Prisma/prisma.client";
-import { ObjectId } from "mongodb";
-import asyncWrapper from "../../utils/asyncWrapper";
+import _ from "lodash";
+import { sendSuccess } from "../../lib/api.response.js";
+import { BadRequestError } from "../../lib/custom.error.js";
+import prisma from "../../Prisma/prisma.client.js";
+import asyncWrapper from "../../utils/asyncWrapper.js";
 
 export const updateTeacherByAdmin = asyncWrapper(async (req, res) => {
   const { profilePicture, name, email, qualification, classRate, address } =
     req.body;
-  const id = ObjectId(String(req.query.id));
+  const id = String(req.query.id);
   const check = await prisma.teacher.findUnique({ where: { id } });
   if (!check) {
     throw new BadRequestError("teacher not found");
@@ -30,16 +30,16 @@ export const updateTeacherByAdmin = asyncWrapper(async (req, res) => {
   if (Object.keys(data).length === 0) {
     throw new BadRequestError("No data to update");
   }
-  const teacher = await prisma.teacher.update({ where: { id }, data });
+  const updatedTeacher = await prisma.teacher.update({ where: { id }, data });
   sendSuccess(res, {
     statusCode: 200,
     message: "teacher updated Successfully",
-    data: teacher,
+    data: { updatedTeacher: _.omit(updatedTeacher, ["passwordHash"]) },
   });
 });
 
 export const deleteTeacherByAdmin = asyncWrapper(async (req, res) => {
-  const id = new ObjectId(String(req.query.id));
+  const id = String(req.query.id);
   const teacher = await prisma.teacher.findUnique({ where: { id } });
   if (!teacher) {
     throw new BadRequestError("teacher not found");
@@ -50,11 +50,23 @@ export const deleteTeacherByAdmin = asyncWrapper(async (req, res) => {
   sendSuccess(res, {
     statusCode: 201,
     message: "teacher deleted Successfully",
-    data: deletedTeacher,
+    data: { deletedTeacher: _.omit(deletedTeacher, ["passwordHash"]) },
   });
 });
 export const getTeachersForSelection = asyncWrapper(async (req, res) => {
+  const { page = 1, limit = 10 } = req.query;
+  if (page < 1) {
+    throw new BadRequestError("paeg should be greater than 0");
+  }
+  if (limit < 1) {
+    throw new BadRequestError("limit should be greater than 0");
+  }
+  const parsedPage = Math.max(1, parseInt(page));
+  const parsedLimit = Math.min(100, Math.max(1, parseInt(limit)));
+  const skip = (parsedPage - 1) * parsedLimit;
   const teachers = await prisma.teacher.findMany({
+    skip,
+    take: parsedLimit,
     select: {
       id: true,
       name: true,
@@ -63,5 +75,9 @@ export const getTeachersForSelection = asyncWrapper(async (req, res) => {
       qualification: true,
     },
   });
-  res.status(200).json(teachers);
+  sendSuccess(res, {
+    statusCode: 200,
+    message: "Teachers fetched Successfully",
+    data: { teachers },
+  });
 });

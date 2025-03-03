@@ -6,9 +6,7 @@ import { verifyToken } from "../utils/jwt.user.js";
 
 const auth = (req, res, next) => {
   const token = req.header("Authorization");
-  if (!token)
-    return res.status(401).json({ error: "Access denied. No token provided." });
-
+  if (!token) throw new AuthenticationError("No token provided");
   try {
     const decoded = verifyToken(token);
     req.user = decoded;

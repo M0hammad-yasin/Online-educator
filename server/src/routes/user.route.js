@@ -4,7 +4,7 @@ import {
   createUser,
   getUser,
   loginUser,
-} from "../controllers/user.controller.js";
+} from "../controllers/UserController/user.controller.js";
 import { validateBody } from "../middleware/validate.middleware.js";
 import { userSchema, loginSchema, emailSchema } from "../utils/validate.js";
 import auth from "../middleware/auth.js";

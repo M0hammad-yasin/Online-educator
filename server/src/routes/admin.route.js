@@ -51,6 +51,8 @@ import {
   countClassesByFilter,
 } from "../controllers/adminController/class.admin.controller.js";
 import { getCalendarClasses } from "../controllers/common.controller.js";
+import { getClassesGroupedCount } from "../controllers/classController/class.controller.js";
+import { isAdmin } from "../middleware/roleCheck.js";
 
 const router = express.Router();
 
@@ -157,6 +159,13 @@ router.get(
   validateQuery(classFilterQuerySchema),
   auth,
   countClassesByFilter
+);
+router.get(
+  "/class-count-by-group",
+  validateQuery(classFilterQuerySchema),
+  auth,
+  isAdmin,
+  getClassesGroupedCount
 );
 
 export default router;
