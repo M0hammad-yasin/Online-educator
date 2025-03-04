@@ -54,9 +54,9 @@ export const deleteTeacherByAdmin = asyncWrapper(async (req, res) => {
   });
 });
 export const getTeachersForSelection = asyncWrapper(async (req, res) => {
-  const { page = 1, limit = 10 } = req.query;
+  const { page = 1, limit = 10, searchName = "" } = req.query;
   if (page < 1) {
-    throw new BadRequestError("paeg should be greater than 0");
+    throw new BadRequestError("page should be greater than 0");
   }
   if (limit < 1) {
     throw new BadRequestError("limit should be greater than 0");
@@ -64,7 +64,14 @@ export const getTeachersForSelection = asyncWrapper(async (req, res) => {
   const parsedPage = Math.max(1, parseInt(page));
   const parsedLimit = Math.min(100, Math.max(1, parseInt(limit)));
   const skip = (parsedPage - 1) * parsedLimit;
+
   const teachers = await prisma.teacher.findMany({
+    where: {
+      name: {
+        contains: searchName,
+        mode: "insensitive", // Case-insensitive search
+      },
+    },
     skip,
     take: parsedLimit,
     select: {
@@ -75,6 +82,7 @@ export const getTeachersForSelection = asyncWrapper(async (req, res) => {
       qualification: true,
     },
   });
+
   sendSuccess(res, {
     statusCode: 200,
     message: "Teachers fetched Successfully",

@@ -62,7 +62,7 @@ export const loginTeacher = asyncWrapper(async (req, res) => {
 export const updateTeacher = asyncWrapper(async (req, res) => {
   const { profilePicture, name, email, qualification, classRate, address } =
     req.body;
-  const id = String(req.query.id);
+  const id = req.user.userId;
   const check = await prisma.teacher.findUnique({ where: { id } });
   if (!check) {
     throw new NotFoundError("teacher not found");

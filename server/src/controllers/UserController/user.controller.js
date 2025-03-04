@@ -47,7 +47,53 @@ const createUser = asyncWrapper(async (req, res) => {
     data: { user },
   });
 });
-
+const updateUser = asyncWrapper(async (req, res) => {
+  if (!existingUser) throw new NotFoundError("User not found");
+  if (req.body?.email) {
+    const existingEmailUser = await prisma.user.findUnique({
+      where: {
+        email: req.body.email,
+      },
+    });
+    if (existingEmailUser)
+      throw new BadRequestError("email is already registered");
+  }
+  const data = {
+    ...(req.body.name && { name: req.body.name }),
+    ...(req.body.email && { email: req.body.email }),
+  };
+  const updatedUser = await prisma.user.update({
+    where: { id: req.user.userId },
+    data,
+  });
+  sendSuccess(res, {
+    statusCode: 200,
+    message: "User updated successfully",
+    data: { user: _.omit(updatedUser, ["passwordHash"]) },
+  });
+});
+const deleteUser = asyncWrapper(async (req, res) => {
+  const check = await prisma.user.findUnique({
+    where: {
+      id: req.query.id,
+    },
+  });
+  if (!check) throw new NotFoundError("User not found");
+  const existingUser = await prisma.user.findUnique({
+    where: {
+      id: req.query.id,
+    },
+  });
+  if (!existingUser) throw new NotFoundError("User not found");
+  const user = await prisma.user.delete({
+    where: { id: req.params.id },
+  });
+  sendSuccess(res, {
+    statusCode: 200,
+    message: "User deleted successfully",
+    data: user,
+  });
+});
 const getUser = asyncWrapper(async (req, res) => {
   const filter = { id: req.params.id ? req.params.id : req.user.userId };
   const user = await prisma.user.findUnique({

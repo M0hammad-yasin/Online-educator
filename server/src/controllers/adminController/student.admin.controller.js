@@ -2,7 +2,7 @@ import { sendSuccess } from "../../lib/api.response.js";
 import { BadRequestError } from "../../lib/custom.error.js";
 import prisma from "../../Prisma/prisma.client.js";
 import asyncWrapper from "../../utils/asyncWrapper.js";
-
+import _ from "lodash";
 export const updateStudentByAdmin = asyncWrapper(async (req, res) => {
   const { profilePicture, name, email, parentEmail, grade, address, region } =
     req.body;
@@ -46,14 +46,14 @@ export const deleteStudentByAdmin = asyncWrapper(async (req, res) => {
   const { id } = req.query;
   const student = await prisma.student.findUnique({ where: { id } });
   if (!student) {
-    throw new BadRequestError("teacher not found");
+    throw new BadRequestError("student not found");
   }
   const delStudent = await prisma.student.delete({
     where: { id },
   });
   sendSuccess(res, {
     statusCode: 201,
-    message: "teacher deleted Successfully",
-    data: { ...delStudent },
+    message: "student deleted Successfully",
+    data: { delStudent: _.omit(delStudent, ["passwordHash"]) },
   });
 });

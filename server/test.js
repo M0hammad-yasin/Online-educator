@@ -1,13 +1,8 @@
-const req = {
-  body: {
-    name: "test",
-    // email: "test",
-    profilePicture: "test",
-    isEmailVerified: true,
-  },
+const hasRole = (roles) => {
+  if (!Array.isArray(roles)) {
+    roles = [roles];
+  }
+
+  if (roles.includes("MODERATOR")) console.log("yes you");
 };
-const number = 345678;
-console.log(typeof number.toString());
-const data = String(number);
-console.log(typeof number);
-console.log(typeof data);
+hasRole("MODERATOR");
