@@ -46,3 +46,24 @@ export const validateQuery = (schema) => (req, res, next) => {
     next(error); // Pass other errors to Express error handler
   }
 };
+export const validate = (schema, dataExtractor) => (req, res, next) => {
+  try {
+    const data = dataExtractor(req);
+    schema.parse(data);
+    next();
+  } catch (error) {
+    if (error instanceof ZodError) {
+      const formattedErrors = error.errors.map((err) => ({
+        field: err.path.join("."), // Join path for nested fields
+        message: err.message,
+      }));
+
+      sendError(res, {
+        statusCode: 400,
+        message: formattedErrors,
+      });
+    } else {
+      next(error); // Pass other errors to Express error handler
+    }
+  }
+};

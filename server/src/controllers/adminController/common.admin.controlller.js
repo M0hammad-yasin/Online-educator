@@ -22,8 +22,8 @@ export const modifyAccess = asyncWrapper(async (req, res) => {
     canDeleteClass,
     canUpdateClass,
     model,
-  } = req.body;
-  const id = req.query.id;
+  } = req.query;
+  const id = req.params.id;
   const user = await prisma[model].findUnique({ where: { id } });
   if (!user) {
     throw new BadRequestError(`${model} not found`);
@@ -70,6 +70,7 @@ export const getUsersWithClasses = asyncWrapper(async (req, res) => {
     status = "all-classes",
     limit = 11,
   } = req.query;
+
   if (!["teacher", "student"].includes(user)) {
     throw new BadRequestError(
       "Invalid user type. Must be 'teacher' or 'student'."

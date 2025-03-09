@@ -7,7 +7,10 @@ import {
 } from "../controllers/UserController/user.controller.js";
 import { hasRole } from "../middleware/roleCheck.js";
 import { validateBody } from "../middleware/validate.middleware.js";
-import { userSchema, loginSchema, mongoIdSchema } from "../utils/validate.js";
+import { userSchema } from "../validation/user.validate.js";
+import { mongoIdSchema } from "../validation/mongoId.validate.js";
+import { loginSchema } from "../validation/login.validate.js";
+
 import auth from "../middleware/auth.js";
 const router = express.Router();
 

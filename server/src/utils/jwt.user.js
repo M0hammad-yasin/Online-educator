@@ -4,8 +4,8 @@ import config from "../config/config.js";
 export const generateToken = (user) => {
   return jwt.sign(
     { userId: user.id, email: user.email, role: user.role },
-    process.env.JWT_SECRET,
-    { expiresIn: "1h" }
+    config.jwtSecret,
+    { expiresIn: config.jwtSecretExpiry }
   );
 };
 

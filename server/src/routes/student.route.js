@@ -1,5 +1,6 @@
 import express from "express";
-import { studentSchema, loginSchema } from "../utils/validate.js";
+import { loginSchema } from "../validation/login.validate.js";
+import { studentSchema } from "../validation/student.validate.js";
 import {
   registerStudent,
   loginStudent,

@@ -5,7 +5,7 @@ import {
 import { verifyToken } from "../utils/jwt.user.js";
 
 const auth = (req, res, next) => {
-  const token = req.header("Authorization");
+  const token = req.cookies?.token || req.header("Authorization");
   if (!token) throw new AuthenticationError("No token provided");
   try {
     const decoded = verifyToken(token);

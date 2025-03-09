@@ -2,6 +2,7 @@ import { format } from "date-fns";
 import { sendSuccess } from "../../lib/api.response.js";
 import prisma from "../../Prisma/prisma.client.js";
 import asyncWrapper from "../../utils/asyncWrapper.js";
+import { AuthorizationError } from "../../lib/custom.error.js";
 
 export const getClassesGroupedCount = asyncWrapper(async (req, res) => {
   // Extract pagination parameters (defaults: page 1, 10 items per page)

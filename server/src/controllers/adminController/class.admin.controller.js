@@ -9,7 +9,6 @@ import { generateClassId, getDuration } from "../Helper/class.helper.js";
 import checkClassConflicts from "../Helper/checkConfliction.js";
 import { sendSuccess } from "../../lib/api.response.js";
 import prisma from "../../Prisma/prisma.client.js";
-import e from "express";
 // Create class (to be used with different middlewares)
 export const createClass = asyncWrapper(async (req, res) => {
   let {
@@ -62,25 +61,6 @@ export const createClass = asyncWrapper(async (req, res) => {
       duration,
     },
   });
-
-  //   export const sendSuccess = (res, options = {}) => {
-  //     const {
-  //       statusCode = 200,
-  //       message = "Operation successful",
-  //       data = null,
-  //       metadata = null,
-  //     } = options;
-
-  //     const response = {
-  //       status: "success",
-  //       message,
-  //     };
-
-  //     if (data) response.data = data;
-  //     if (metadata) response.metadata = metadata;
-
-  //     return res.status(statusCode).json(response);
-  //   };
   sendSuccess(res, {
     statusCode: 201,
     message: "class created Successfully",
@@ -101,7 +81,7 @@ export const updateClass = asyncWrapper(async (req, res) => {
     status,
     title,
   } = req.body;
-  const { id } = req.query;
+  const { id } = req.params;
   // Find the class
   const classData = await prisma.class.findUnique({
     where: { id },
@@ -187,7 +167,7 @@ export const updateClass = asyncWrapper(async (req, res) => {
 });
 
 export const deleteClass = asyncWrapper(async (req, res) => {
-  const { id } = req.query;
+  const { id } = req.params;
   const deletedClass = await prisma.class.delete({
     where: { id },
   });
@@ -227,42 +207,41 @@ export const getClass = asyncWrapper(async (req, res) => {
     data: { class: classData },
   });
 });
-export const countAllClasses = asyncWrapper(async (req, res) => {
-  const count = await prisma.class.count();
-  sendSuccess(res, {
-    statusCode: 201,
-    message: "class fetched Successfully",
-    data: { classCount: count },
-  });
-});
-export const countClassesByFilter = asyncWrapper(async (req, res) => {
+
+// ----------------- COUNT ALL,FILTERED,PAGINATED CLASSES --------------
+// ----------------- ONLY FOR ADMIN AND MODERATOR --------------
+export const countClasses = asyncWrapper(async (req, res) => {
   const { teacherId, studentId, subject, status, startDate, endDate } =
     req.query;
 
   const filter = {};
+
   if (startDate || endDate) {
-    filter.startDate.gte = new Date(startDate);
-    filter.startDate.lte = new Date(endDate);
+    filter.startDate = {};
+    if (startDate) filter.startDate.gte = new Date(startDate);
+    if (endDate) filter.startDate.lte = new Date(endDate);
   }
-  filter = {
+
+  // Other filters
+  Object.assign(filter, {
     ...(teacherId && { teacherId }),
     ...(studentId && { studentId }),
     ...(subject && { subject }),
     ...(status && { status }),
-  };
-  const count = await prisma.class.count({
-    where: { ...filter },
   });
-  const metadata = {
-    ...filter,
-  };
+
+  const count = await prisma.class.count({ where: filter });
+  if (!count) throw new NotFoundError("No class Founded");
   sendSuccess(res, {
-    statusCode: 201,
-    message: "class fetched Successfully",
+    statusCode: 200,
+    message: "Class count fetched successfully",
     data: { classCount: count },
-    metadata,
+    metadata: { filters: { ...req.query } },
   });
 });
+
+// ----------------- GET ALL,FILTERED,GROUPED CLASSES --------------
+// ----------------- ONLY FOR ADMIN AND MODERATOR --------------
 export const getGroupedClasses = asyncWrapper(async (req, res) => {
   // Extract pagination parameters (defaults: page 1, 10 items per page)
   const {

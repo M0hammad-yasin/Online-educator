@@ -58,7 +58,7 @@ export const loginStudent = asyncWrapper(async (req, res) => {
 
 // Get Student Profile
 export const getStudent = asyncWrapper(async (req, res) => {
-  const filter = { id: req.params.id ? req.params.id : req.user.userId };
+  const filter = { id: req.user.userId };
   const student = await prisma.student.findUnique({
     where: filter,
   });

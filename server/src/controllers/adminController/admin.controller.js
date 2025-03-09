@@ -5,6 +5,7 @@ import { BadRequestError } from "../../lib/custom.error.js";
 import { sendSuccess } from "../../lib/api.response.js";
 import { generateToken } from "../../utils/jwt.user.js";
 import asyncWrapper from "../../utils/asyncWrapper.js";
+import config from "../../config/config.js";
 export const createAdmin = asyncWrapper(async (req, res) => {
   const hashedPassword = await hashPassword(req.body.password);
   const data = {
@@ -117,9 +118,39 @@ export const loginAdmin = asyncWrapper(async (req, res) => {
     throw new BadRequestError("invalidpassword");
   }
   const token = generateToken(admin);
+  res.cookie("token", token, {
+    httpOnly: true,
+    secure: config.isProduction, // Use secure in production
+    sameSite: "strict",
+    maxAge: config.jwtSecretExpiry, // 1 hour in milliseconds (match JWT expiry)
+  });
   sendSuccess(res, {
     statusCode: 201,
     message: "Admin logged in Successfully",
     data: { token },
   });
+});
+export const verifyEmail = asyncWrapper(async (req, res) => {
+  const admin = await prisma.admin.update({
+    where: { id: req.user.userId },
+    data: {
+      isEmailVerified: true,
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      profilePicture: true,
+      isEmailVerified: true,
+    },
+  });
+  sendSuccess(res, {
+    statusCode: 201,
+    message: "Email verified Successfully",
+    data: { admin },
+  });
+});
+export const logOutAdmin = asyncWrapper(async (req, res) => {
+  res.clearCookie("token");
+  res.status(200).json({ message: "Logged out successfully" });
 });

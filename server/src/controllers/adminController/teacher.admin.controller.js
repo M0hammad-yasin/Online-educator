@@ -64,14 +64,11 @@ export const getTeachersForSelection = asyncWrapper(async (req, res) => {
   const parsedPage = Math.max(1, parseInt(page));
   const parsedLimit = Math.min(100, Math.max(1, parseInt(limit)));
   const skip = (parsedPage - 1) * parsedLimit;
-
+  const filter = {
+    ...(searchName && { name: { contains: searchName, mode: "insensitive" } }),
+  };
   const teachers = await prisma.teacher.findMany({
-    where: {
-      name: {
-        contains: searchName,
-        mode: "insensitive", // Case-insensitive search
-      },
-    },
+    where: filter,
     skip,
     take: parsedLimit,
     select: {
@@ -89,3 +86,4 @@ export const getTeachersForSelection = asyncWrapper(async (req, res) => {
     data: { teachers },
   });
 });
+//
