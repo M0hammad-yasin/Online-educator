@@ -5,7 +5,7 @@ export const sendSuccess = (res, options = {}) => {
     statusCode = 200,
     message = "Operation successful",
     data = null,
-    metadata = null,
+    metaData = null,
   } = options;
 
   const response = {
@@ -14,7 +14,7 @@ export const sendSuccess = (res, options = {}) => {
   };
 
   if (data) response.data = data;
-  if (metadata) response.metadata = metadata;
+  if (metaData) response.metaData = metaData;
 
   return res.status(statusCode).json(response);
 };

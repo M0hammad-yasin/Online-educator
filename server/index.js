@@ -1,6 +1,6 @@
 //convert from commonjs to module
 import { app } from "./src/app.js";
-import config from "./src/config/config.js";
+import config from "./src/Config/config.js";
 
 import prisma from "./src/Prisma/prisma.client.js";
 // const port = 3000;

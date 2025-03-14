@@ -2,64 +2,90 @@ import express from "express";
 import {
   teacherSchema,
   teacherUpdateSchema,
-} from "../validation/teacher.validate.js";
-import { accessControlSchema } from "../validation/access.validate.js";
-import { mongoIdSchema } from "../validation/mongoId.validate.js";
-import { teacherUpdateSchema } from "../validation/mongoId.validate.js";
-import { loginSchema } from "../validation/login.validate.js";
-import { classFilterQuerySchema } from "../validation/class.validate.js";
+} from "../Validation/teacher.validate.js";
+import { accessControlSchema } from "../Validation/access.validate.js";
+import { mongoIdSchema } from "../Validation/mongoId.validate.js";
+import { loginSchema } from "../Validation/login.validate.js";
+import { classFilterQuerySchema } from "../Validation/class.validate.js";
 
 import {
   registerTeacher,
   loginTeacher,
   getTeacher,
+  getAllTeacher,
   updateTeacher,
+  logoutTeacher,
+  getTeacherClassCountForDay,
+  getTeachersForSelection,
 } from "../controllers/TeacherController/teacher.controller.js";
-import auth from "../middleware/auth.js";
+import auth from "../Middleware/auth.js";
 import {
   validate,
   validateBody,
   validateQuery,
-} from "../middleware/validate.middleware.js";
+} from "../Middleware/validate.middleware.js";
+import paginationSchema from "../Validation/pagination.validate.js";
 import {
   getUsersWithClasses as teachersWithClasses,
   modifyAccess,
 } from "../controllers/adminController/common.admin.controlller.js";
-import { hasRole, isAdmin } from "../middleware/roleCheck.js";
-import { getClassesGroupedCount } from "../controllers/classController/class.controller.js";
-import roleBasedController from "../utils/roleBasedController.js";
+import roleBasedController from "../Utils/roleBasedController.js";
 import {
   deleteTeacherByAdmin,
   updateTeacherByAdmin,
 } from "../controllers/adminController/teacher.admin.controller.js";
+import { isAdmin, hasRole } from "../middleware/roleCheck.js";
+import { Role } from "../constant.js";
 
 const router = express.Router();
-
-router.post(
-  "/register",
-  validateBody(teacherSchema),
+router.get(
+  "/",
   auth,
-  roleBasedController(["ADMIN", "MODERATOR"], registerTeacher)
+  validate(paginationSchema, (req) => req.query),
+  hasRole([Role.ADMIN, Role.MODERATOR]),
+  getAllTeacher
 );
+router.post(
+  "/select",
+  validate(paginationSchema, (req) => req.query),
+  auth,
+  hasRole(["ADMIN", "MODERATOR"], getTeachersForSelection)
+);
+router.post(
+  "/class-day-count",
+  validate(paginationSchema, (req) => req.query),
+  auth,
+  hasRole(["ADMIN", "MODERATOR"], getTeacherClassCountForDay)
+);
+
+// router.post(
+//   "/register",
+//   validateBody(teacherSchema),
+//   auth,
+//   roleBasedController(["ADMIN", "MODERATOR"], registerTeacher)
+// );
+
 router.post("/register", validateBody(teacherSchema), registerTeacher);
 router.post("/login", validateBody(loginSchema), loginTeacher);
+router.post("/logout", auth, logoutTeacher);
+
 router.get("/me", auth, getTeacher);
 
 router.get(
-  "/class",
+  "/classes",
   validateQuery(classFilterQuerySchema),
   auth,
   hasRole(["ADMIN", "MODERATOR"]),
   teachersWithClasses
 );
+
 router.get(
-  "/class-count-by-group",
-  validateQuery(classFilterQuerySchema),
+  "/:id",
+  validate(mongoIdSchema, (req) => req.params),
   auth,
-  hasRole(["ADMIN", "MODERATOR", "TEACHER", "STUDENT"]),
-  getClassesGroupedCount
+  hasRole(["ADMIN", "MODERATOR"]),
+  getTeacher
 );
-router.get("/:id", auth, hasRole(["ADMIN", "MODERATOR"]), getTeacher);
 router.put(
   "/:id/access-control",
   validate(mongoIdSchema, (req) => req.params),
@@ -84,7 +110,7 @@ router.put(
 );
 router.delete(
   "/:id",
-  validateQuery(mongoIdSchema),
+  validate(mongoIdSchema, (req) => req.params),
   validateBody(mongoIdSchema),
   auth,
   hasRole(["ADMIN", "MODERATOR"]),

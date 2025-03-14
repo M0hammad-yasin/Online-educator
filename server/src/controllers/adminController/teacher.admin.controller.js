@@ -1,8 +1,8 @@
 import _ from "lodash";
-import { sendSuccess } from "../../lib/api.response.js";
-import { BadRequestError } from "../../lib/custom.error.js";
+import { sendSuccess } from "../../Lib/api.response.js";
+import { BadRequestError } from "../../Lib/custom.error.js";
 import prisma from "../../Prisma/prisma.client.js";
-import asyncWrapper from "../../utils/asyncWrapper.js";
+import asyncWrapper from "../../Utils/asyncWrapper.js";
 
 export const updateTeacherByAdmin = asyncWrapper(async (req, res) => {
   const { profilePicture, name, email, qualification, classRate, address } =
@@ -79,11 +79,18 @@ export const getTeachersForSelection = asyncWrapper(async (req, res) => {
       qualification: true,
     },
   });
-
+  const paginationData = {
+    page,
+    totalTeacher: limit,
+  };
   sendSuccess(res, {
     statusCode: 200,
     message: "Teachers fetched Successfully",
     data: { teachers },
+    metaData: {
+      filter: req.query,
+      paginationData,
+    },
   });
 });
 //

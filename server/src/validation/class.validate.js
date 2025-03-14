@@ -50,7 +50,7 @@ export const classSchema = z.object({
   ),
 
   // Status must be one of the allowed uppercase values
-  status: z
+  classStatus: z
     .enum(["SCHEDULED", "LIVE", "CANCELLED", "COMPLETED", "IN_PROGRESS"], {
       message:
         "Status must be one of: SCHEDULED, IN_PROGRESS, CANCELLED,COMPLETED",
@@ -65,12 +65,11 @@ export const classFilterQuerySchema = z.object({
     .enum([
       "teacher",
       "student",
-      "status",
+      "classStatus",
       "subject",
       "startTime",
       "day",
       "hour",
-      "status",
       "month",
       "grade",
     ])
@@ -96,7 +95,7 @@ export const classFilterQuerySchema = z.object({
       "grade",
     ])
     .optional(),
-  status: z
+  classStatus: z
     .enum(
       [
         "SCHEDULED",

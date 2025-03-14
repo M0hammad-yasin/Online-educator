@@ -1,144 +1,204 @@
-import { format } from "date-fns";
-import { sendSuccess } from "../../lib/api.response.js";
-import prisma from "../../Prisma/prisma.client.js";
-import asyncWrapper from "../../utils/asyncWrapper.js";
-import { AuthorizationError } from "../../lib/custom.error.js";
+import _ from "lodash";
+import { sendSuccess } from "../../Lib/api.response.js";
+import asyncWrapper from "../../Utils/asyncWrapper.js";
+import { classService, classUtil } from "../../Services/class.services.js";
+import { Role } from "../../constant.js";
 
-export const getClassesGroupedCount = asyncWrapper(async (req, res) => {
-  // Extract pagination parameters (defaults: page 1, 10 items per page)
-  const {
-    startDate,
-    endDate,
-    sortBy = "startTime",
-    order = "asc",
-    page = 1,
-    status,
-    groupBy,
-    limit = 10,
-  } = req.query;
-  let teacherId = null,
-    studentId = null;
-  if (req.user.role === "ADMIN" || req.user.role === "MODERATOR") {
-    studentId = teacherId = null;
-  } else if (req.user.role === "TEACHER") {
-    teacherId = req.user.userId;
-    studentId = null;
-  } else if (req.user.role === "STUDENT") {
-    studentId = req.user.userId;
-    teacherId = null;
+export const createClass = asyncWrapper(async (req, res) => {
+  const scheduledAt = new Date(req.body.scheduledAt);
+  if (!req.body.startTime) {
+    req.body.startTime = new Date(scheduledAt);
   }
-  const parsedPage = Math.max(1, parseInt(page));
-  const parsedLimit = Math.min(100, Math.max(1, parseInt(limit)));
-  const skip = (parsedPage - 1) * parsedLimit;
-  // Build the class filter from query if provided.
-  // We assume the client sends a JSON string in ?filter=
-  const classFilter = {
-    ...(teacherId && { teacherId }),
-    ...(studentId && { studentId }),
-  };
-  if (startDate || endDate) {
-    classFilter.startTime = {
-      gte: new Date(startDate),
-      lte: new Date(endDate),
-    };
+  if (!req.body.endTime) {
+    req.body.endTime = new Date(
+      scheduledAt.getTime() + req.body.duration * 60000
+    );
   }
-  if (status) {
-    classFilter.status = status;
-  }
-
-  const [classes, totalClasses] = await Promise.all([
-    prisma.class.findMany({
-      where: classFilter,
-      skip,
-      take: parsedLimit,
-      orderBy: {
-        [sortBy]: order,
+  const { newClass } = await classService.createClass(req.body);
+  sendSuccess(res, {
+    statusCode: 201,
+    message: "Class created successfully",
+    data: {
+      class: {
+        ...newClass,
+        duration: classUtil.formatDuration(newClass.duration),
       },
-      select: {
-        id: true,
-        scheduledAt: true,
-        student: {
-          select: {
-            id: true,
+    },
+  });
+});
 
-            grade: true,
-          },
-        },
-      },
-    }),
-    prisma.class.count({
-      where: classFilter,
-    }),
-  ]);
-  if (!classes) {
-    throw new NotFoundError("No classes found");
-  }
-  //grouping
-  let groupedDataCount = null;
-  function gradeToOrdinal(n) {
-    const j = n % 10,
-      k = n % 100;
-    if (j === 1 && k !== 11) {
-      return n + "st";
-    }
-    if (j === 2 && k !== 12) {
-      return n + "nd";
-    }
-    if (j === 3 && k !== 13) {
-      return n + "rd";
-    }
-    return n + "th";
-  }
-  if (groupBy) groupedDataCount = classes;
-  if (groupBy === "grade") {
-    // Group classes by grade and count them
-    groupedDataCount = classes.reduce((acc, cls) => {
-      const grade = gradeToOrdinal(cls.student.grade);
-
-      if (!acc[grade]) {
-        acc[grade] = [{ classCount: 0 }];
-      }
-
-      acc[grade][0].classCount++;
-      return acc;
-    }, {});
-  } else if (groupBy) {
-    const groupKeyFormat =
-      groupBy.toLowerCase() === "day"
-        ? "yyyy-MM-dd"
-        : groupBy.toLowerCase() === "hour"
-        ? "yyyy-MM-dd HH:00"
-        : "yyyy-MM"; // for "month"
-
-    groupedDataCount = classes.reduce((acc, cls) => {
-      // Use scheduledAt for grouping. We are formatting it but not reducing the original field.
-      const groupKey = format(new Date(cls.scheduledAt), groupKeyFormat);
-      if (!acc[groupKey]) {
-        acc[groupKey] = [{ classCount: 0 }];
-      }
-      acc[groupKey][0].classCount++;
-      return acc;
-    }, {});
-  }
-
-  const from = skip + 1;
-  const to = Math.min(skip + classes.length, totalClasses);
-
-  const metadata = {
-    total: classes.length,
-    range: `${from} to ${to} of ${totalClasses}`,
-    currentPage: page,
-    pageSize: limit,
-    ...(groupBy && { groupBy }),
+export const updateClass = asyncWrapper(async (req, res) => {
+  const filter = {
+    id: req.params.id,
   };
+  if (Role.TEACHER === req.user?.role) filter.teacherId = req.user.userId;
+
+  const { updatedClass } = await classService.updateClass(filter, req.body);
   sendSuccess(res, {
     statusCode: 200,
-    message: "class fetched successfully",
+    message: "Class updated successfully",
     data: {
-      ...(groupBy
-        ? { groupClassCount: groupedDataCount }
-        : { classCount: classes }),
+      class: {
+        ...updatedClass,
+        duration: classUtil.formatDuration(updatedClass.duration),
+      },
     },
-    metadata,
+  });
+});
+
+export const deleteClass = asyncWrapper(async (req, res) => {
+  const filter = {
+    id: req.params.id,
+  };
+  if (Role.TEACHER === req.user?.role) filter.teacherId = req.user.userId;
+  const { deletedClass } = await classService.deleteClass(filter);
+  sendSuccess(res, {
+    statusCode: 200,
+    message: "Class deleted successfully",
+    data: { deletedClass },
+  });
+});
+export const getClassCount = asyncWrapper(async (req, res) => {
+  const { classCount, metaData } = await classService.getClassCount(
+    req.query,
+    req.user
+  );
+  sendSuccess(res, {
+    statusCode: 200,
+    message: "Class count fetched successfully",
+    data: { classCount },
+    metaData,
+  });
+});
+export const getClassCountForAdmin = asyncWrapper(async (req, res) => {
+  const { classCount, metaData } = await classService.getClassCountForAdmin(
+    req.query
+  );
+  sendSuccess(res, {
+    statusCode: 200,
+    message: "Class count fetched successfully",
+    data: { classCount },
+    metaData,
+  });
+});
+export const getClassById = asyncWrapper(async (req, res) => {
+  const filter = {
+    id: req.params.id,
+  };
+  if (Role.TEACHER === req.user?.role) filter.teacherId = req.user.userId;
+  if (Role.STUDENT === req.user?.role) filter.studentId = req.user.userId;
+  const { classData } = await classService.getClassById(filter);
+  sendSuccess(res, {
+    statusCode: 200,
+    message: "Class fetched successfully",
+    data: { class: classData },
+  });
+});
+export const getAllClasses = asyncWrapper(async (req, res) => {
+  const { classes, metaData } = await classService.getAllClasses(
+    req.query,
+    req.user
+  );
+  sendSuccess(res, {
+    statusCode: 200,
+    message: "Classes fetched successfully",
+    data: { classes },
+    metaData,
+  });
+});
+export const getAllClassesForAdmin = asyncWrapper(async (req, res) => {
+  const { classes, metaData } = await classService.getAllClassesForAdmin(
+    req.query
+  );
+  sendSuccess(res, {
+    statusCode: 200,
+    message: "Classes fetched successfully",
+    data: { classes },
+    metaData,
+  });
+});
+export const getClassesForSelectionByAdmin = asyncWrapper(async (req, res) => {
+  const { classes, metaData } = await classService.getClassesForSelection(
+    req.query
+  );
+
+  sendSuccess(res, {
+    statusCode: 200,
+    message: "Classes fetched Successfully",
+    data: { classes },
+    metaData,
+  });
+});
+export const getClassesForSelection = asyncWrapper(async (req, res) => {
+  const { classes, metaData } = await classService.getClassesForSelection(
+    req.query,
+    req.user
+  );
+
+  sendSuccess(res, {
+    statusCode: 200,
+    message: "Classes fetched Successfully",
+    data: { classes },
+    metaData,
+  });
+});
+export const getGroupedClasses = asyncWrapper(async (req, res) => {
+  const { classes, metaData } = [Role.TEACHER, Role.STUDENT].includes(
+    req.user.role
+  )
+    ? await classService.getAllClasses(req.query, req.user)
+    : await classService.getAllClassesForAdmin(req.query);
+  const groupedClassData = classService.groupClasses(
+    classes,
+    req.query?.groupBy
+  );
+  sendSuccess(res, {
+    statusCode: 200,
+    message: "grouped Classes fetched successfully",
+    data: { groupedClassData },
+    metadata: {
+      ...metaData,
+      filter: {
+        ...metaData.filter, // Preserve existing filter fields
+        groupBy: req.query?.groupBy, // Add groupBy from query
+      },
+    },
+  });
+});
+export const calendarViewClassData = asyncWrapper(async (req, res) => {
+  const { classes, metaData } = [Role.TEACHER, Role.STUDENT].includes(
+    req.user.role
+  )
+    ? await classService.getAllClasses(req.query, req.user)
+    : await classService.getAllClassesForAdmin(req.query);
+  const calendarViewClassData = classService.getCalanderViewClasses(classes);
+  sendSuccess(res, {
+    statusCode: 200,
+    message: "grouped Classes fetched successfully",
+    data: calendarViewClassData,
+    metaData,
+  });
+});
+export const countClassesByGroup = asyncWrapper(async (req, res) => {
+  const { classes, metaData } = [Role.TEACHER, Role.STUDENT].includes(
+    req.user.role
+  )
+    ? await classService.getAllClasses(req.query, req.user)
+    : await classService.getAllClassesForAdmin(req.query);
+  const groupedClassesCount = classService.countClassesByGroup(
+    classes,
+    req.query?.groupBy
+  );
+  sendSuccess(res, {
+    statusCode: 200,
+    message: "grouped Classes fetched successfully",
+    data: groupedClassesCount,
+    metadata: {
+      ...metaData,
+      filter: {
+        ...metaData.filter, // Preserve existing filter fields
+        groupBy: req.query?.groupBy, // Add groupBy from query
+      },
+    },
   });
 });

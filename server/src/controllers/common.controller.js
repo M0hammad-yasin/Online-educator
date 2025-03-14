@@ -1,6 +1,6 @@
-import { sendSuccess } from "../lib/api.response.js";
+import { sendSuccess } from "../Lib/api.response.js";
 import prisma from "../Prisma/prisma.client.js";
-import asyncWrapper from "../utils/asyncWrapper.js";
+import asyncWrapper from "../Utils/asyncWrapper.js";
 import _ from "lodash";
 export const updatePassword = asyncWrapper(async (req, res) => {
   const { password, model } = req.body;
@@ -64,26 +64,5 @@ export const getCalendarClasses = asyncWrapper(async (req, res) => {
     orderBy: {
       startTime: "asc",
     },
-  });
-
-  // Format data for calendar view
-  const calendarData = classes.map((cls) => ({
-    id: cls.id,
-    title: cls.subject,
-    date: cls.scheduledAt,
-    start: cls.startTime,
-    end: cls.endTime,
-    status: cls.status,
-    teacherName: cls.teacher.name,
-    studentName: cls.student.name,
-    teacherId: cls.teacherId,
-    studentId: cls.studentId,
-    classId: cls.classId,
-  }));
-
-  sendSuccess(res, {
-    statusCode: 200,
-    message: "Classes fetched successfully",
-    data: { classCalenderData: calendarData },
   });
 });

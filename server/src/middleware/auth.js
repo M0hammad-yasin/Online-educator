@@ -1,8 +1,8 @@
 import {
   AuthenticationError,
   AuthorizationError,
-} from "../lib/custom.error.js";
-import { verifyToken } from "../utils/jwt.user.js";
+} from "../Lib/custom.error.js";
+import { verifyToken } from "../Utils/jwt.user.js";
 
 const auth = (req, res, next) => {
   const token = req.cookies?.token || req.header("Authorization");

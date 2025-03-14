@@ -3,7 +3,7 @@ import cors from "cors";
 import morgan from "morgan";
 
 import initializeRoutes from "./route.js";
-import { sendError } from "./lib/api.response.js";
+import { sendError } from "./Lib/api.response.js";
 const app = express();
 
 // Middleware

@@ -1,7 +1,7 @@
-import { sendSuccess } from "../../lib/api.response.js";
-import { BadRequestError } from "../../lib/custom.error.js";
+import { sendSuccess } from "../../Lib/api.response.js";
+import { BadRequestError } from "../../Lib/custom.error.js";
 import prisma from "../../Prisma/prisma.client.js";
-import asyncWrapper from "../../utils/asyncWrapper.js";
+import asyncWrapper from "../../Utils/asyncWrapper.js";
 
 export const modifyAccess = asyncWrapper(async (req, res) => {
   const {
@@ -58,6 +58,8 @@ export const modifyAccess = asyncWrapper(async (req, res) => {
     data: { updatedUserAccess: updatedUser },
   });
 });
+
+//get all teachers or students with their classes
 export const getUsersWithClasses = asyncWrapper(async (req, res) => {
   // Extract pagination parameters (defaults: page 1, 10 items per page)
   const {
@@ -67,7 +69,7 @@ export const getUsersWithClasses = asyncWrapper(async (req, res) => {
     order = "asc",
     page = 1,
     user,
-    status = "all-classes",
+    classStatus = "all-classes",
     limit = 11,
   } = req.query;
 
@@ -84,7 +86,7 @@ export const getUsersWithClasses = asyncWrapper(async (req, res) => {
   // We assume the client sends a JSON string in ?filter=
   const classFilter = {};
 
-  if (status !== "all-classes") classFilter.status = status;
+  if (classStatus !== "all-classes") classFilter.status = classStatus;
 
   if (startDate || endDate) {
     classFilter.startTime = {};
@@ -128,7 +130,7 @@ export const getUsersWithClasses = asyncWrapper(async (req, res) => {
   const from = skip + 1;
   const to = Math.min(skip + users.length, totalUsers);
 
-  const metadata = {
+  const paginationData = {
     total: totalUsers,
     range: `${from} to ${to} of ${totalUsers}`,
     currentPage: page,
@@ -139,6 +141,9 @@ export const getUsersWithClasses = asyncWrapper(async (req, res) => {
     statusCode: 200,
     message: `${user}s fetched successfully!`,
     data: { [`${user}s`]: users },
-    metadata,
+    metadata: {
+      classFilter,
+      paginationData,
+    },
   });
 });

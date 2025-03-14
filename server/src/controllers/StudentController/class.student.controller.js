@@ -1,6 +1,6 @@
 import { format } from "date-fns";
 import prisma from "../../Prisma/prisma.client.js";
-import asyncWrapper from "../../utils/asyncWrapper.js";
+import asyncWrapper from "../../Utils/asyncWrapper.js";
 
 export const getGroupedClasses = asyncWrapper(async (req, res) => {
   // Extract pagination parameters (defaults: page 1, 10 items per page)
@@ -10,7 +10,7 @@ export const getGroupedClasses = asyncWrapper(async (req, res) => {
     sortBy = "startTime",
     order = "asc",
     page = 1,
-    status,
+    classStatus,
     groupBy,
     limit = 10,
   } = req.query;
@@ -26,8 +26,8 @@ export const getGroupedClasses = asyncWrapper(async (req, res) => {
       lte: new Date(endDate),
     };
   }
-  if (status) {
-    classFilter.status = status;
+  if (classStatus) {
+    classFilter.status = classStatus;
   }
   classFilter.studentId = req.user.id;
 

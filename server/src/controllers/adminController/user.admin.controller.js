@@ -1,8 +1,8 @@
 import _ from "lodash";
-import { sendSuccess } from "../../lib/api.response";
-import { BadRequestError } from "../../lib/custom.error";
+import { sendSuccess } from "../../Lib/api.response";
+import { BadRequestError } from "../../Lib/custom.error";
 import prisma from "../../Prisma/prisma.client";
-import asyncWrapper from "../../utils/asyncWrapper";
+import asyncWrapper from "../../Utils/asyncWrapper";
 import _ from "lodash";
 export const getAllUsers = asyncWrapper(async (req, res) => {
   const { page = 1, limit = 10 } = req.query;

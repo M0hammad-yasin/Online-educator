@@ -1,5 +1,5 @@
-import { AuthorizationError } from "../lib/custom.error.js";
-import asyncWrapper from "../utils/asyncWrapper.js";
+import { AuthorizationError } from "../Lib/custom.error.js";
+import asyncWrapper from "../Utils/asyncWrapper.js";
 
 // Existing middleware functions//+
 export const isAdmin = (req, _, next) => {
@@ -40,5 +40,28 @@ export const hasRole = (roles) => {
       );
     }
     next();
+  });
+};
+// middleware/roleBasedController.js
+
+/**
+ * Creates a role-based controller handler with O(1) complexity
+ * @param {Object} roleControllers - Map of roles to controller functions
+ * @returns {Function} Express middleware handler
+ */
+export const roleBasedController = (roleControllers) => {
+  // Convert to Map for faster lookups and better security
+  const roleMap = new Map(Object.entries(roleControllers));
+
+  return asyncWrapper(async (req, res, next) => {
+    const userRole = req.user?.role;
+    const controller = roleMap.get(userRole);
+
+    if (!controller)
+      throw new AuthorizationError(
+        "your are not authorized to access this resource"
+      );
+    // 4. Execute the controller with error handling
+    await controller(req, res, next);
   });
 };

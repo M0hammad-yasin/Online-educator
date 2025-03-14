@@ -6,7 +6,7 @@
 //     stack: process.env.NODE_ENV === "development" ? err.stack : undefined,
 //   });
 // }
-import { sendError } from "../lib/api.response.js";
+import { sendError } from "../Lib/api.response.js";
 export default (err, req, res, next) => {
   console.log("Express Error : ", err.stack);
 

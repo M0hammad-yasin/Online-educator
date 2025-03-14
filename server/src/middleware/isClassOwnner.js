@@ -1,4 +1,4 @@
-import { AuthorizationError } from "../lib/custom.error";
+import { AuthorizationError } from "../Lib/custom.error";
 
 // Middleware for role-based access
 export const checkRole = (roles) => (req, res, next) => {

@@ -1,10 +1,10 @@
-import asyncWrapper from "../../utils/asyncWrapper.js";
-import { comparePassword, hashPassword } from "../../utils/bcrypt.js";
-import { generateToken } from "../../utils/jwt.user.js";
+import asyncWrapper from "../../Utils/asyncWrapper.js";
+import { comparePassword, hashPassword } from "../../Utils/bcrypt.js";
+import { generateToken } from "../../Utils/jwt.user.js";
 import prisma from "../../Prisma/prisma.client.js";
 import _ from "lodash";
-import { BadRequestError, NotFoundError } from "../../lib/custom.error.js";
-import { sendSuccess } from "../../lib/api.response.js";
+import { BadRequestError, NotFoundError } from "../../Lib/custom.error.js";
+import { sendSuccess } from "../../Lib/api.response.js";
 const loginUser = asyncWrapper(async (req, res) => {
   const { email, password } = req.body;
 

@@ -122,5 +122,6 @@ enum ClassStatus {
   COMPLETED
   IN_PROGRESS
   CANCELLED
+  ACTIVE
   }
 //mongod --replSet rs0 --bind_ip localhost

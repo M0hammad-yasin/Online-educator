@@ -1,11 +1,11 @@
 //create admin crud operation
-import { comparePassword, hashPassword } from "../../utils/bcrypt.js";
+import { comparePassword, hashPassword } from "../../Utils/bcrypt.js";
 import prisma from "../../Prisma/prisma.client.js";
-import { BadRequestError } from "../../lib/custom.error.js";
-import { sendSuccess } from "../../lib/api.response.js";
-import { generateToken } from "../../utils/jwt.user.js";
-import asyncWrapper from "../../utils/asyncWrapper.js";
-import config from "../../config/config.js";
+import { BadRequestError } from "../../Lib/custom.error.js";
+import { sendSuccess } from "../../Lib/api.response.js";
+import { generateToken } from "../../Utils/jwt.user.js";
+import asyncWrapper from "../../Utils/asyncWrapper.js";
+import config from "../../Config/config.js";
 export const createAdmin = asyncWrapper(async (req, res) => {
   const hashedPassword = await hashPassword(req.body.password);
   const data = {
@@ -119,11 +119,12 @@ export const loginAdmin = asyncWrapper(async (req, res) => {
   }
   const token = generateToken(admin);
   res.cookie("token", token, {
-    httpOnly: true,
+    httpOnly: false,
     secure: config.isProduction, // Use secure in production
     sameSite: "strict",
-    maxAge: config.jwtSecretExpiry, // 1 hour in milliseconds (match JWT expiry)
+    maxAge: parseInt(config.jwtSecretExpiry, 10), // Ensure maxAge is a number
   });
+
   sendSuccess(res, {
     statusCode: 201,
     message: "Admin logged in Successfully",
