@@ -23,9 +23,16 @@ export class AuthorizationError extends Error {
 }
 
 export class ConflictError extends Error {
-  constructor(message) {
+  // throw new ConflictError("Email already exists", {
+  //   conflictingField: "email",
+  //   suggestedAlternatives: generateEmailSuggestions(userData.email)
+  // });
+  //
+  // details = {}
+  constructor(message, details = {}) {
     super(message);
     this.name = "ConflictError";
+    this.details = details;
     this.statusCode = 409;
   }
 }

@@ -7,7 +7,7 @@ import { Role } from "../../constant.js";
 import { BadRequestError, NotFoundError } from "../../Lib/custom.error.js";
 import { sendSuccess } from "../../Lib/api.response.js";
 import config from "../../Config/config.js";
-import { classUtil } from "../../Services/class.services.js";
+import { classUtil } from "../../services/class.services.js";
 import { controllerHelper } from "../../Utils/controller.helper.js";
 import pagination from "../../Utils/pagination.js";
 // Register Student

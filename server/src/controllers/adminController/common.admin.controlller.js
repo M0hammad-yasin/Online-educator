@@ -2,6 +2,7 @@ import { sendSuccess } from "../../Lib/api.response.js";
 import { BadRequestError } from "../../Lib/custom.error.js";
 import prisma from "../../Prisma/prisma.client.js";
 import asyncWrapper from "../../Utils/asyncWrapper.js";
+import pagination from "../../Utils/pagination.js";
 
 export const modifyAccess = asyncWrapper(async (req, res) => {
   const {
@@ -67,10 +68,8 @@ export const getUsersWithClasses = asyncWrapper(async (req, res) => {
     endDate,
     sortBy = "name",
     order = "asc",
-    page = 1,
     user,
     classStatus = "all-classes",
-    limit = 11,
   } = req.query;
 
   if (!["teacher", "student"].includes(user)) {
@@ -79,9 +78,7 @@ export const getUsersWithClasses = asyncWrapper(async (req, res) => {
     );
   }
   const userClass = user === "teacher" ? "classes" : "bookedClasses";
-  const parsedPage = Math.max(1, parseInt(page));
-  const parsedLimit = Math.min(100, Math.max(1, parseInt(limit)));
-  const skip = (parsedPage - 1) * parsedLimit;
+  const { page, limit, take, skip } = pagination(req.query);
   // Build the class filter from query if provided.
   // We assume the client sends a JSON string in ?filter=
   const classFilter = {};
@@ -104,7 +101,7 @@ export const getUsersWithClasses = asyncWrapper(async (req, res) => {
   const [users, totalUsers] = await Promise.all([
     prisma[user].findMany({
       skip,
-      take: parsedLimit,
+      take,
       select: {
         id: true,
         name: true,

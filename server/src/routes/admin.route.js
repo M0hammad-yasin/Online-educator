@@ -7,7 +7,7 @@ import {
   updatePassword,
   logOutAdmin,
   verifyEmail,
-} from "../Controllers/adminController/admin.controller.js";
+} from "../controllers/adminController/admin.controller.js";
 import auth from "../Middleware/auth.js";
 import { validate } from "../Middleware/validate.middleware.js";
 import verifyPassword from "../Middleware/comparePassword.middleware.js";

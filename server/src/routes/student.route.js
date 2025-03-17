@@ -22,7 +22,7 @@ import {
 import { getUsersWithClasses as studentsWithClasses } from "../controllers/adminController/common.admin.controlller.js";
 import auth from "../Middleware/auth.js";
 import { validate, validateBody } from "../Middleware/validate.middleware.js";
-import { hasRole } from "../middleware/roleCheck.js";
+import { hasRole, isStudent } from "../middleware/roleCheck.js";
 import { Role } from "../constant.js";
 
 const router = express.Router();
@@ -31,7 +31,7 @@ router.get(
   validate(paginationSchema, (req) => req.query),
   validate(classFilterQuerySchema, (req) => req.query),
   auth,
-  hasRole([Role.ADMIN, Role.MODERATOR]),
+  hasRole([Role.ADMIN, Role.MODERATOR, Role.TEACHER]),
   getAllStudent
 );
 
@@ -60,7 +60,7 @@ router.get(
 );
 router.post("/login", validateBody(loginSchema), loginStudent);
 router.post("/logout", auth, hasRole(Role.STUDENT), logoutStudent);
-router.get("/me", auth, getStudent);
+router.get("/me", auth, isStudent, getStudent);
 router.get(
   "/select",
   auth,
@@ -85,7 +85,7 @@ router.put(
   updateStudentByAdmin
 );
 router.delete(
-  ":id",
+  "/:id",
   validate(mongoIdSchema, (req) => req.params),
   auth,
   hasRole([Role.ADMIN, Role.MODERATOR]),

@@ -4,7 +4,7 @@ config.config();
 export default {
   port: process.env.PORT || 5000,
   jwtSecret: process.env.JWT_SECRET,
-  jwtSecretExpiry: process.env.JWT_SECRET_EXPIRES_IN,
+  jwtSecretExpiry: parseInt(process.env.JWT_SECRET_EXPIRES_IN, 10),
   isProduction: process.env.NODE_ENV === "production",
   mongoURI: process.env.MONGO_URI,
   cloudinary: {

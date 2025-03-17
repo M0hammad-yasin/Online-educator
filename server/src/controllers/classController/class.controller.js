@@ -1,8 +1,9 @@
 import _ from "lodash";
 import { sendSuccess } from "../../Lib/api.response.js";
 import asyncWrapper from "../../Utils/asyncWrapper.js";
-import { classService, classUtil } from "../../Services/class.services.js";
+import { classService, classUtil } from "../../services/class.services.js";
 import { Role } from "../../constant.js";
+import { format } from "date-fns";
 
 export const createClass = asyncWrapper(async (req, res) => {
   const scheduledAt = new Date(req.body.scheduledAt);
@@ -110,6 +111,7 @@ export const getAllClassesForAdmin = asyncWrapper(async (req, res) => {
   const { classes, metaData } = await classService.getAllClassesForAdmin(
     req.query
   );
+
   sendSuccess(res, {
     statusCode: 200,
     message: "Classes fetched successfully",

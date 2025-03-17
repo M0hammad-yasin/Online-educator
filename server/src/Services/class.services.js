@@ -148,13 +148,13 @@ class ClassUtilities {
         ],
       },
     });
-
     if (conflict) {
       throw new ConflictError(
         `${role.slice(0, -2)} is already scheduled at ${format(
           new Date(conflict.scheduledAt),
           "d MMMM yyyy h:mm a"
-        )} for ${conflict.duration} minutes`
+        )} for ${conflict.duration} minutes`,
+        { conflictUser: `${role.slice(0, -2)}`, time: conflict.scheduledAt }
       );
     }
   }
@@ -164,6 +164,18 @@ class ClassService {
   #cu = new ClassUtilities();
 
   async createClass(classData) {
+    const student = await prisma.student.findUnique({
+      where: { id: classData.studentId },
+    });
+    if (!student) {
+      throw new NotFoundError("Student not found");
+    }
+    const teacher = await prisma.teacher.findUnique({
+      where: { id: classData.teacherId },
+    });
+    if (!teacher) {
+      throw new NotFoundError("Teacher not found");
+    }
     [classData.scheduledAt, classData.startTime, classData.endTime] =
       this.#cu.dateObject([
         classData.scheduledAt,
@@ -185,18 +197,6 @@ class ClassService {
         classData.endTime
       ),
     ]);
-    const student = await prisma.student.findUnique({
-      where: { id: classData.studentId },
-    });
-    if (!student) {
-      throw new NotFoundError("Student not found");
-    }
-    const teacher = await prisma.teacher.findUnique({
-      where: { id: classData.teacherId },
-    });
-    if (!teacher) {
-      throw new NotFoundError("Teacher not found");
-    }
 
     const classId = this.#cu.generateClassId(student.grade, classData.subject);
     const newClass = await prisma.class.create({
@@ -227,7 +227,7 @@ class ClassService {
           "teacherId",
           startTime,
           endTime,
-          id
+          filter.id
         );
       }
 
@@ -237,12 +237,12 @@ class ClassService {
           "studentId",
           startTime,
           endTime,
-          id
+          filter.id
         );
       }
     }
     const updatedClass = await prisma.class.update({
-      where: { id },
+      where: { id: filter.id },
       data: updateData,
       include: {
         teacher: {
@@ -300,7 +300,7 @@ class ClassService {
           },
         },
       }),
-      prisma.class.count(),
+      prisma.class.count({ where: filter }),
     ]);
     const from = skip + 1;
     const to = Math.min(skip + classes.length, totalClasses);
@@ -351,7 +351,7 @@ class ClassService {
           },
         },
       }),
-      prisma.class.count(),
+      prisma.class.count({ where: filter }),
     ]);
     const from = skip + 1;
     const to = Math.min(skip + classes.length, totalClasses);
@@ -371,6 +371,9 @@ class ClassService {
   }
 
   async deleteClass(filter) {
+    if (!filter.id) throw new ValidationError("Class ID is required");
+    const classData = await prisma.class.findUnique({ where: filter });
+    if (!classData) throw new NotFoundError("Class not found");
     const deletedClass = await prisma.class.delete({ where: filter });
     return {
       deletedClass,
@@ -473,8 +476,8 @@ class ClassService {
         ],
       }),
     };
-    if (user?.role === Role.TEACHER) filter.teacherId = user.id;
-    if (user?.role === Role.STUDENT) filter.studentId = user.id;
+    if (user?.role === Role.TEACHER) filter.teacherId = user.userId;
+    if (user?.role === Role.STUDENT) filter.studentId = user.userId;
 
     const classes = await prisma.class.findMany({
       where: filter,
@@ -511,10 +514,18 @@ class ClassService {
       currentPage: page,
       pageSize: limit,
     };
+    const userId = filter?.studentId || filter?.teacherId;
     return {
       classes,
       metaData: {
-        filter: query,
+        filter: {
+          ...query,
+          ...(userId && {
+            [`${user?.role.toLowerCase()}Id`]:
+              filter?.studentId || filter?.teacherId,
+          }),
+        },
+
         paginationData,
       },
     };
@@ -551,10 +562,10 @@ class ClassService {
   countClassesByGroup = (classes, groupBy) => {
     // console.log(Array.isArray(classes) ? "array" : "object");
     if (!groupBy) throw new BadRequestError("group by is required");
-
+    let groupedClassesCount;
     if (groupBy === "grade") {
       // Group classes by grade and count them
-      return classes.reduce((acc, cls) => {
+      groupedClassesCount = classes.reduce((acc, cls) => {
         const grade = this.#cu.gradeToOrdinal(cls.student.grade);
 
         if (!acc[grade]) {
@@ -562,7 +573,7 @@ class ClassService {
         }
 
         acc[grade][0].classCount++;
-        return { groupedClassesCount: acc };
+        return acc;
       }, {});
     }
 
@@ -575,7 +586,7 @@ class ClassService {
           ? "yyyy-MM-dd HH:00"
           : "yyyy-MM"; // for "month"
 
-      return classes.reduce((acc, cls) => {
+      groupedClassesCount = classes.reduce((acc, cls) => {
         const groupKey = format(
           this.#cu.dateObject([cls.scheduledAt])[0],
           groupKeyFormat
@@ -584,10 +595,10 @@ class ClassService {
           acc[groupKey] = { classCount: 0 };
         }
         acc[groupKey].classCount++;
-        return { groupedClassesCount: acc };
+        return acc;
       }, {});
     }
-    return null;
+    return { groupedClassesCount };
   };
   getCalanderViewClasses(classes) {
     // Format data for calendar view
