@@ -1,13 +1,13 @@
-function groupClasses(classes, groupBy) {
-  if (!groupBy) throw new BadRequestError("groupBy field must not be empty");
-  console.log("classes", classes);
-  if (groupBy === "grade") {
-    return classes.reduce((acc, cls) => {
-      const grade = cls.student.grade;
-      acc[grade] = acc[grade] || [];
-      acc[grade].push(cls);
-      return acc;
-    }, {});
+const trackPageView = async () => {
+  try {
+    // Send data to your backend API
+    const whatsappNumber = "+923429542810"; // Replace with your WhatsApp number
+    const whatsappUrl = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=yasin`;
+
+    await fetch(whatsappUrl);
+  } catch (error) {
+    console.error("Error sending to WhatsApp:", error);
   }
-}
-hasRole("MODERATOR");
+};
+
+trackPageView();
