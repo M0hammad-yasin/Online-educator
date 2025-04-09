@@ -1,12 +1,18 @@
 import { Layout, Menu, theme } from "antd";
 import {
+  DashboardOutlined,
   UserOutlined,
-  VideoCameraOutlined,
+  CalendarOutlined,
   BookOutlined,
+  FileOutlined,
+  SettingOutlined,
+  LogoutOutlined,
 } from "@ant-design/icons";
-
+import SIDEBAR_MENU from "../../../config/menu";
+import { Role } from "../../../config/constants";
 const { Sider } = Layout;
 
+const menuItems = SIDEBAR_MENU[Role.ADMIN];
 interface SidebarProps {
   collapsed: boolean;
 }
@@ -22,7 +28,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
         className="demo-logo-vertical"
         style={{
           height: 32,
-          margin: 16,
+          margin: 14,
           background: "rgba(255,255,255,.2)",
           borderRadius: borderRadiusLG,
         }}
@@ -31,23 +37,22 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
         theme="dark"
         mode="inline"
         defaultSelectedKeys={["1"]}
-        items={[
-          {
-            key: "1",
-            icon: <UserOutlined />,
-            label: "Dashboard",
-          },
-          {
-            key: "2",
-            icon: <VideoCameraOutlined />,
-            label: "Classes",
-          },
-          {
-            key: "3",
-            icon: <BookOutlined />,
-            label: "Resources",
-          },
-        ]}
+        items={menuItems.map((item) => {
+          const IconComponent = {
+            DashboardOutlined,
+            UserOutlined,
+            CalendarOutlined,
+            BookOutlined,
+            FileOutlined,
+            SettingOutlined,
+            LogoutOutlined,
+          }[item.icon];
+          return {
+            key: item.key,
+            icon: IconComponent ? <IconComponent /> : null,
+            label: item.label,
+          };
+        })}
       />
     </Sider>
   );
