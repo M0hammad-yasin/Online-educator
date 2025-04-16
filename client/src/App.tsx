@@ -2,7 +2,7 @@ import { Layout } from "antd";
 import { useState } from "react";
 
 // Import the CSS file for styling
-import "./App.css";
+import "./style/App.css";
 import { AppHeader, MainContent, Sidebar } from "./components/layout";
 
 const App = () => {

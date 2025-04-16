@@ -19,22 +19,33 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
   const {
-    token: { borderRadiusLG },
+    token: { colorBgContainer, borderRadiusLG, Layout },
   } = theme.useToken();
-
+  console.log(colorBgContainer);
   return (
-    <Sider trigger={null} collapsible collapsed={collapsed}>
+    <Sider
+      style={{
+        background: Layout?.siderBg,
+        borderRadius: borderRadiusLG,
+      }}
+      trigger={null}
+      collapsible
+      collapsed={collapsed}
+    >
       <div
         className="demo-logo-vertical"
         style={{
           height: 32,
           margin: 14,
-          background: "rgba(255,255,255,.2)",
+          background: "rgba(24, 144, 255, 0.2)",
           borderRadius: borderRadiusLG,
         }}
       />
       <Menu
-        theme="dark"
+        // style={{
+        //   background: colorBgContainer,
+        //   borderRadius: borderRadiusLG,
+        // }}
         mode="inline"
         defaultSelectedKeys={["1"]}
         items={menuItems.map((item) => {
@@ -50,7 +61,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
           return {
             key: item.key,
             icon: IconComponent ? <IconComponent /> : null,
-            label: item.label,
+            label: <span style={{ fontWeight: 600 }}>{item.label}</span>,
           };
         })}
       />
