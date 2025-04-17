@@ -13,10 +13,7 @@ const App = () => {
       <Sidebar collapsed={collapsed} />
       <Layout>
         <AppHeader collapsed={collapsed} setCollapsed={setCollapsed} />
-        <MainContent>
-          {/* Content can be passed as children to MainContent */}
-          <div>Welcome to the Online Educator Platform!</div>
-        </MainContent>
+        <MainContent />
       </Layout>
     </Layout>
   );
