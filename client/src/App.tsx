@@ -4,6 +4,7 @@ import { useState } from "react";
 // Import the CSS file for styling
 import "./style/App.css";
 import { AppHeader, MainContent, Sidebar } from "./components/layout";
+import Dashboard from "./components/dashboard/Dashboard";
 
 const App = () => {
   const [collapsed, setCollapsed] = useState(false);
@@ -14,8 +15,7 @@ const App = () => {
       <Layout>
         <AppHeader collapsed={collapsed} setCollapsed={setCollapsed} />
         <MainContent>
-          {/* Content can be passed as children to MainContent */}
-          <div>Welcome to the Online Educator Platform!</div>
+          <Dashboard />
         </MainContent>
       </Layout>
     </Layout>
