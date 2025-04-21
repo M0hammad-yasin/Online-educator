@@ -1,6 +1,6 @@
 // client/src/components/dashboard/Dashboard.tsx
-import React from "react";
-import { Row, Col, Card, Typography } from "antd";
+import React, { useState } from "react";
+import { Row, Col, Card, Typography, Select } from "antd";
 import StatCard from "./StatCard";
 import ItemList from "./ItemList";
 import ClassesBarChart from "./charts/ClassesBarChart";
@@ -13,10 +13,17 @@ import {
   FaChalkboardTeacher,
   FaBook,
 } from "react-icons/fa";
+import {
+  CLASS_STATUS,
+  CLASS_STATUS_OPTIONS,
+} from "../../constants/classStatus";
 
-const { Title, Text } = Typography;
+const { Title } = Typography;
 
 const Dashboard: React.FC = () => {
+  const [selectedStatus, setSelectedStatus] = useState<string>(
+    CLASS_STATUS.UPCOMING
+  );
   return (
     <div className="dashboard">
       {/* Stat Cards Row */}
@@ -119,9 +126,17 @@ const Dashboard: React.FC = () => {
               <Title level={5} style={{ margin: 0 }}>
                 Classes per day
               </Title>
-              <Text type="secondary">upcoming</Text>
+              <Select
+                defaultValue={CLASS_STATUS.UPCOMING}
+                style={{ width: 120 }}
+                onChange={(value) => setSelectedStatus(value)}
+                options={CLASS_STATUS_OPTIONS.map((status) => ({
+                  value: status,
+                  label: status.charAt(0) + status.slice(1).toLowerCase(),
+                }))}
+              />
             </div>
-            <ClassesBarChart />
+            <ClassesBarChart status={selectedStatus} />
           </Card>
         </Col>
       </Row>

@@ -10,7 +10,13 @@ import {
 } from "recharts";
 import { theme } from "antd";
 
-const ClassesBarChart: React.FC = () => {
+interface ClassesBarChartProps {
+  status?: string;
+}
+
+const ClassesBarChart: React.FC<ClassesBarChartProps> = ({
+  status = "UPCOMING",
+}) => {
   const { token } = theme.useToken();
 
   const data = [
@@ -21,6 +27,9 @@ const ClassesBarChart: React.FC = () => {
     { day: "Fri", classes: 6 },
     { day: "Sat", classes: 3 },
   ];
+
+  // In a real application, we would filter or fetch data based on the status
+  console.log(`Showing classes with status: ${status}`);
 
   return (
     <ResponsiveContainer width="100%" height={270}>

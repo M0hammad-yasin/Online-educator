@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, Typography, Space, theme } from "antd";
+import { Card, Typography, Space, theme, Flex } from "antd";
 
 const { Title, Text } = Typography;
 
@@ -14,32 +14,54 @@ const StatCard: React.FC<StatCardProps> = ({ icon, title, value, period }) => {
   const { token } = theme.useToken();
 
   return (
-    <Card style={{ padding: 5 }}>
-      <Space direction="horizontal" align="center">
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            padding: 8,
-            borderRadius: token.borderRadiusLG,
-            backgroundColor: token.colorPrimaryBg,
-            color: token.colorPrimary,
-            fontSize: 24,
-          }}
+    <Card
+      style={{
+        margin: 0,
+        padding: 2,
+        borderRadius: token.borderRadiusLG,
+        boxShadow: token.boxShadowSecondary,
+      }}
+    >
+      <Flex
+        vertical
+        align={"center"}
+        justify="center"
+        gap={3}
+        style={{ margin: 0 }}
+      >
+        <Title type="secondary" level={3}>
+          {title}
+        </Title>
+        <Flex
+          justify={"space-evenly"}
+          align="center"
+          // gap={3}
+          className="w-full"
         >
-          {icon}
-        </div>
-        <Space direction="vertical" size={0}>
-          <Text type="secondary">{title}</Text>
-          <Title level={3} style={{ margin: 0 }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              padding: 10,
+              borderRadius: token.borderRadiusLG,
+              backgroundColor: token.colorPrimaryBg,
+              color: token.colorPrimary,
+              fontSize: 25,
+            }}
+          >
+            {icon}
+          </div>
+          <Title level={1} style={{ margin: 0 }}>
             {value}
           </Title>
-          <Text type="secondary" style={{ fontSize: 12 }}>
+        </Flex>
+        <Space direction="vertical" size={0}>
+          <Text type="secondary" style={{ fontSize: 20, fontWeight: 500 }}>
             {period}
           </Text>
         </Space>
-      </Space>
+      </Flex>
     </Card>
   );
 };

@@ -25,7 +25,7 @@ const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
       borderRadiusLG: 8,
       fontFamily: '"Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
       fontSize: 14,
-      colorBgContainer: mode === "dark" ? "#1f1f1f" : "#ffffff",
+      colorBgContainer: mode === "dark" ? "#1f1f1f" : "#FAFDFE",
     },
     components: {
       Menu: {
@@ -40,7 +40,7 @@ const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
       Layout: {
         algorithm: true,
         headerBg: mode === "dark" ? "#1f1f1f" : "#fdf7f7",
-        bodyBg: mode === "dark" ? "#141414" : "#f0f2f5",
+        bodyBg: mode === "dark" ? "#141414" : "#F3FDFF",
         siderBg: mode === "dark" ? "#141414" : "#f3f3f3",
         triggerBg: "#002140",
       },

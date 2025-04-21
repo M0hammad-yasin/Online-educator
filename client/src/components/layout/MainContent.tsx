@@ -7,18 +7,14 @@ interface MainContentProps {
 }
 
 const MainContent: React.FC<MainContentProps> = ({ children }) => {
-  const {
-    token: { colorBgContainer, borderRadiusLG },
-  } = theme.useToken();
+  const { token } = theme.useToken();
 
   return (
     <Content
       style={{
-        margin: "24px 16px",
         padding: 24,
         minHeight: 280,
-        background: colorBgContainer,
-        borderRadius: borderRadiusLG,
+        background: token.Layout?.bodyBg,
       }}
     >
       {children || "Main content goes here"}
