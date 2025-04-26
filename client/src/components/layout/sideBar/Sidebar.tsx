@@ -19,14 +19,15 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
   const {
-    token: { colorBgContainer, borderRadiusLG, Layout },
+    token: { colorBgContainer, borderRadiusLG, Layout, colorBorder },
   } = theme.useToken();
   console.log(colorBgContainer);
   return (
     <Sider
       style={{
         background: Layout?.siderBg,
-        borderRadius: borderRadiusLG,
+        borderRightColor: colorBorder,
+        borderRightWidth: 1,
       }}
       trigger={null}
       collapsible
@@ -42,10 +43,6 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
         }}
       />
       <Menu
-        // style={{
-        //   background: colorBgContainer,
-        //   borderRadius: borderRadiusLG,
-        // }}
         mode="inline"
         defaultSelectedKeys={["1"]}
         items={menuItems.map((item) => {

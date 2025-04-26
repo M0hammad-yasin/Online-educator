@@ -15,8 +15,6 @@ import {
 } from "antd";
 import {
   BellOutlined,
-  MenuFoldOutlined,
-  MenuUnfoldOutlined,
   SearchOutlined,
   UserOutlined,
   SunOutlined,
@@ -27,6 +25,7 @@ import {
 } from "@ant-design/icons";
 import useThemeStore from "../../../store/themeStore";
 import "../../../style/header.css";
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 const { Header } = Layout;
 
 interface HeaderProps {
@@ -42,6 +41,7 @@ const AppHeader: React.FC<HeaderProps> = ({ collapsed, setCollapsed }) => {
       colorPrimary,
       colorTextSecondary,
       colorBorderSecondary,
+      borderRadius,
     },
   } = theme.useToken();
 
@@ -69,11 +69,13 @@ const AppHeader: React.FC<HeaderProps> = ({ collapsed, setCollapsed }) => {
   return (
     <Header
       style={{
+        margin: "0 10px",
         padding: "0 16px",
-        background: colorBgContainer,
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
+        borderRadius: borderRadius,
+        border: `1.4px solid ${colorBorderSecondary}`,
       }}
     >
       <div
@@ -81,7 +83,7 @@ const AppHeader: React.FC<HeaderProps> = ({ collapsed, setCollapsed }) => {
       >
         <Button
           type="text"
-          icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+          icon={collapsed ? <FaChevronRight /> : <FaChevronLeft />}
           onClick={() => setCollapsed(!collapsed)}
           style={{
             position: "absolute",

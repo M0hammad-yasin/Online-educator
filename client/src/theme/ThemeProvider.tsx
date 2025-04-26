@@ -22,10 +22,11 @@ const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
       colorTextBase: mode === "dark" ? "#ffffff" : "#000000",
       colorBgBase: mode === "dark" ? "#141414" : "#ffffff",
       borderRadius: 6,
-      borderRadiusLG: 8,
+      borderRadiusLG: 12,
       fontFamily: '"Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
       fontSize: 14,
       colorBgContainer: mode === "dark" ? "#1f1f1f" : "#FAFDFE",
+      boxShadow: "1px 5px 9px #00000027", // Added custom box shadow
     },
     components: {
       Menu: {
@@ -39,9 +40,9 @@ const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
       },
       Layout: {
         algorithm: true,
-        headerBg: mode === "dark" ? "#1f1f1f" : "#fdf7f7",
+        headerBg: mode === "dark" ? "#1f1f1f" : "#f8f8f8",
         bodyBg: mode === "dark" ? "#141414" : "#F3FDFF",
-        siderBg: mode === "dark" ? "#141414" : "#f3f3f3",
+        siderBg: mode === "dark" ? "#141414" : "#f8f8f8",
         triggerBg: "#002140",
       },
       Button: {

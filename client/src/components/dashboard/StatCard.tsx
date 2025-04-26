@@ -15,11 +15,17 @@ const StatCard: React.FC<StatCardProps> = ({ icon, title, value, period }) => {
 
   return (
     <Card
+      // className="stat-card"
+      styles={{
+        body: {
+          padding: "14px 8px",
+          borderRadius: token.borderRadiusLG,
+        },
+      }}
       style={{
         margin: 0,
-        padding: 2,
         borderRadius: token.borderRadiusLG,
-        boxShadow: token.boxShadowSecondary,
+        boxShadow: token.boxShadow,
       }}
     >
       <Flex
@@ -35,8 +41,9 @@ const StatCard: React.FC<StatCardProps> = ({ icon, title, value, period }) => {
         <Flex
           justify={"space-evenly"}
           align="center"
-          // gap={3}
+          gap={16}
           className="w-full"
+          style={{ padding: "0 8px" }}
         >
           <div
             style={{

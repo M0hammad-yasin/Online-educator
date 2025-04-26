@@ -27,7 +27,7 @@ const Dashboard: React.FC = () => {
   return (
     <div className="dashboard">
       {/* Stat Cards Row */}
-      <Row gutter={[16, 16]}>
+      <Row gutter={[40, 40]}>
         <Col xs={24} sm={12} md={12} lg={6}>
           <StatCard
             icon={<FaBookOpen />}
@@ -66,7 +66,7 @@ const Dashboard: React.FC = () => {
       <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
         {/* First three List items */}
         <Col xs={24} lg={14}>
-          <Row gutter={[16, 16]}>
+          <Row gutter={[24, 24]}>
             <Col xs={24} lg={8}>
               <ItemList
                 title="All Classes"
@@ -150,7 +150,7 @@ const Dashboard: React.FC = () => {
 
         {/* Charts - 2/5 of the width */}
         <Col xs={24} lg={10}>
-          <Row gutter={[16, 16]}>
+          <Row gutter={[24, 24]}>
             {/* Students by Location */}
             <Col xs={24}>
               <Card title="Students by Location">
