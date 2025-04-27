@@ -1,0 +1,23 @@
+.itemRow {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-color);
+  transition: background-color 0.3s;
+  cursor: pointer;
+}
+
+.itemRow:hover {
+  background-color: var(--bg-elevated);
+}
+
+.itemRow:last-child {
+  border-bottom: none;
+}
+
+.showMoreButton {
+  padding: 12px;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-elevated);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

@@ -1,18 +1,37 @@
-import React from "react";
-import { Card, Typography, Space, theme, Flex } from "antd";
+import React, { useState } from "react";
+import { Card, Typography, theme, Flex, Select, DatePicker } from "antd";
+import dayjs from "dayjs";
 
-const { Title, Text } = Typography;
+const { Title } = Typography;
+
+interface SelectOption {
+  value: string;
+  label: string;
+}
 
 interface StatCardProps {
   icon: React.ReactNode;
-  title: string;
   value: number;
-  period: string;
+  titleOptions: SelectOption[];
+  // periodOptions: SelectOption[]; // Removed
+  onTitleChange?: (value: string) => void;
+  onPeriodChange?: (date: dayjs.Dayjs, dateString: string | string[]) => void; // Updated signature
 }
 
-const StatCard: React.FC<StatCardProps> = ({ icon, title, value, period }) => {
+const StatCard: React.FC<StatCardProps> = ({
+  icon,
+  value,
+  titleOptions,
+  // periodOptions, // Removed
+  onTitleChange,
+  onPeriodChange,
+}) => {
   const { token } = theme.useToken();
 
+  const [selectedTitle, setSelectedTitle] = useState<string>(
+    titleOptions[0].label
+  );
+  const [selectedPeriod, setSelectedPeriod] = useState<dayjs.Dayjs>(dayjs());
   return (
     <Card
       // className="stat-card"
@@ -20,30 +39,36 @@ const StatCard: React.FC<StatCardProps> = ({ icon, title, value, period }) => {
         body: {
           padding: "14px 8px",
           borderRadius: token.borderRadiusLG,
+          boxShadow: token.boxShadow,
         },
-      }}
-      style={{
-        margin: 0,
-        borderRadius: token.borderRadiusLG,
-        boxShadow: token.boxShadow,
       }}
     >
       <Flex
         vertical
         align={"center"}
         justify="center"
-        gap={3}
+        gap={4}
         style={{ margin: 0 }}
       >
-        <Title type="secondary" level={3}>
-          {title}
-        </Title>
+        <Flex justify="space-evenly" align="center" className="w-full mb-10">
+          <Title level={4} style={{ margin: 0, fontSize: 20 }}>
+            <Select
+              style={{ width: 160, textAlign: "left" }}
+              value={selectedTitle}
+              onChange={(value) => {
+                setSelectedTitle(value);
+                onTitleChange?.(value);
+              }}
+              options={titleOptions}
+            />
+          </Title>
+        </Flex>
         <Flex
           justify={"space-evenly"}
           align="center"
           gap={16}
           className="w-full"
-          style={{ padding: "0 8px" }}
+          style={{ padding: "5px 8px", margin: "10px 0px" }}
         >
           <div
             style={{
@@ -63,11 +88,19 @@ const StatCard: React.FC<StatCardProps> = ({ icon, title, value, period }) => {
             {value}
           </Title>
         </Flex>
-        <Space direction="vertical" size={0}>
-          <Text type="secondary" style={{ fontSize: 20, fontWeight: 500 }}>
-            {period}
-          </Text>
-        </Space>
+        <Flex justify="center" align="center" className="w-full">
+          <DatePicker
+            picker="month"
+            defaultValue={selectedPeriod}
+            format="MMM YYYY"
+            style={{ width: 160, textAlign: "center" }}
+            onChange={(date, dateString) => {
+              if (date) setSelectedPeriod(date);
+              onPeriodChange?.(date, dateString);
+            }}
+            allowClear={false}
+          />
+        </Flex>
       </Flex>
     </Card>
   );

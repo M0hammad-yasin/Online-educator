@@ -17,6 +17,13 @@ import {
   CLASS_STATUS,
   CLASS_STATUS_OPTIONS,
 } from "../../constants/classStatus";
+import {
+  CLASS_TITLE_OPTIONS,
+  STUDENT_TITLE_OPTIONS,
+  TEACHER_TITLE_OPTIONS,
+  COURSE_TITLE_OPTIONS,
+  // PERIOD_OPTIONS, // Removed
+} from "../../constants/statCardOptions";
 
 const { Title } = Typography;
 
@@ -31,33 +38,33 @@ const Dashboard: React.FC = () => {
         <Col xs={24} sm={12} md={12} lg={6}>
           <StatCard
             icon={<FaBookOpen />}
-            title="Total Classes"
             value={23}
-            period="January 2025"
+            titleOptions={CLASS_TITLE_OPTIONS}
+            // periodOptions={PERIOD_OPTIONS} // Removed
           />
         </Col>
         <Col xs={24} sm={12} md={12} lg={6}>
           <StatCard
             icon={<FaUserGraduate />}
-            title="Total Students"
             value={23}
-            period="January 2025"
+            titleOptions={STUDENT_TITLE_OPTIONS}
+            // periodOptions={PERIOD_OPTIONS} // Removed
           />
         </Col>
         <Col xs={24} sm={12} md={12} lg={6}>
           <StatCard
             icon={<FaChalkboardTeacher />}
-            title="Total Teachers"
             value={23}
-            period="January 2025"
+            titleOptions={TEACHER_TITLE_OPTIONS}
+            // periodOptions={PERIOD_OPTIONS} // Removed
           />
         </Col>
         <Col xs={24} sm={12} md={12} lg={6}>
           <StatCard
             icon={<FaBook />}
-            title="Total Courses"
             value={23}
-            period="January 2025"
+            titleOptions={COURSE_TITLE_OPTIONS}
+            // periodOptions={PERIOD_OPTIONS} // Removed
           />
         </Col>
       </Row>
@@ -66,11 +73,11 @@ const Dashboard: React.FC = () => {
       <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
         {/* First three List items */}
         <Col xs={24} lg={14}>
-          <Row gutter={[24, 24]}>
+          <Row gutter={[16, 16]}>
             <Col xs={24} lg={8}>
               <ItemList
-                title="All Classes"
-                date="Jan 12 Jul 2025"
+                titleOptions={CLASS_TITLE_OPTIONS}
+                icon={<FaBookOpen />}
                 items={[
                   { label: "class1", time: "3 pm", status: "success" },
                   { label: "class1", time: "12 pm", status: "warning" },
@@ -84,8 +91,8 @@ const Dashboard: React.FC = () => {
             </Col>
             <Col xs={24} lg={8}>
               <ItemList
-                title="Teachers"
-                date="Jan 12 Jul 2025"
+                titleOptions={STUDENT_TITLE_OPTIONS}
+                icon={<FaUserGraduate />}
                 items={[
                   { label: "class1", time: "3 pm", status: "success" },
                   { label: "class1", time: "12 pm", status: "warning" },
@@ -99,8 +106,8 @@ const Dashboard: React.FC = () => {
             </Col>
             <Col xs={24} lg={8}>
               <ItemList
-                title="Students"
-                date="Jan 12 Jul 2025"
+                titleOptions={TEACHER_TITLE_OPTIONS}
+                icon={<FaChalkboardTeacher />}
                 items={[
                   { label: "class1", time: "3 pm", status: "success" },
                   { label: "class1", time: "12 pm", status: "warning" },

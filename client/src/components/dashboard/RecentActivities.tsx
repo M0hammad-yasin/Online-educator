@@ -27,7 +27,9 @@ const Activity: React.FC<ActivityProps> = ({
           icon={icon}
           style={{ backgroundColor: color || "#1890ff" }}
         />
-        <Title>{title}</Title>
+        <Title level={3} style={{ fontSize: 15 }}>
+          {title}
+        </Title>
       </div>
       <Text type="secondary">{description}</Text>
       <Text type="secondary" style={{ fontSize: 12 }}>
