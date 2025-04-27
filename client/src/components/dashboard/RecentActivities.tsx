@@ -41,7 +41,21 @@ const Activity: React.FC<ActivityProps> = ({
 
 const RecentActivities: React.FC = () => {
   return (
-    <Card title="Recent Activities" style={{ height: "100%" }}>
+    <Card
+      title="Recent Activities"
+      style={{
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+      }}
+      styles={{
+        body: {
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+        },
+      }}
+    >
       <Timeline
         items={[
           {

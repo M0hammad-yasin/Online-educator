@@ -40,7 +40,15 @@ const StatCard: React.FC<StatCardProps> = ({
           padding: "14px 8px",
           borderRadius: token.borderRadiusLG,
           boxShadow: token.boxShadow,
+          display: "flex",
+          flexDirection: "column",
+          height: "100%",
         },
+      }}
+      style={{
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
       }}
     >
       <Flex

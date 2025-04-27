@@ -7,6 +7,7 @@ import ClassesBarChart from "./charts/ClassesBarChart";
 import RecentActivities from "./RecentActivities";
 import StudentsPieChart from "./charts/StudentsPieChart";
 import RevenueLineChart from "./charts/RevenueLineChart";
+import styles from "./Dashboard.module.css";
 import {
   FaBookOpen,
   FaUserGraduate,
@@ -32,10 +33,10 @@ const Dashboard: React.FC = () => {
     CLASS_STATUS.UPCOMING
   );
   return (
-    <div className="dashboard">
+    <div className={styles.dashboard}>
       {/* Stat Cards Row */}
-      <Row gutter={[40, 40]}>
-        <Col xs={24} sm={12} md={12} lg={6}>
+      <Row gutter={[40, 40]} className={styles.equalHeightRow}>
+        <Col xs={24} sm={12} md={12} lg={6} className={styles.equalHeightCol}>
           <StatCard
             icon={<FaBookOpen />}
             value={23}
@@ -43,7 +44,7 @@ const Dashboard: React.FC = () => {
             // periodOptions={PERIOD_OPTIONS} // Removed
           />
         </Col>
-        <Col xs={24} sm={12} md={12} lg={6}>
+        <Col xs={24} sm={12} md={12} lg={6} className={styles.equalHeightCol}>
           <StatCard
             icon={<FaUserGraduate />}
             value={23}
@@ -51,7 +52,7 @@ const Dashboard: React.FC = () => {
             // periodOptions={PERIOD_OPTIONS} // Removed
           />
         </Col>
-        <Col xs={24} sm={12} md={12} lg={6}>
+        <Col xs={24} sm={12} md={12} lg={6} className={styles.equalHeightCol}>
           <StatCard
             icon={<FaChalkboardTeacher />}
             value={23}
@@ -59,7 +60,7 @@ const Dashboard: React.FC = () => {
             // periodOptions={PERIOD_OPTIONS} // Removed
           />
         </Col>
-        <Col xs={24} sm={12} md={12} lg={6}>
+        <Col xs={24} sm={12} md={12} lg={6} className={styles.equalHeightCol}>
           <StatCard
             icon={<FaBook />}
             value={23}
@@ -70,11 +71,15 @@ const Dashboard: React.FC = () => {
       </Row>
 
       {/* Middle Row */}
-      <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
+      <Row
+        gutter={[16, 16]}
+        style={{ marginTop: 16 }}
+        className={styles.equalHeightRow}
+      >
         {/* First three List items */}
-        <Col xs={24} lg={14}>
-          <Row gutter={[16, 16]}>
-            <Col xs={24} lg={8}>
+        <Col xs={24} lg={14} className={styles.equalHeightCol}>
+          <Row gutter={[16, 16]} className={styles.equalHeightRow}>
+            <Col xs={24} lg={8} className={styles.equalHeightCol}>
               <ItemList
                 titleOptions={CLASS_TITLE_OPTIONS}
                 icon={<FaBookOpen />}
@@ -89,7 +94,7 @@ const Dashboard: React.FC = () => {
                 ]}
               />
             </Col>
-            <Col xs={24} lg={8}>
+            <Col xs={24} lg={8} className={styles.equalHeightCol}>
               <ItemList
                 titleOptions={STUDENT_TITLE_OPTIONS}
                 icon={<FaUserGraduate />}
@@ -104,7 +109,7 @@ const Dashboard: React.FC = () => {
                 ]}
               />
             </Col>
-            <Col xs={24} lg={8}>
+            <Col xs={24} lg={8} className={styles.equalHeightCol}>
               <ItemList
                 titleOptions={TEACHER_TITLE_OPTIONS}
                 icon={<FaChalkboardTeacher />}
@@ -122,8 +127,8 @@ const Dashboard: React.FC = () => {
           </Row>
         </Col>
         {/* Bar Chart col */}
-        <Col xs={24} lg={10}>
-          <Card>
+        <Col xs={24} lg={10} className={styles.equalHeightCol}>
+          <Card className={styles.equalHeightCard}>
             <div
               style={{
                 display: "flex",
@@ -149,18 +154,25 @@ const Dashboard: React.FC = () => {
       </Row>
 
       {/* Bottom Row */}
-      <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
+      <Row
+        gutter={[16, 16]}
+        style={{ marginTop: 16 }}
+        className={styles.equalHeightRow}
+      >
         {/* Recent Activities - 3/5 of the width */}
-        <Col xs={24} lg={14}>
+        <Col xs={24} lg={14} className={styles.equalHeightCol}>
           <RecentActivities />
         </Col>
 
         {/* Charts - 2/5 of the width */}
-        <Col xs={24} lg={10}>
-          <Row gutter={[24, 24]}>
+        <Col xs={24} lg={10} className={styles.equalHeightCol}>
+          <Row gutter={[24, 24]} className={styles.equalHeightRow}>
             {/* Students by Location */}
             <Col xs={24}>
-              <Card title="Students by Location">
+              <Card
+                title="Students by Location"
+                className={styles.equalHeightCard}
+              >
                 <StudentsPieChart
                   data={[
                     { name: "United States", value: 52.1 },
@@ -174,7 +186,10 @@ const Dashboard: React.FC = () => {
 
             {/* Revenue vs Payouts */}
             <Col xs={24} style={{ marginTop: 16 }}>
-              <Card title="Revenue vs. Payouts">
+              <Card
+                title="Revenue vs. Payouts"
+                className={styles.equalHeightCard}
+              >
                 <RevenueLineChart />
               </Card>
             </Col>

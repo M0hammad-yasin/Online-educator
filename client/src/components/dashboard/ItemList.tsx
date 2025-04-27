@@ -51,6 +51,9 @@ const ItemList: React.FC<ItemListProps> = ({ titleOptions, items, icon }) => {
         body: {
           padding: "0",
           background: token.colorBgContainer,
+          display: "flex",
+          flexDirection: "column",
+          flex: 1,
         },
       }}
       title={
@@ -127,6 +130,8 @@ const ItemList: React.FC<ItemListProps> = ({ titleOptions, items, icon }) => {
         boxShadow: token.boxShadow,
         borderRadius: token.borderRadiusLG,
         overflow: "hidden",
+        display: "flex",
+        flexDirection: "column",
       }}
     >
       <div style={{ width: "100%" }}>
@@ -192,11 +197,11 @@ const ItemList: React.FC<ItemListProps> = ({ titleOptions, items, icon }) => {
         ))}
 
         {items.length > 5 && (
-          <Flex align="center" justify="center">
+          <Flex align="center" justify="center" className="showMoreButton">
             <Button
               type="link"
               style={{
-                padding: 0,
+                padding: 3,
                 fontWeight: 500,
                 fontSize: "14px",
               }}
