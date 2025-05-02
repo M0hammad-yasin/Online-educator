@@ -142,11 +142,19 @@ const ItemList: React.FC<ItemListProps> = ({ titleOptions, items, icon }) => {
             align="center"
             className={styles.itemRow}
             style={{
+              backgroundColor: "transparent",
+              transition: "background-color 0.3s",
               padding: "6px 12px",
               borderBottom:
                 index < items.slice(0, 5).length - 1
                   ? `1px solid ${token.colorBorder}`
                   : "none",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = token.colorBgTextHover;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = "transparent";
             }}
           >
             <Flex align="center" gap={8}>
@@ -197,7 +205,15 @@ const ItemList: React.FC<ItemListProps> = ({ titleOptions, items, icon }) => {
         ))}
 
         {items.length > 5 && (
-          <Flex align="center" justify="center" className="showMoreButton">
+          <Flex
+            align="center"
+            justify="center"
+            className={styles.showMoreButton}
+            style={{
+              borderTopColor: token.colorBorderSecondary,
+              background: token.colorBgElevated,
+            }}
+          >
             <Button
               type="link"
               style={{

@@ -1,130 +1,215 @@
 import React from "react";
-import { Card, Typography, Space, Timeline, Avatar, Button } from "antd";
-import { FaTrophy, FaRocket, FaGlobeAmericas } from "react-icons/fa";
+import { Card, Typography, List, Avatar, Button, Tag, Flex, theme } from "antd";
+import styles from "./RecentActivities.module.css";
+import {
+  FaBookOpen,
+  FaUserGraduate,
+  FaChalkboardTeacher,
+  FaGraduationCap,
+  FaStar,
+  FaCalendarCheck,
+  FaDollarSign,
+  FaUsers,
+  FaClipboard,
+  FaRegClock,
+} from "react-icons/fa";
 
 const { Title, Text } = Typography;
+const { useToken } = theme;
 
-interface ActivityProps {
+interface ActivityItem {
   icon: React.ReactNode;
   title: string;
   description: string;
   time: string;
-  color?: string;
+  color: string;
 }
 
-const Activity: React.FC<ActivityProps> = ({
-  icon,
-  title,
-  description,
-  time,
-  color,
-}) => {
-  return (
-    <Space direction="vertical" size={0}>
-      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <Avatar
-          size="small"
-          icon={icon}
-          style={{ backgroundColor: color || "#1890ff" }}
-        />
-        <Title level={3} style={{ fontSize: 15 }}>
-          {title}
-        </Title>
-      </div>
-      <Text type="secondary">{description}</Text>
-      <Text type="secondary" style={{ fontSize: 12 }}>
-        {time}
-      </Text>
-    </Space>
-  );
-};
+const activityItems: ActivityItem[] = [
+  {
+    icon: <FaGraduationCap />,
+    title: "Completed Advanced Math Course",
+    description:
+      "Emma Wilson completed the Advanced Math Course with distinction.",
+    time: "1 day ago",
+    color: "#1890ff",
+  },
+  {
+    icon: <FaUserGraduate />,
+    title: "New Student Enrollment",
+    description: "Alex Johnson enrolled in the Physics 101 course.",
+    time: "2 hours ago",
+    color: "#52c41a",
+  },
+  {
+    icon: <FaChalkboardTeacher />,
+    title: "Teacher Added New Lesson Plan",
+    description: "Ms. Parker added a new lesson plan for Chemistry class.",
+    time: "2 days ago",
+    color: "#722ed1",
+  },
+  {
+    icon: <FaBookOpen />,
+    title: "New Course Created",
+    description:
+      "The 'Introduction to Computer Science' course was successfully created.",
+    time: "3 days ago",
+    color: "#faad14",
+  },
+  {
+    icon: <FaStar />,
+    title: "Student Achievement",
+    description: "Ryan Thomas scored 95% in the Biology Final Exam.",
+    time: "5 days ago",
+    color: "#eb2f96",
+  },
+  {
+    icon: <FaCalendarCheck />,
+    title: "Class Scheduled by Teacher",
+    description:
+      "Mr. Harris scheduled a new class on 'Environmental Science' for April 30th.",
+    time: "6 hours ago",
+    color: "#13c2c2",
+  },
+  {
+    icon: <FaDollarSign />,
+    title: "Payment Received from Student",
+    description: "Samantha paid for 5 sessions of the Spanish Language Course.",
+    time: "4 hours ago",
+    color: "#fa541c",
+  },
+  {
+    icon: <FaUsers />,
+    title: "New Teacher Assigned to Class",
+    description: "John Smith was assigned as the teacher for 'Physics 102'.",
+    time: "1 day ago",
+    color: "#f5222d",
+  },
+  {
+    icon: <FaClipboard />,
+    title: "Class Rescheduled by Teacher",
+    description:
+      "The 'Advanced Chemistry' class was rescheduled to May 5th at 10 AM.",
+    time: "3 days ago",
+    color: "#faad14",
+  },
+  {
+    icon: <FaRegClock />,
+    title: "Class Join Confirmation",
+    description: "Student Lucy joined the 'Machine Learning' class at 3 PM.",
+    time: "30 minutes ago",
+    color: "#2f54eb",
+  },
+];
 
 const RecentActivities: React.FC = () => {
+  const { token } = useToken();
+
   return (
     <Card
-      title="Recent Activities"
+      title={
+        <Flex justify="space-between" align="center">
+          <Title level={5} style={{ margin: 0 }}>
+            Recent Educational Activities
+          </Title>
+          <Tag color="processing">Today</Tag>
+        </Flex>
+      }
       style={{
         height: "100%",
         display: "flex",
         flexDirection: "column",
+        borderRadius: token.borderRadiusLG,
+        overflow: "hidden",
       }}
       styles={{
         body: {
           flex: 1,
           display: "flex",
           flexDirection: "column",
+          padding: 0,
         },
       }}
     >
-      <Timeline
-        items={[
-          {
-            dot: <FaTrophy style={{ fontSize: "16px", color: "#1890ff" }} />,
-            children: (
-              <Activity
-                icon={<FaTrophy />}
-                title="1st place in 'Chess'"
-                description="John Doe won 1st place in 'Chess'"
-                time="1 day ago"
-                color="#1890ff"
+      <List
+        itemLayout="horizontal"
+        dataSource={activityItems.slice(0, 8)}
+        renderItem={(item, index) => (
+          <List.Item
+            style={{
+              padding: "12px 24px",
+              borderBottom:
+                index < activityItems.length - 1
+                  ? `1px solid ${token.colorBorderSecondary}`
+                  : "none",
+              transition: "background-color 0.3s",
+            }}
+            className={styles.activityItem}
+          >
+            <Flex
+              align="center"
+              style={{ width: "100%" }}
+              className={styles.activityContent}
+            >
+              <Avatar
+                size="large"
+                icon={item.icon}
+                style={{
+                  backgroundColor: item.color,
+                  marginRight: 16,
+                }}
+                className={styles.activityAvatar}
               />
-            ),
-          },
-          {
-            dot: <FaRocket style={{ fontSize: "16px", color: "#52c41a" }} />,
-            children: (
-              <Activity
-                icon={<FaRocket />}
-                title="Participated in 'Carrom'"
-                description="Justin Lee participated in 'Carrom'"
-                time="2 hours ago"
-                color="#52c41a"
-              />
-            ),
-          },
-          {
-            dot: (
-              <FaGlobeAmericas style={{ fontSize: "16px", color: "#722ed1" }} />
-            ),
-            children: (
-              <Activity
-                icon={<FaGlobeAmericas />}
-                title="Internation conference in 'St.John School'"
-                description="Justin Lee attended internation conference in 'St.John School'"
-                time="2 Week ago"
-                color="#722ed1"
-              />
-            ),
-          },
-          {
-            dot: <FaTrophy style={{ fontSize: "16px", color: "#faad14" }} />,
-            children: (
-              <Activity
-                icon={<FaTrophy />}
-                title="Won 1st place in 'Chess'"
-                description="John Doe won 1st place in 'Chess'"
-                time="3 Day ago"
-                color="#faad14"
-              />
-            ),
-          },
-          {
-            dot: <FaTrophy style={{ fontSize: "16px", color: "#faad14" }} />,
-            children: (
-              <Activity
-                icon={<FaTrophy />}
-                title="Won 1st place in 'Chess'"
-                description="John Doe won 1st place in 'Chess'"
-                time="3 Day ago"
-                color="#faad14"
-              />
-            ),
-          },
-        ]}
+              <Flex
+                vertical
+                style={{
+                  flex: 1,
+                  overflow: "hidden",
+                }}
+              >
+                <Flex
+                  align="center"
+                  justify="space-between"
+                  className={styles.activityHeader}
+                >
+                  <Title level={5} style={{ margin: 0, fontSize: 16 }}>
+                    {item.title}
+                  </Title>
+                  <Tag color={item.color}>{item.time}</Tag>
+                </Flex>
+                <Text
+                  type="secondary"
+                  style={{
+                    whiteSpace: "normal",
+                    wordBreak: "break-word",
+                  }}
+                >
+                  {item.description}
+                </Text>
+              </Flex>
+            </Flex>
+          </List.Item>
+        )}
+        footer={
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignContent: "center",
+              padding: "12px 24px",
+            }}
+          >
+            <Button type="link" style={{ padding: 0 }}>
+              Show more
+            </Button>
+          </div>
+        }
+        style={{
+          flex: 1,
+          // overflow: "auto",
+        }}
+        className={styles.activityList}
       />
-      <Button type="link" style={{ padding: 0 }}>
-        Show more
-      </Button>
     </Card>
   );
 };

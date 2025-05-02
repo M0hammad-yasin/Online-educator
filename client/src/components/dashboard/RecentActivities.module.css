@@ -1,0 +1,28 @@
+.activityItem:hover {
+  background-color: var()
+}
+
+/* Responsive styles */
+@media (max-width: 576px) {
+  .activityContent {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .activityHeader {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+}
+
+@media (max-width: 768px) {
+  .activityAvatar {
+    margin-right: 12px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .activityList {
+    max-height: 500px;
+  }
+}

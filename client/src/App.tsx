@@ -5,7 +5,6 @@ import { useState } from "react";
 import "./style/App.css";
 import { AppHeader, MainContent, Sidebar } from "./components/layout";
 import Dashboard from "./components/dashboard/Dashboard";
-
 const App = () => {
   const [collapsed, setCollapsed] = useState(false);
 

@@ -32,7 +32,7 @@ const ClassesBarChart: React.FC<ClassesBarChartProps> = ({
   console.log(`Showing classes with status: ${status}`);
 
   return (
-    <ResponsiveContainer width="100%" height={270}>
+    <ResponsiveContainer width="100%" height={250}>
       <BarChart
         data={data}
         margin={{

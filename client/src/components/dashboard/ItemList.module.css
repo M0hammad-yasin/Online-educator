@@ -1,24 +1,24 @@
 .itemRow {
   margin-bottom: 2px;
-  padding: 5px 10px;
-  border-bottom: 1px solid var(--border-color);
-  transition: background-color 0.3s;
+  padding: 8px 16px;
+  transition: all 0.3s;
   cursor: pointer;
+  border-radius: 4px;
 }
 
-.itemRow:hover {
-  background-color: var(--bg-elevated);
-}
+/* Hover styles will be applied through the component using token variables */
 
 .itemRow:last-child {
   border-bottom: none;
 }
 
 .showMoreButton {
-  border-top: 1px solid var(--border-color);
-  background: var(--bg-elevated);
+  border-top: 1px solid;
   display: flex;
   justify-content: center;
   align-items: center;
   margin-bottom: auto;
+  padding: 8px 0;
+  cursor: pointer;
+  transition: all 0.3s;
 }

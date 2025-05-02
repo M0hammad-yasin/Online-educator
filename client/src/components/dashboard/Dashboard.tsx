@@ -128,11 +128,22 @@ const Dashboard: React.FC = () => {
         </Col>
         {/* Bar Chart col */}
         <Col xs={24} lg={10} className={styles.equalHeightCol}>
-          <Card className={styles.equalHeightCard}>
+          <Card
+            className={styles.equalHeightCard}
+            styles={{
+              body: {
+                padding: "16px",
+                display: "flex",
+                flexDirection: "column",
+                flex: 1,
+              },
+            }}
+          >
             <div
               style={{
                 display: "flex",
                 justifyContent: "space-between",
+                marginBottom: "16px",
               }}
             >
               <Title level={5} style={{ margin: 0 }}>
@@ -166,12 +177,20 @@ const Dashboard: React.FC = () => {
 
         {/* Charts - 2/5 of the width */}
         <Col xs={24} lg={10} className={styles.equalHeightCol}>
-          <Row gutter={[24, 24]} className={styles.equalHeightRow}>
+          <Row gutter={[16, 16]} className={styles.equalHeightRow}>
             {/* Students by Location */}
             <Col xs={24}>
               <Card
                 title="Students by Location"
                 className={styles.equalHeightCard}
+                styles={{
+                  body: {
+                    padding: "16px",
+                    display: "flex",
+                    flexDirection: "column",
+                    flex: 1,
+                  },
+                }}
               >
                 <StudentsPieChart
                   data={[
@@ -185,10 +204,18 @@ const Dashboard: React.FC = () => {
             </Col>
 
             {/* Revenue vs Payouts */}
-            <Col xs={24} style={{ marginTop: 16 }}>
+            <Col xs={24}>
               <Card
                 title="Revenue vs. Payouts"
                 className={styles.equalHeightCard}
+                styles={{
+                  body: {
+                    padding: "16px",
+                    display: "flex",
+                    flexDirection: "column",
+                    flex: 1,
+                  },
+                }}
               >
                 <RevenueLineChart />
               </Card>
