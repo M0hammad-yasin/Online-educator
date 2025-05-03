@@ -8,8 +8,8 @@ import {
   SettingOutlined,
   LogoutOutlined,
 } from "@ant-design/icons";
-import SIDEBAR_MENU from "../../../config/menu";
-import { Role } from "../../../config/constants";
+import SIDEBAR_MENU from "../../../constants/menu";
+import { Role } from "../../../constants/role";
 const { Sider } = Layout;
 
 const menuItems = SIDEBAR_MENU[Role.ADMIN];

@@ -3,6 +3,7 @@ import { Form, Input, Button, Typography, Card, message } from 'antd';
 import { MailOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import { ForgotPasswordIllustration, SuccessCheckmark } from '../../assets/auth-illustrations';
+import useAuthStore from '../../store/authStore';
 import styles from './ForgotPassword.module.css';
 
 const { Title, Text, Paragraph } = Typography;
@@ -12,18 +13,18 @@ interface ForgotPasswordFormValues {
 }
 
 const ForgotPassword: React.FC = () => {
-  const [loading, setLoading] = useState(false);
+  const { forgotPassword, loading } = useAuthStore();
   const [submitted, setSubmitted] = useState(false);
 
-  const onFinish = (values: ForgotPasswordFormValues) => {
-    setLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      console.log('Reset password request for:', values.email);
-      setLoading(false);
+  const onFinish = async (values: ForgotPasswordFormValues) => {
+    try {
+      await forgotPassword(values.email);
       setSubmitted(true);
       message.success('Password reset instructions sent!');
-    }, 1500);
+    } catch (error) {
+      console.error('Error sending reset instructions:', error);
+      message.error('Error sending reset instructions. Please try again.');
+    }
   };
 
   return (
@@ -100,5 +101,4 @@ const ForgotPassword: React.FC = () => {
     </div>
   );
 };
-
 export default ForgotPassword;

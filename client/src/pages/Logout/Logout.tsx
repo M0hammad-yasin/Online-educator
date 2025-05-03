@@ -1,25 +1,35 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Button, Typography, Card, Result } from 'antd';
 import { LogoutOutlined, LoginOutlined, HomeOutlined } from '@ant-design/icons';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { LogoutIllustration, LoadingSpinner } from '../../assets/auth-illustrations';
+import useAuthStore from '../../store/authStore';
 import styles from './Logout.module.css';
 
 const { Title, Paragraph } = Typography;
 
 const Logout: React.FC = () => {
-  const [isLoggingOut, setIsLoggingOut] = useState(true);
-
+  const { logout, loading, isAuthenticated } = useAuthStore();
+  
   useEffect(() => {
-    // Simulate logout process
-    const timer = setTimeout(() => {
-      setIsLoggingOut(false);
-      // In a real app, you would clear auth tokens, user data, etc.
-      console.log('User logged out successfully');
-    }, 1500);
+    const performLogout = async () => {
+      if (isAuthenticated) {
+        try {
+          await logout();
+          console.log('User logged out successfully');
+        } catch (error) {
+          console.error('Logout failed:', error);
+        }
+      }
+    };
+    
+    performLogout();
+  }, [logout, isAuthenticated]);
 
-    return () => clearTimeout(timer);
-  }, []);
+  // If not authenticated and not in the process of logging out, redirect to login
+  if (!isAuthenticated && !loading) {
+    return <Navigate to="/login" />;
+  }
 
   return (
     <div className={styles.logoutContainer}>
@@ -28,7 +38,7 @@ const Logout: React.FC = () => {
           <div className={styles.logoutBackground}>
             <LogoutIllustration />
           </div>
-          {isLoggingOut ? (
+          {loading ? (
             <div className={styles.loggingOutContent}>
               <div className={styles.loadingIcon}>
                 <LoadingSpinner />

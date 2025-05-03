@@ -25,18 +25,3 @@ export const COURSE_TITLE_OPTIONS = [
   { value: "activeCourses", label: "Active Courses" },
   { value: "completedCourses", label: "Completed Courses" },
 ];
-
-export const PERIOD_OPTIONS = [
-  { value: "today", label: "Today" },
-  { value: "yesterday", label: "Yesterday" },
-  { value: "last7days", label: "Last 7 Days" },
-  { value: "thisMonth", label: "This Month" },
-];
-
-// Default values for each card type
-export const DEFAULT_TITLE_VALUES = {
-  class: "allClasses",
-  student: "allStudents",
-  teacher: "allTeachers",
-  course: "allCourses",
-};

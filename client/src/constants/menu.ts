@@ -1,4 +1,4 @@
-import { Role } from "./constants";
+import { Role } from "./role";
 const SIDEBAR_MENU = {
   [Role.ADMIN]: [
     {
