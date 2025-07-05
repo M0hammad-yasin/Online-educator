@@ -58,7 +58,11 @@ const StatCard: React.FC<StatCardProps> = ({
         gap={4}
         style={{ margin: 0 }}
       >
-        <Flex justify="space-evenly" align="center" className="w-full mb-10">
+        <Flex 
+          justify="space-evenly" 
+          align="center" 
+          style={{ width: "100%", marginBottom: "40px" }}
+        >
           <Title level={4} style={{ margin: 0, fontSize: 20 }}>
             <Select
               style={{ width: 160, textAlign: "left" }}
@@ -75,8 +79,7 @@ const StatCard: React.FC<StatCardProps> = ({
           justify={"space-evenly"}
           align="center"
           gap={16}
-          className="w-full"
-          style={{ padding: "5px 8px", margin: "10px 0px" }}
+          style={{ width: "100%", padding: "5px 8px", margin: "10px 0px" }}
         >
           <div
             style={{
@@ -96,7 +99,11 @@ const StatCard: React.FC<StatCardProps> = ({
             {value}
           </Title>
         </Flex>
-        <Flex justify="center" align="center" className="w-full">
+        <Flex 
+          justify="center" 
+          align="center" 
+          style={{ width: "100%" }}
+        >
           <DatePicker
             picker="month"
             defaultValue={selectedPeriod}
