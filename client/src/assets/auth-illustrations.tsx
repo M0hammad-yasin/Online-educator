@@ -3,31 +3,48 @@ import React from 'react';
 // Collection of SVG illustrations for authentication pages
 export const LoginIllustration: React.FC = () => (
   <svg width="100%" height="100%" viewBox="0 0 500 400" xmlns="http://www.w3.org/2000/svg">
-    {/* Background shape */}
-    <path d="M250,80 Q350,20 450,80 L450,250 Q350,310 250,250 Q150,310 50,250 L50,80 Q150,20 250,80 Z" 
-      fill="#e6f4ff" stroke="#4096ff" strokeWidth="2"/>
+    {/* Simple gradient background */}
+    <rect x="0" y="0" width="500" height="400" fill="#f0f9ff" />
+    <path d="M0,350 Q125,300 250,350 T500,350" fill="#e6f7ff" />
+    <path d="M0,380 Q125,330 250,380 T500,380" fill="#bae7ff" />
     
-    {/* Decorative elements */}
-    <circle cx="250" cy="100" r="30" fill="#1677ff"/>
-    <rect x="200" y="150" width="100" height="120" rx="10" fill="#f0f7ff" stroke="#4096ff" strokeWidth="2"/>
-    <path d="M220,180 L280,180 M220,200 L280,200 M220,220 L260,220" stroke="#1677ff" strokeWidth="2" strokeLinecap="round"/>
+    {/* Abstract shapes */}
+    <circle cx="400" cy="80" r="30" fill="#1677ff" opacity="0.1" />
+    <circle cx="420" cy="120" r="20" fill="#1677ff" opacity="0.1" />
+    <circle cx="380" cy="110" r="15" fill="#1677ff" opacity="0.1" />
     
-    {/* Books/Education elements */}
-    <rect x="120" y="200" width="60" height="80" rx="5" fill="#bae0ff" stroke="#4096ff" strokeWidth="2"/>
-    <rect x="130" y="210" width="40" height="10" fill="#1677ff"/>
-    <rect x="130" y="230" width="40" height="5" fill="#1677ff"/>
-    <rect x="130" y="245" width="30" height="5" fill="#1677ff"/>
+    {/* Books stack - simplified */}
+    <rect x="150" y="240" width="70" height="15" fill="#1677ff" opacity="0.7" rx="3" />
+    <rect x="145" y="225" width="70" height="15" fill="#1677ff" opacity="0.5" rx="3" />
+    <rect x="155" y="210" width="70" height="15" fill="#1677ff" opacity="0.3" rx="3" />
+    <rect x="140" y="195" width="70" height="15" fill="#1677ff" opacity="0.1" rx="3" />
     
-    <rect x="320" y="180" width="70" height="90" rx="5" fill="#bae0ff" stroke="#4096ff" strokeWidth="2"/>
-    <rect x="330" y="190" width="50" height="10" fill="#1677ff"/>
-    <rect x="330" y="210" width="50" height="5" fill="#1677ff"/>
-    <rect x="330" y="225" width="40" height="5" fill="#1677ff"/>
+    {/* Pencil - simplified */}
+    <path d="M250,200 L260,170 L270,200 Z" fill="#1677ff" opacity="0.2" />
+    <rect x="255" y="200" width="10" height="30" fill="#1677ff" opacity="0.1" />
     
-    {/* Connection lines */}
-    <path d="M150,300 Q250,350 350,300" stroke="#1677ff" strokeWidth="2" fill="transparent" strokeLinecap="round"/>
-    <circle cx="150" cy="300" r="5" fill="#1677ff"/>
-    <circle cx="250" cy="325" r="5" fill="#1677ff"/>
-    <circle cx="350" cy="300" r="5" fill="#1677ff"/>
+    {/* Abstract person with graduation cap */}
+    <circle cx="350" cy="280" r="20" fill="#1677ff" opacity="0.2" /> {/* Head */}
+    <rect x="335" y="300" width="30" height="40" fill="#1677ff" opacity="0.1" rx="5" /> {/* Body */}
+    <path d="M330,280 L370,280 L350,265 Z" fill="#1677ff" opacity="0.3" /> {/* Graduation cap */}
+    <line x1="350" y1="265" x2="360" y2="275" stroke="#1677ff" opacity="0.3" strokeWidth="2" /> {/* Tassel */}
+    
+    {/* Abstract learning symbols */}
+    <circle cx="150" cy="120" r="40" fill="none" stroke="#1677ff" opacity="0.2" strokeWidth="2" strokeDasharray="5,5" />
+    <path d="M130,120 L170,120 M150,100 L150,140" stroke="#1677ff" opacity="0.3" strokeWidth="2" />
+    
+    {/* Light bulb - representing ideas */}
+    <circle cx="250" cy="100" r="25" fill="#1677ff" opacity="0.1" />
+    <path d="M250,125 L250,140" stroke="#1677ff" opacity="0.3" strokeWidth="2" />
+    <path d="M240,135 L260,135" stroke="#1677ff" opacity="0.3" strokeWidth="2" />
+    
+    {/* Decorative dots */}
+    <circle cx="100" cy="200" r="3" fill="#1677ff" opacity="0.3" />
+    <circle cx="120" cy="220" r="2" fill="#1677ff" opacity="0.3" />
+    <circle cx="90" cy="230" r="4" fill="#1677ff" opacity="0.3" />
+    <circle cx="400" cy="200" r="3" fill="#1677ff" opacity="0.3" />
+    <circle cx="420" cy="220" r="2" fill="#1677ff" opacity="0.3" />
+    <circle cx="390" cy="230" r="4" fill="#1677ff" opacity="0.3" />
   </svg>
 );
 
