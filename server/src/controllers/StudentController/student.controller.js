@@ -32,7 +32,11 @@ export const registerStudent = asyncWrapper(async (req, res) => {
     },
   });
 
-  res.status(201).json({ message: "Student registered successfully", student });
+  sendSuccess(res, {
+    statusCode: 201,
+    message: "Student registered successfully",
+    data: { student },
+  });
 });
 export const updateStudent = asyncWrapper(async (req, res) => {
   const { profilePicture, name, email, parentEmail, grade, address, region } =

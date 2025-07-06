@@ -52,7 +52,7 @@ export const loginTeacher = asyncWrapper(async (req, res) => {
   // Compare password
   const isMatch = await comparePassword(password, teacher.passwordHash);
   if (!isMatch) {
-    return res.status(401).json({ error: "Invalid email or password" });
+    throw new BadRequestError("Invalid email or password");
   }
 
   // Generate JWT token

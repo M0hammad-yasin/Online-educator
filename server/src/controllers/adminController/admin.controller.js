@@ -153,5 +153,9 @@ export const verifyEmail = asyncWrapper(async (req, res) => {
 });
 export const logOutAdmin = asyncWrapper(async (req, res) => {
   res.clearCookie("token");
-  res.status(200).json({ message: "Logged out successfully" });
+  sendSuccess(res, {
+    statusCode: 200,
+    message: "Logged out successfully",
+    data: null,
+  });
 });

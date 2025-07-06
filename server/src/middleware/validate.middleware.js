@@ -7,7 +7,7 @@
 //   next();
 
 import { ZodError } from "zod";
-import { sendError } from "../Lib/api.response.js";
+import { BadRequestError } from "../Lib/custom.error.js";
 export const validateBody = (schema) => (req, res, next) => {
   try {
     schema.parse(req.body);
@@ -19,10 +19,9 @@ export const validateBody = (schema) => (req, res, next) => {
         message: err.message,
       }));
 
-      sendError(res, {
-        statusCode: 400,
-        message: formattedErrors,
-      });
+      const validationError = new BadRequestError("Validation failed");
+      validationError.details = formattedErrors;
+      return next(validationError);
     }
     next(error); // Pass other errors to Express error handler
   }
@@ -38,10 +37,9 @@ export const validateQuery = (schema) => (req, res, next) => {
         message: err.message,
       }));
 
-      sendError(res, {
-        statusCode: 400,
-        message: formattedErrors,
-      });
+      const validationError = new BadRequestError("Validation failed");
+      validationError.details = formattedErrors;
+      return next(validationError);
     }
     next(error); // Pass other errors to Express error handler
   }
@@ -58,10 +56,9 @@ export const validate = (schema, dataExtractor) => (req, res, next) => {
         message: err.message,
       }));
 
-      sendError(res, {
-        statusCode: 400,
-        message: formattedErrors,
-      });
+      const validationError = new BadRequestError("Validation failed");
+      validationError.details = formattedErrors;
+      return next(validationError);
     } else {
       next(error); // Pass other errors to Express error handler
     }

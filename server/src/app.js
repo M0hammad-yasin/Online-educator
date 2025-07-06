@@ -3,7 +3,7 @@ import cors from "cors";
 import morgan from "morgan";
 
 import initializeRoutes from "./route.js";
-import { sendError } from "./Lib/api.response.js";
+import { NotFoundError } from "./Lib/custom.error.js";
 import config from "./Config/config.js";
 const app = express();
 
@@ -18,10 +18,7 @@ app.use(
 );
 app.use(morgan("dev"));
 initializeRoutes(app);
-app.route("*").all((req, res) => {
-  sendError(res, {
-    statusCode: 404,
-    message: "Route not found",
-  });
+app.route("*").all((req, res, next) => {
+  throw new NotFoundError("Route not found");
 });
 export { app };

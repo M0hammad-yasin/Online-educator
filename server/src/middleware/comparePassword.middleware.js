@@ -3,6 +3,7 @@ import {
   BadRequestError,
   ServerError,
 } from "../Lib/custom.error.js";
+import { Role } from "../constant.js";
 import prisma from "../Prisma/prisma.client.js";
 import { comparePassword, hashPassword } from "../Utils/bcrypt.js";
 
