@@ -2,8 +2,8 @@ import React from 'react';
 import { Form, Input, Button, Typography, Checkbox, Card, Flex, message } from 'antd';
 import { UserOutlined, LockOutlined, LoginOutlined } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
-import { LoginIllustration } from '../../assets/auth-illustrations';
-import useAuthStore from '../../store/authStore';
+import { LoginIllustration } from '../../../assets/auth-illustrations';
+import useAuthStore from '../store/authStore';
 import styles from './Login.module.css';
 
 const { Title, Text } = Typography;
@@ -121,4 +121,5 @@ const Login: React.FC = () => {
     </div>
   );
 };
-export default Login;
+
+export default Login; 

@@ -5,20 +5,22 @@ import { Routes, Route } from 'react-router-dom';
 
 // Teacher Placeholder Components
 // In a real app, you would import actual teacher components
-const MyCourses = () => <div>My Courses</div>;
-const Students = () => <div>My Students</div>;
-const Assignments = () => <div>Assignments</div>;
-const Grades = () => <div>Grades</div>;
-const TeacherProfile = () => <div>Teacher Profile</div>;
+const MyClasses = () => <div>My Classes</div>;
+const MyAssignments = () => <div>My Assignments</div>;
+const Calendar = () => <div>Calendar</div>;
+const MyStudents = () => <div>My Students</div>;
+const Settings = () => <div>Settings</div>;
+const Profile = () => <div>My Profile</div>;
 
 const TeacherRoutes: React.FC = () => {
   return (
     <Routes>
-      <Route path="courses" element={<MyCourses />} />
-      <Route path="students" element={<Students />} />
-      <Route path="assignments" element={<Assignments />} />
-      <Route path="grades" element={<Grades />} />
-      <Route path="profile" element={<TeacherProfile />} />
+      <Route path="classes" element={<MyClasses />} />
+      <Route path="assignments" element={<MyAssignments />} />
+      <Route path="calendar" element={<Calendar />} />
+      <Route path="students" element={<MyStudents />} />
+      <Route path="settings" element={<Settings />} />
+      <Route path="profile" element={<Profile />} />
       <Route index element={<div>Teacher Dashboard</div>} />
       <Route path="*" element={<div>Teacher Page Not Found</div>} />
     </Routes>

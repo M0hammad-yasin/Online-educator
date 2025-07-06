@@ -8,20 +8,63 @@ import {
   SettingOutlined,
   LogoutOutlined,
 } from "@ant-design/icons";
+import { useNavigate, useLocation } from "react-router-dom";
 import SIDEBAR_MENU from "../../../constants/menu";
 import { Role } from "../../../constants/role";
+import useAuthStore from "../../../features/authentication/store/authStore";
 const { Sider } = Layout;
 
-const menuItems = SIDEBAR_MENU[Role.ADMIN];
 interface SidebarProps {
   collapsed: boolean;
 }
 
+interface MenuItem {
+  key: number;
+  label: string;
+  path: string;
+  icon: string;
+}
+
 const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { user, logout } = useAuthStore();
+  
   const {
     token: { colorBgContainer, borderRadiusLG, Layout, colorBorder },
   } = theme.useToken();
-  console.log(colorBgContainer);
+
+  // Get menu items based on user role
+  const userRole = user?.role || Role.STUDENT;
+  const menuItems = SIDEBAR_MENU[userRole as keyof typeof SIDEBAR_MENU] || SIDEBAR_MENU[Role.STUDENT];
+
+  // Handle menu item click
+  const handleMenuClick = async (item: { key: string }) => {
+    const menuItem = menuItems.find((menu: MenuItem) => menu.key.toString() === item.key);
+    
+    if (menuItem) {
+      if (menuItem.path === "/logout") {
+        // Handle logout
+        try {
+          await logout();
+          navigate("/login");
+        } catch (error) {
+          console.error("Logout failed:", error);
+        }
+      } else {
+        // Navigate to the specified path
+        navigate(menuItem.path);
+      }
+    }
+  };
+
+  // Get current selected key based on location
+  const getSelectedKey = () => {
+    const currentPath = location.pathname;
+    const menuItem = menuItems.find((item: MenuItem) => item.path === currentPath);
+    return menuItem ? [menuItem.key.toString()] : ["1"];
+  };
+
   return (
     <Sider
       style={{
@@ -44,9 +87,10 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
       />
       <Menu
         mode="inline"
-        defaultSelectedKeys={["1"]}
+        selectedKeys={getSelectedKey()}
+        onClick={handleMenuClick}
         items={menuItems.map((item) => {
-          const IconComponent = {
+          const iconMap: { [key: string]: React.ComponentType<any> } = {
             DashboardOutlined,
             UserOutlined,
             CalendarOutlined,
@@ -54,7 +98,8 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
             FileOutlined,
             SettingOutlined,
             LogoutOutlined,
-          }[item.icon];
+          };
+          const IconComponent = iconMap[item.icon];
           return {
             key: item.key,
             icon: IconComponent ? <IconComponent /> : null,
