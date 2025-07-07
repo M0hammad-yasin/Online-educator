@@ -8,7 +8,6 @@ import adminRoutes from "./routes/admin.route.js";
 export default function (app) {
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
-  app.use("/api/user", userRoutes);
   app.use("/api/student", studentRoutes);
   app.use("/api/teacher", teacherRoutes);
   app.use("/api/class", classRoutes);

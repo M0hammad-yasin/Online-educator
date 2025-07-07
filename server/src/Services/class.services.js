@@ -536,7 +536,6 @@ class ClassService {
    */
   groupClasses(classes, groupBy) {
     if (!groupBy) throw new BadRequestError("groupBy field must not be empty");
-    console.log("classes", classes);
     if (groupBy === "grade") {
       return classes.reduce((acc, cls) => {
         const grade = this.#cu.gradeToOrdinal(cls.student.grade);
