@@ -19,8 +19,8 @@ export const validateBody = (schema) => (req, res, next) => {
         message: err.message,
       }));
 
-      const validationError = new BadRequestError("Validation failed");
-      validationError.details = formattedErrors;
+      const errorMessage = formattedErrors.map(err => `${err.field}: ${err.message}`).join('; ');
+      const validationError = new BadRequestError(errorMessage);
       return next(validationError);
     }
     next(error); // Pass other errors to Express error handler
@@ -37,8 +37,8 @@ export const validateQuery = (schema) => (req, res, next) => {
         message: err.message,
       }));
 
-      const validationError = new BadRequestError("Validation failed");
-      validationError.details = formattedErrors;
+      const errorMessage = formattedErrors.map(err => `${err.field}: ${err.message}`).join('; ');
+      const validationError = new BadRequestError(errorMessage);
       return next(validationError);
     }
     next(error); // Pass other errors to Express error handler
@@ -56,8 +56,8 @@ export const validate = (schema, dataExtractor) => (req, res, next) => {
         message: err.message,
       }));
 
-      const validationError = new BadRequestError("Validation failed");
-      validationError.details = formattedErrors;
+      const errorMessage = formattedErrors.map(err => `${err.field}: ${err.message}`).join('; ');
+      const validationError = new BadRequestError(errorMessage);
       return next(validationError);
     } else {
       next(error); // Pass other errors to Express error handler

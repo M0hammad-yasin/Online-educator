@@ -1,6 +1,5 @@
 import config from "dotenv";
 config.config();
-
 export default {
   port: process.env.PORT || 5000,
   jwtSecret: process.env.JWT_SECRET,
