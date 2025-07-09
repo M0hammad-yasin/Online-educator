@@ -12,7 +12,7 @@ app.use(
   cors({
     origin: config.isProduction
       ? "yourdomain.com"
-      : `http://localhost${config.port}`,
+      : `http://localhost:${config.clientPort}`,
     credentials: true,
   })
 );

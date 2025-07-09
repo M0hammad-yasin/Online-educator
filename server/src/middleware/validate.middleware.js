@@ -7,7 +7,7 @@
 //   next();
 
 import { ZodError } from "zod";
-import { BadRequestError } from "../Lib/custom.error.js";
+import { ValidationError } from "../Lib/custom.error.js";
 export const validateBody = (schema) => (req, res, next) => {
   try {
     schema.parse(req.body);
@@ -20,7 +20,7 @@ export const validateBody = (schema) => (req, res, next) => {
       }));
 
       const errorMessage = formattedErrors.map(err => `${err.field}: ${err.message}`).join('; ');
-      const validationError = new BadRequestError(errorMessage);
+      const validationError = new ValidationError(errorMessage);
       return next(validationError);
     }
     next(error); // Pass other errors to Express error handler
@@ -38,7 +38,7 @@ export const validateQuery = (schema) => (req, res, next) => {
       }));
 
       const errorMessage = formattedErrors.map(err => `${err.field}: ${err.message}`).join('; ');
-      const validationError = new BadRequestError(errorMessage);
+      const validationError = new ValidationError(errorMessage);
       return next(validationError);
     }
     next(error); // Pass other errors to Express error handler
@@ -57,7 +57,7 @@ export const validate = (schema, dataExtractor) => (req, res, next) => {
       }));
 
       const errorMessage = formattedErrors.map(err => `${err.field}: ${err.message}`).join('; ');
-      const validationError = new BadRequestError(errorMessage);
+      const validationError = new ValidationError(errorMessage);
       return next(validationError);
     } else {
       next(error); // Pass other errors to Express error handler

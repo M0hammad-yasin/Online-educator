@@ -1,5 +1,5 @@
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
-import { ApiError } from './types';
+import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import { ApiError, ApiErrorResponse } from './types';
 
 class ApiClient {
   private static instance: ApiClient;
@@ -61,25 +61,24 @@ class ApiClient {
             window.location.href = '/login';
           }
         }
-
+        console.error(`API Error (${error.response?.status}):`, error);
         return Promise.reject(this.transformError(error));
       }
     );
   }
 
   private transformError(error: any): ApiError {
-    if (error.response) {
-      const { status, data } = error.response;
-      const message = data?.message || data?.error || 'An error occurred';
-      
-      if (status === 401) {
-        localStorage.removeItem('accessToken');
-      }
-      
-      return new ApiError(message, status, data);
+    // If it's an Axios error with a response, extract the server error structure
+    if (error?.response?.data) {
+      const data = error.response.data?.error as ApiErrorResponse
+      return new ApiError(
+        data.message || 'An error occurred',
+        data.type || 'unknown_error',
+        data.stack
+      );
     }
-    
-    return new ApiError(error.message || 'Network error', 0);
+    // Fallback for other errors
+    return new ApiError(error.message || 'Network error', 'network_error');
   }
 
   getAxiosInstance(): AxiosInstance {

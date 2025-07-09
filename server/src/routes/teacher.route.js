@@ -67,7 +67,7 @@ router.post(
 // );
 
 router.post("/register", validateBody(teacherSchema), registerTeacher);
-router.post("/login", validateBody(loginSchema), loginTeacher);
+router.post("/login", loginTeacher);
 router.post("/logout", auth, logoutTeacher);
 
 router.get("/me", auth, getTeacher);

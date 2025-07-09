@@ -22,6 +22,7 @@ interface AuthState {
   logout: () => Promise<void>;
   forgotPassword: (email: string) => Promise<void>;
   checkAuthStatus: () => Promise<void>;
+  register: (name: string, email: string, password: string) => Promise<void>;
 }
 
 // Create the store with persistence
@@ -129,6 +130,21 @@ const useAuthStore = create<AuthState>()(
           set({ loading: false });
         } catch (error) {
           console.error('Forgot password request failed:', error);
+          set({ loading: false });
+          throw error;
+        }
+      },
+      // Register function
+      register: async (name: string, email: string, password: string) => {
+        set({ loading: true });
+        try {
+          // In a real app, you would make an API call to your register endpoint
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          console.log('Registering user:', name, email);
+          // Simulate successful registration (do not log in user automatically)
+          set({ loading: false });
+        } catch (error) {
+          console.error('Registration failed:', error);
           set({ loading: false });
           throw error;
         }

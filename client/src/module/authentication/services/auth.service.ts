@@ -23,13 +23,9 @@ export interface AuthResponse {
   accessToken: string;
 }
 
-export interface LoginCredentials { /* ... */ }
-export interface RegisterData { /* ... */ }
-export interface AuthResponse { /* ... */ }
-
 class AuthService extends BaseService<any> {
   constructor() {
-    super('/auth');
+    super('/student');
   }
 
   async login(credentials: LoginCredentials): Promise<ApiResponse<AuthResponse>> {

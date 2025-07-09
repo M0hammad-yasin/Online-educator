@@ -6,6 +6,8 @@ import { sendSuccess } from "../../Lib/api.response.js";
 import { generateToken } from "../../Utils/jwt.user.js";
 import asyncWrapper from "../../Utils/asyncWrapper.js";
 import config from "../../Config/config.js";
+import _ from "lodash";
+
 export const createAdmin = asyncWrapper(async (req, res) => {
   const hashedPassword = await hashPassword(req.body.password);
   const data = {
@@ -54,6 +56,7 @@ export const getAdmin = asyncWrapper(async (req, res) => {
     data: { admin },
   });
 });
+
 export const updateAdmin = asyncWrapper(async (req, res) => {
   const data = {
     ...(req.body?.name && { name: req.body?.name }),
@@ -82,6 +85,7 @@ export const updateAdmin = asyncWrapper(async (req, res) => {
     data: { updatedAdmin: admin },
   });
 });
+
 export const updatePassword = asyncWrapper(async (req, res) => {
   const hashedPassword = await hashPassword(req.body.password);
   const admin = await prisma.admin.update({
@@ -103,6 +107,7 @@ export const updatePassword = asyncWrapper(async (req, res) => {
     data: { updatedAdmin: admin },
   });
 });
+
 export const loginAdmin = asyncWrapper(async (req, res) => {
   const where = {
     email: req.body.email,
@@ -128,9 +133,20 @@ export const loginAdmin = asyncWrapper(async (req, res) => {
   sendSuccess(res, {
     statusCode: 201,
     message: "Admin logged in Successfully",
-    data: { token },
+    data: {
+      token,
+      user: _.pick(admin, [
+        "id",
+        "name",
+        "email",
+        "role",
+        "profilePicture"
+        // add any other safe fields you want to expose
+      ])
+    },
   });
 });
+
 export const verifyEmail = asyncWrapper(async (req, res) => {
   const admin = await prisma.admin.update({
     where: { id: req.user.userId },
@@ -151,6 +167,7 @@ export const verifyEmail = asyncWrapper(async (req, res) => {
     data: { admin },
   });
 });
+
 export const logOutAdmin = asyncWrapper(async (req, res) => {
   res.clearCookie("token");
   sendSuccess(res, {

@@ -31,13 +31,18 @@ export interface BaseEntity {
   updatedAt: string;
 }
 
+export interface ApiErrorResponse {
+  type: string;
+  message: string;
+  stack?: string;
+}
+
 export class ApiError extends Error {
-  constructor(
-    message: string,
-    public status: number = 0,
-    public data: any = null
-  ) {
+  type: string;
+  stack?: string;
+  constructor(message: string, type: string, stack?: string) {
     super(message);
-    this.name = 'ApiError';
+    this.type = type;
+    this.stack = stack;
   }
 } 

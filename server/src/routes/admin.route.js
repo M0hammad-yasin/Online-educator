@@ -34,7 +34,6 @@ router.put(
 );
 router.post(
   "/login",
-  validate(loginSchema, (req) => req.body),
   loginAdmin
 );
 router.put("/update-password", auth, isAdmin, verifyPassword, updatePassword);

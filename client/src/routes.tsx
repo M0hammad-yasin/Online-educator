@@ -44,7 +44,7 @@ const AppRouter: React.FC = () => {
         <Route path="/logout" element={<Logout />} />
         
         {/* Protected routes with layout */}
-        <Route path="/" element={
+        <Route path="/dashboard" element={
           <ProtectedRoute element={
             <AppLayout>
               <Dashboard />

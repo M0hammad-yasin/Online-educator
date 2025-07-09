@@ -11,7 +11,7 @@ import {
 import { useNavigate, useLocation } from "react-router-dom";
 import SIDEBAR_MENU from "../../../constants/menu";
 import { Role } from "../../../constants/role";
-import useAuthStore from "../../../features/authentication/store/authStore";
+import useAuthStore from "../../../module/authentication/store/authStore";
 const { Sider } = Layout;
 
 interface SidebarProps {

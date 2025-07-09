@@ -21,6 +21,7 @@ const Login: React.FC = () => {
   const onFinish = async (values: LoginFormValues) => {
     try {
       await login(values.email, values.password);
+      localStorage.setItem('isAuthenticated', 'true');
       message.success('Login successful!');
       navigate('/dashboard');
     } catch (error) {

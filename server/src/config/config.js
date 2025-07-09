@@ -1,7 +1,8 @@
 import config from "dotenv";
 config.config();
 export default {
-  port: process.env.PORT || 5000,
+  port: process.env.PORT || 3000,
+  clientPort: process.env.CLIENT_PORT||5000,
   jwtSecret: process.env.JWT_SECRET,
   jwtSecretExpiry: parseInt(process.env.JWT_SECRET_EXPIRES_IN, 10),
   isProduction: process.env.NODE_ENV === "production",

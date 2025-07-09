@@ -58,7 +58,7 @@ router.get(
   hasRole(["ADMIN", "MODERATOR"]),
   studentsWithClasses
 );
-router.post("/login", validateBody(loginSchema), loginStudent);
+router.post("/login", loginStudent);
 router.post("/logout", auth, hasRole(Role.STUDENT), logoutStudent);
 router.get("/me", auth, isStudent, getStudent);
 router.get(

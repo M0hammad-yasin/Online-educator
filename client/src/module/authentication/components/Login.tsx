@@ -3,7 +3,7 @@ import { Form, Input, Button, Typography, Checkbox, Card, Flex, message } from '
 import { UserOutlined, LockOutlined, LoginOutlined } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
 import { LoginIllustration } from '../../../assets/auth-illustrations';
-import useAuthStore from '../store/authStore';
+import { useLogin } from '../hooks/useAuth';
 import styles from './Login.module.css';
 
 const { Title, Text } = Typography;
@@ -15,18 +15,22 @@ interface LoginFormValues {
 }
 
 const Login: React.FC = () => {
-  const { login, loading } = useAuthStore();
   const navigate = useNavigate();
-
-  const onFinish = async (values: LoginFormValues) => {
-    try {
-      await login(values.email, values.password);
-      message.success('Login successful!');
-      navigate('/dashboard');
-    } catch (error) {
-      console.error('Login failed:', error);
-      message.error('Login failed. Please check your credentials.');
-    }
+  const { mutate: login, isPending} = useLogin();
+  const onFinish = (values: LoginFormValues) => {
+    login(
+      { email: values.email, password: values.password },
+      {
+        onSuccess: () => {
+          message.success('Login successful!');
+          navigate('/dashboard');
+        },
+        onError: (error: any) => {
+          // Show the error message from the server if available
+          message.error(error?.message || 'Login failed. Please try again.');
+        },
+      }
+    );
   };
 
   return (
@@ -100,9 +104,9 @@ const Login: React.FC = () => {
                 <Button 
                   type="primary" 
                   htmlType="submit" 
-                  disabled={loading}
+                  disabled={isPending}
                   className={styles.loginButton}
-                  loading={loading}
+                  loading={isPending}
                   icon={<LoginOutlined />}
                   block
                 >

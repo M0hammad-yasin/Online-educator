@@ -1,13 +1,14 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Layout} from 'antd';
-import { Login, ForgotPassword, Logout } from '../features/authentication/components';
+import { Login, ForgotPassword, Logout } from '../module/authentication/components';
+import Register from '../module/authentication/components/Register';
 import AdminRoutes from './AdminRoutes';
 import TeacherRoutes from './TeacherRoutes';
 import StudentRoutes from './StudentRoutes';
 import { AppHeader, MainContent, Sidebar } from '../components/layout';
 import Dashboard from '../components/dashboard/Dashboard';
-import useAuthStore, { UserRole } from '../features/authentication/store/authStore';
+import useAuthStore, { UserRole } from '../module/authentication/store/authStore';
 import { Role } from '../constants/role';
 
 // Auth guard for protected routes
@@ -70,6 +71,7 @@ const AppRouter: React.FC = () => {
       <Routes>
         {/* Public Routes */}
         <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/logout" element={<Logout />} />
         

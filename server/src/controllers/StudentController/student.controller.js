@@ -101,7 +101,16 @@ export const loginStudent = asyncWrapper(async (req, res) => {
   sendSuccess(res, {
     statusCode: 200,
     message: "Login successful",
-    data: { token },
+    data: {
+      token,
+      user: _.pick(student, [
+        "id",
+        "name",
+        "email",
+        "role",
+        "profilePicture",
+      ])
+    },
   });
 });
 export const logoutStudent = asyncWrapper(async (req, res) => {

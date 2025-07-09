@@ -66,7 +66,16 @@ export const loginTeacher = asyncWrapper(async (req, res) => {
   sendSuccess(res, {
     statusCode: 200,
     message: "Login successful",
-    data: { token },
+    data: {
+      token,
+      user: _.pick(teacher, [
+        "id",
+        "name",
+        "email",
+        "role",
+        "profilePicture",
+      ])
+    },
   });
 });
 export const logoutTeacher = asyncWrapper(async (req, res) => {

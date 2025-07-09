@@ -10,6 +10,6 @@ export default function (app) {
   app.use("/api/student", studentRoutes);
   app.use("/api/teacher", teacherRoutes);
   app.use("/api/class", classRoutes);
-  app.use("/--admin--", adminRoutes);
+  app.use("/api/admin", adminRoutes);
   app.use(error);
 }
