@@ -12,32 +12,25 @@ import useAuthStore, { UserRole } from '../module/authentication/store/authStore
 import { Role } from '../constants/role';
 
 // Auth guard for protected routes
-const ProtectedRoute = ({ 
-  children, 
-  role ,
-  redirectUrl,
-}: { 
-  children: React.ReactNode, 
-  role: UserRole | UserRole[] |null,
+const AuthGuard = ({ children, role, redirectUrl }: {
+  children: React.ReactNode,
+  role?: UserRole | UserRole[] | null,
   redirectUrl?: string,
 }) => {
-  const { isAuthenticated, user } = useAuthStore();
-  
-  // Not authenticated - redirect to login
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated());
+  const user = useAuthStore((state) => state.user);
+
   if (!isAuthenticated) {
     return <Navigate to="/login" />;
   }
-  
-  
-  // Check if user has required role
+
   if (role && user?.role) {
     const roles = Array.isArray(role) ? role : [role];
     if (!roles.includes(user.role)) {
-      // User doesn't have the required role, redirect to dashboard
       return <Navigate to={redirectUrl || "/dashboard"} />;
     }
   }
-  
+
   return <>{children}</>;
 };
 
@@ -59,13 +52,7 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
 };
 
 const AppRouter: React.FC = () => {
-  const { isAuthenticated,checkAuthStatus } = useAuthStore();
-  
-  // Check authentication status when app loads
-  useEffect(() => {
-    checkAuthStatus();
-  }, [checkAuthStatus]);
-  
+
   return (
     <BrowserRouter>
       <Routes>
@@ -74,145 +61,145 @@ const AppRouter: React.FC = () => {
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/logout" element={<Logout />} />
-        
+
         {/* Default route - redirect to dashboard if authenticated, login if not */}
-        <Route 
-          path="/" 
+        <Route
+          path="/"
           element={
-            isAuthenticated ? 
-              <Navigate to="/dashboard" replace /> : 
-              <Navigate to="/login" replace />
-          } 
+            <AuthGuard>
+              <Navigate to="/dashboard" replace />
+            </AuthGuard>
+          }
         />
-        
+
         {/* Protected Routes with Layout */}
-        <Route 
-          path="/dashboard" 
+        <Route
+          path="/dashboard"
           element={
-            <ProtectedRoute role={null}>
+            <AuthGuard>
               <AppLayout>
                 <Dashboard />
               </AppLayout>
-            </ProtectedRoute>
-          } 
+            </AuthGuard>
+          }
         />
-        
+
         {/* Admin Routes */}
-        <Route 
-          path="/teachers" 
+        <Route
+          path="/teachers"
           element={
-            <ProtectedRoute role={Role.ADMIN}>
+            <AuthGuard role={Role.ADMIN}>
               <AppLayout>
                 <div>Manage Teachers</div>
               </AppLayout>
-            </ProtectedRoute>
-          } 
+            </AuthGuard>
+          }
         />
-        <Route 
-          path="/students" 
+        <Route
+          path="/students"
           element={
-            <ProtectedRoute role={[Role.ADMIN, Role.TEACHER]}>
+            <AuthGuard role={[Role.ADMIN, Role.TEACHER]}>
               <AppLayout>
                 <div>Manage Students</div>
               </AppLayout>
-            </ProtectedRoute>
-          } 
+            </AuthGuard>
+          }
         />
-        <Route 
-          path="/classes" 
+        <Route
+          path="/classes"
           element={
-            <ProtectedRoute role={[Role.ADMIN, Role.TEACHER, Role.STUDENT]}>
+            <AuthGuard role={[Role.ADMIN, Role.TEACHER, Role.STUDENT]}>
               <AppLayout>
                 <div>Manage Classes</div>
               </AppLayout>
-            </ProtectedRoute>
-          } 
+            </AuthGuard>
+          }
         />
-        <Route 
-          path="/subjects" 
+        <Route
+          path="/subjects"
           element={
-            <ProtectedRoute role={Role.ADMIN}>
+            <AuthGuard role={Role.ADMIN}>
               <AppLayout>
                 <div>Manage Subjects</div>
               </AppLayout>
-            </ProtectedRoute>
-          } 
+            </AuthGuard>
+          }
         />
-        <Route 
-          path="/assignments" 
+        <Route
+          path="/assignments"
           element={
-            <ProtectedRoute role={[Role.ADMIN, Role.TEACHER, Role.STUDENT]}>
+            <AuthGuard role={[Role.ADMIN, Role.TEACHER, Role.STUDENT]}>
               <AppLayout>
                 <div>Manage Assignments</div>
               </AppLayout>
-            </ProtectedRoute>
-          } 
+            </AuthGuard>
+          }
         />
-        <Route 
-          path="/calendar" 
+        <Route
+          path="/calendar"
           element={
-            <ProtectedRoute role={[Role.ADMIN, Role.TEACHER, Role.STUDENT]}>
+            <AuthGuard role={[Role.ADMIN, Role.TEACHER, Role.STUDENT]}>
               <AppLayout>
                 <div>Calendar</div>
               </AppLayout>
-            </ProtectedRoute>
-          } 
+            </AuthGuard>
+          }
         />
-        <Route 
-          path="/settings" 
+        <Route
+          path="/settings"
           element={
-            <ProtectedRoute role={[Role.ADMIN, Role.TEACHER, Role.STUDENT]}>
+            <AuthGuard role={[Role.ADMIN, Role.TEACHER, Role.STUDENT]}>
               <AppLayout>
                 <div>Settings</div>
               </AppLayout>
-            </ProtectedRoute>
-          } 
+            </AuthGuard>
+          }
         />
-        <Route 
-          path="/profile" 
+        <Route
+          path="/profile"
           element={
-            <ProtectedRoute role={[Role.ADMIN, Role.TEACHER, Role.STUDENT]}>
+            <AuthGuard role={[Role.ADMIN, Role.TEACHER, Role.STUDENT]}>
               <AppLayout>
                 <div>My Profile</div>
               </AppLayout>
-            </ProtectedRoute>
-          } 
+            </AuthGuard>
+          }
         />
-        
+
         {/* Legacy Role-based Routes (keeping for backward compatibility) */}
-        <Route 
-          path="/admin/*" 
+        <Route
+          path="/admin/*"
           element={
-            <ProtectedRoute role={Role.ADMIN}>
+            <AuthGuard role={Role.ADMIN}>
               <AppLayout>
                 <AdminRoutes />
               </AppLayout>
-            </ProtectedRoute>
-          } 
+            </AuthGuard>
+          }
         />
-        
-        <Route 
-          path="/teacher/*" 
+
+        <Route
+          path="/teacher/*"
           element={
-            <ProtectedRoute role={Role.TEACHER}>
+            <AuthGuard role={Role.TEACHER}>
               <AppLayout>
                 <TeacherRoutes />
               </AppLayout>
-            </ProtectedRoute>
-          } 
+            </AuthGuard>
+          }
         />
-        
-        <Route 
-          path="/student/*" 
+
+        <Route
+          path="/student/*"
           element={
-            <ProtectedRoute role={Role.STUDENT}>
+            <AuthGuard role={Role.STUDENT}>
               <AppLayout>
                 <StudentRoutes />
               </AppLayout>
-            </ProtectedRoute>
-          } 
+            </AuthGuard>
+          }
         />
-        
+
         {/* 404 Catch All */}
         <Route path="*" element={<div>Page Not Found</div>} />
       </Routes>

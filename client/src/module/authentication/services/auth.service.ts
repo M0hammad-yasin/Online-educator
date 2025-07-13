@@ -1,3 +1,4 @@
+import { Role } from '../../../constants/role';
 import { BaseService } from '../../../services';
 import { ApiResponse } from '../../../services/api/types';
 
@@ -12,13 +13,14 @@ export interface RegisterData {
   password: string;
   role: 'TEACHER' | 'STUDENT';
 }
+export type UserRole = keyof typeof Role | null;
 
 export interface AuthResponse {
   user: {
     id: string;
     name: string;
     email: string;
-    role: string;
+    role: UserRole;
   };
   accessToken: string;
 }
@@ -50,6 +52,10 @@ class AuthService extends BaseService<any> {
 
   async resetPassword(token: string, password: string): Promise<ApiResponse<void>> {
     return this.customPost<void>('/reset-password', { token, password });
+  }
+
+  async getProfile(): Promise<ApiResponse<{ user: AuthResponse['user'] }>> {
+    return await (this.customGet<{ user: AuthResponse['user'] }>('/me'));
   }
 }
 

@@ -1,5 +1,6 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { authService, LoginCredentials, RegisterData } from '../services/auth.service';
+import useAuthStore from '../store/authStore';
 
 export const useLogin = () => {
   const queryClient = useQueryClient();
@@ -7,8 +8,11 @@ export const useLogin = () => {
   return useMutation({
     mutationFn: (credentials: LoginCredentials) => authService.login(credentials),
     onSuccess: (response) => {
-      if (response.data?.accessToken) {
-        localStorage.setItem('accessToken', response.data.accessToken);
+      if (response.data?.accessToken && response.data?.user) {
+        useAuthStore.getState().setAuth({
+          token: response.data.accessToken,
+          user: response.data.user,
+        });
         queryClient.setQueryData(['auth', 'user'], response.data.user);
       }
     },
