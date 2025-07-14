@@ -26,6 +26,7 @@ import {
 import useThemeStore from "../../../store/themeStore";
 import "../../../style/header.css";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import UserManagement from '../../../module/authentication/components/UserManagement';
 const { Header } = Layout;
 
 interface HeaderProps {
@@ -44,27 +45,6 @@ const AppHeader: React.FC<HeaderProps> = ({ collapsed, setCollapsed }) => {
       borderRadius,
     },
   } = theme.useToken();
-
-  const profileMenuItems: MenuProps["items"] = [
-    {
-      key: "profile",
-      icon: <UserOutlined style={{ color: colorTextSecondary }} />,
-      label: <span style={{ color: colorTextSecondary }}>Profile</span>,
-    },
-    {
-      key: "settings",
-      icon: <SettingOutlined style={{ color: colorTextSecondary }} />,
-      label: <span style={{ color: colorTextSecondary }}>Settings</span>,
-    },
-    {
-      type: "divider",
-    },
-    {
-      key: "logout",
-      icon: <LogoutOutlined style={{ color: colorTextSecondary }} />,
-      label: <span style={{ color: colorTextSecondary }}>Logout</span>,
-    },
-  ];
 
   return (
     <Header
@@ -127,56 +107,8 @@ const AppHeader: React.FC<HeaderProps> = ({ collapsed, setCollapsed }) => {
             onChange={toggleTheme}
           />
         </Tooltip>
-        <Space align="center" size={8}>
-          <Avatar
-            icon={<UserOutlined />}
-            src="https://randomuser.me/api/portraits/women/44.jpg"
-          />
-          <Flex vertical align="start">
-            <Typography.Text strong style={{ lineHeight: "1.2" }}>
-              Moni Roy
-            </Typography.Text>
-            <Typography.Text
-              style={{ fontSize: "12px", color: colorTextSecondary }}
-            >
-              Admin
-            </Typography.Text>
-          </Flex>
-          <Dropdown
-            menu={{
-              items: profileMenuItems,
-              style: {
-                borderRadius: 6,
-              },
-            }}
-            trigger={["click"]}
-            dropdownRender={(menu) => (
-              <div
-                style={{
-                  boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-                  borderRadius: 6,
-                  color: colorTextSecondary,
-                }}
-              >
-                {menu}
-              </div>
-            )}
-          >
-            <Button
-              style={{
-                borderRadius: "50%",
-                width: 25,
-                height: 25,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                padding: 0,
-              }}
-            >
-              <DownOutlined style={{ color: colorPrimary }} />
-            </Button>
-          </Dropdown>
-        </Space>
+        {/* Replace old user profile and dropdown with UserManagement */}
+        <UserManagement />
       </div>
     </Header>
   );
