@@ -1,5 +1,5 @@
 import React from "react";
-import { Avatar, Button, Dropdown, MenuProps, Typography, Flex, message, Drawer, Descriptions, Space } from "antd";
+import { Avatar, Button, Dropdown, MenuProps, Typography, Flex, message, Drawer, Descriptions, Space, Spin } from "antd";
 import { UserOutlined, SettingOutlined, LogoutOutlined, DownOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import useAuthStore from "../store/authStore";
@@ -43,7 +43,7 @@ const UserManagement: React.FC = () => {
     },
     {
       key: "logout",
-      icon: <LogoutOutlined />,
+      icon: isPending ? <Spin size="small" /> : <LogoutOutlined />, // fixed icon
       label: <span>Logout</span>,
       danger: true,
     },
@@ -87,7 +87,6 @@ const UserManagement: React.FC = () => {
         </Descriptions>
         <Space style={{ marginTop: 24, width: "100%", justifyContent: "center", display: "flex" }}>
           <Button type="primary" onClick={() => { setDrawerOpen(false); navigate('/profile'); }}>Update Profile</Button>
-          <Button onClick={() => { setDrawerOpen(false); navigate('/settings'); }}>See Detail</Button>
         </Space>
       </Drawer>
     </>

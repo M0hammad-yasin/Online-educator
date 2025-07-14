@@ -92,4 +92,17 @@ export abstract class BaseService<T extends BaseEntity> {
     );
     return response.data;
   }
+
+  protected async customPatch<R>(
+    path: string,
+    data?: any,
+    config?: AxiosRequestConfig
+  ): Promise<ApiResponse<R>> {
+    const response = await apiClient.patch<ApiResponse<R>>(
+      this.buildUrl(path),
+      data,
+      config
+    );
+    return response.data;
+  }
 } 

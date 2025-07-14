@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
-import { authService, LoginCredentials, RegisterData } from '../services/auth.service';
-import useAuthStore from '../store/authStore';
+import { AllUserProps, authService, LoginCredentials, RegisterData } from '../services/auth.service';
+import useAuthStore, { User } from '../store/authStore';
 
 export const useLogin = () => {
   const queryClient = useQueryClient();
@@ -97,3 +97,28 @@ export const useProfile = () => {
     },
   });
 };
+
+export const usePatchProfile = () => {
+  const queryClient = useQueryClient();
+  const setAuth = useAuthStore((state) => state.setAuth);
+  return useMutation({
+    mutationFn: (data: Partial<AllUserProps>) => authService.patchProfile(data),
+    onSuccess: (response) => {
+      if (response.data) {
+        const { id = '', name = '', email = '', role = 'STUDENT', profilePicture = '' } = response.data as User;
+        setAuth({
+          token: useAuthStore.getState().token!,
+          user: { id, name, email, role, profilePicture },
+        });
+        queryClient.setQueryData(['auth', 'user'], { id, name, email, role, profilePicture });
+        queryClient.setQueryData(['auth', 'profile'], response.data);
+      }
+    },
+    onError: (error) => {
+      console.error('Patch profile failed:', error);
+    },
+  });
+};
+export const useUpdate=()=>{
+  
+}

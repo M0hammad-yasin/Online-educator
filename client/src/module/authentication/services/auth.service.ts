@@ -1,6 +1,18 @@
 import { BaseService,ApiResponse } from '../../../services';
 import {User, UserRole} from '../store/authStore';
+import type {Student} from '../../student';
+import type { Teacher } from '../../teacher/types';
+import type { Moderator } from '../../moderator/types';
+import type { Admin } from '../../admin/types';
 
+export type AllUserProps = {
+  [K in keyof Student | keyof Teacher | keyof Admin | keyof Moderator]?:
+    K extends keyof Student ? Student[K] :
+    K extends keyof Teacher ? Teacher[K] :
+    K extends keyof Admin ? Admin[K] :
+    K extends keyof Moderator ? Moderator[K] :
+    never;
+};
 export interface LoginCredentials {
   email: string;
   password: string;
@@ -65,6 +77,9 @@ class AuthService extends BaseService<any> {
 
   async getProfile(): Promise<ApiResponse<{ user: AuthResponse['user'] }>> {
     return await (this.customGet<{ user: AuthResponse['user'] }>('/me'));
+  }
+  async patchProfile(data: Partial<AllUserProps>): Promise<ApiResponse<AllUserProps>> {
+    return await this.customPatch<AllUserProps>('/me', data);
   }
 }
 
