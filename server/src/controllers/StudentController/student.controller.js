@@ -92,8 +92,8 @@ export const loginStudent = asyncWrapper(async (req, res) => {
     throw new BadRequestError("Invalid password");
   }
   // Generate JWT token
-  const token = generateToken(student);
-  res.cookie("token", token, {
+  const accessToken = generateToken(student);
+  res.cookie("token", accessToken, {
     httpOnly: true,
     secure: config.isProduction, // Use secure in production
     sameSite: "strict",
@@ -102,7 +102,7 @@ export const loginStudent = asyncWrapper(async (req, res) => {
     statusCode: 200,
     message: "Login successful",
     data: {
-      token,
+      accessToken,
       user: _.pick(student, [
         "id",
         "name",

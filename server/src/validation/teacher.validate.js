@@ -12,7 +12,7 @@ export const teacherSchema = z.object({
     .optional(),
   hourlyRate: z
     .number({ invalid_type_error: "Hourly rate must be a number" })
-    .min(300, { message: "Hourly rate must be at least 300" }),
+    .min(300, { message: "Hourly rate must be at least 300" }).optional(),
   password: passwordSchema,
   role: z.enum(["TEACHER"], { message: "Role must be 'TEACHER' only" }),
   isEmailVerified: z

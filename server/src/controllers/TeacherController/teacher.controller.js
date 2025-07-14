@@ -56,8 +56,8 @@ export const loginTeacher = asyncWrapper(async (req, res) => {
   }
 
   // Generate JWT token
-  const token = generateToken(teacher);
-  res.cookie("token", token, {
+  const accessToken = generateToken(teacher);
+  res.cookie("token", accessToken, {
     httpOnly: false,
     secure: config.isProduction, // Use secure in production
     sameSite: "strict",
@@ -67,7 +67,7 @@ export const loginTeacher = asyncWrapper(async (req, res) => {
     statusCode: 200,
     message: "Login successful",
     data: {
-      token,
+       accessToken,
       user: _.pick(teacher, [
         "id",
         "name",

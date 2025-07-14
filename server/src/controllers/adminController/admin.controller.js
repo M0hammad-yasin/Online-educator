@@ -122,9 +122,9 @@ export const loginAdmin = asyncWrapper(async (req, res) => {
   if (!isMatch) {
     throw new BadRequestError("invalidpassword");
   }
-  const token = generateToken(admin);
+  const accessToken = generateToken(admin);
   const maxAge = parseInt(config.jwtSecretExpiry, 10);
-  res.cookie("token", token, {
+  res.cookie("token", accessToken, {
     httpOnly: true,
     secure: config.isProduction, // Use secure in production
     sameSite: "strict",
@@ -134,7 +134,7 @@ export const loginAdmin = asyncWrapper(async (req, res) => {
     statusCode: 201,
     message: "Admin logged in Successfully",
     data: {
-      token,
+      accessToken,
       user: _.pick(admin, [
         "id",
         "name",
