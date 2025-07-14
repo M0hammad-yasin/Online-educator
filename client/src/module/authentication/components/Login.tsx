@@ -1,22 +1,32 @@
 import React from 'react';
-import { Form, Input, Button, Typography, Checkbox, Card, Flex, message } from 'antd';
+import { Form, Input, Button, Typography, Checkbox, Card, Flex, message, Select } from 'antd';
 import { UserOutlined, LockOutlined, LoginOutlined } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
 import { LoginIllustration } from '../../../assets/auth-illustrations';
 import { useLogin } from '../hooks/useAuth';
 import styles from './Login.module.css';
+import { authService } from '../services/auth.service';
+import { UserRole } from '../store/authStore';
 
 const { Title, Text } = Typography;
-
+const { Option } = Select;
 interface LoginFormValues {
   email: string;
   password: string;
   remember: boolean;
+  role: UserRole;
 }
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
   const { mutate: login, isPending} = useLogin();
+  const [role, setRole] = React.useState<UserRole>('STUDENT');
+
+  // Update endpoint when role changes
+  React.useEffect(() => {
+    authService.setRole(role);
+  }, [role]);
+
   const onFinish = (values: LoginFormValues) => {
     login(
       { email: values.email, password: values.password },
@@ -26,7 +36,6 @@ const Login: React.FC = () => {
           navigate('/dashboard');
         },
         onError: (error: any) => {
-          // Show the error message from the server if available
           message.error(error?.message || 'Login failed. Please try again.');
         },
       }
@@ -60,11 +69,25 @@ const Login: React.FC = () => {
             <Form
               name="login_form"
               className={styles.loginForm}
-              initialValues={{ remember: true }}
+              initialValues={{ remember: true, role: 'STUDENT' }}
               onFinish={onFinish}
               layout="vertical"
               size="large"
             >
+              {/* Role selection */}
+              <Form.Item
+                name="role"
+                label="Role"
+                rules={[{ required: true, message: 'Please select your role!' }]}
+                initialValue={role}
+              >
+                <Select value={role} onChange={setRole}>
+                  <Option value="ADMIN">Admin</Option>
+                  <Option value="TEACHER">Teacher</Option>
+                  <Option value="STUDENT">Student</Option>
+                </Select>
+              </Form.Item>
+
               <Form.Item
                 name="email"
                 rules={[
@@ -116,7 +139,7 @@ const Login: React.FC = () => {
 
               <div className={styles.registerPrompt}>
                 <Text>Don't have an account? </Text>
-                <Link to="/register" className={styles.registerLink}>Sign Up</Link>
+                <Link to={`/register?role=${role}`} className={styles.registerLink}>Sign Up</Link>
               </div>
             </Form>
           </Card>

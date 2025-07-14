@@ -1,10 +1,12 @@
 import React, { useRef } from 'react';
 import { Form, Input, Button, Typography, Select, Card, Flex, message, InputNumber } from 'antd';
 import { UserOutlined, LockOutlined, MailOutlined, LoginOutlined } from '@ant-design/icons';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useRegister } from '../hooks/useAuth';
 import styles from './Login.module.css';
 import { ApiError } from '../../../services/api/types';
+import { UserRole } from '../store/authStore';
+import { authService } from '../services/auth.service';
 
 const { Title, Text } = Typography;
 
@@ -13,13 +15,23 @@ interface RegisterFormValues {
   email: string;
   password: string;
   confirmPassword: string;
+  grade: number;
+  role: UserRole;
 }
 
 const Register: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [form] = Form.useForm();
-  const { mutate: register, isPending, error } = useRegister();
+  const { mutate: register, isPending } = useRegister();
 
+  // Get role from query string or default to STUDENT
+  const queryParams = new URLSearchParams(location.search);
+  const initialRole = (queryParams.get('role')?.toUpperCase() as UserRole) || 'STUDENT';
+  const [role, setRole] = React.useState<UserRole>(initialRole);
+  React.useEffect(() => {
+    authService.setRole(role);
+  }, [role]);
   // Helper to parse server error message into field-error map
   const parseServerErrors = (msg: string) => {
     const errorObj: Record<string, string> = {};
@@ -34,12 +46,11 @@ const Register: React.FC = () => {
   };
 
   const onFinish = (values: RegisterFormValues) => {
-    // Ensure 'role' is included for the API
-    const registerData = { ...values, role: 'STUDENT' as 'STUDENT' };
     if (values.password !== values.confirmPassword) {
       message.error('Passwords do not match!');
       return;
     }
+    const registerData = { ...values, role };
     register(registerData, {
       onSuccess: () => {
         message.success('Registration successful!');
@@ -87,7 +98,21 @@ const Register: React.FC = () => {
               onFinish={onFinish}
               layout="vertical"
               size="large"
+              initialValues={{ role: initialRole }}
             >
+              {/* Role selection */}
+              <Form.Item
+                name="role"
+                label="Role"
+                rules={[{ required: true, message: 'Please select your role!' }]}
+                initialValue={role}
+              >
+                <Select value={role} onChange={setRole}>
+                  <Select.Option value="ADMIN">Admin</Select.Option>
+                  <Select.Option value="TEACHER">Teacher</Select.Option>
+                  <Select.Option value="STUDENT">Student</Select.Option>
+                </Select>
+              </Form.Item>
               <Form.Item
                 name="name"
                 rules={[{ required: true, message: 'Please enter your name!' }]}
@@ -111,6 +136,7 @@ const Register: React.FC = () => {
                   className={styles.formInput}
                 />
               </Form.Item>
+              {role==="STUDENT" &&
               <Form.Item
                 name="grade"
                 rules={[
@@ -130,7 +156,7 @@ const Register: React.FC = () => {
                   placeholder="Grade"
                   style={{ width: '100%' }}
                 />
-              </Form.Item>
+              </Form.Item>}
               <Form.Item
                 name="password"
                 rules={[{ required: true, message: 'Please enter your password!' }]}

@@ -3,31 +3,24 @@ import { Button, Typography, Card, Result } from 'antd';
 import { LogoutOutlined, LoginOutlined, HomeOutlined } from '@ant-design/icons';
 import { Link, Navigate } from 'react-router-dom';
 import { LogoutIllustration, LoadingSpinner } from '../../../assets/auth-illustrations';
-import useAuthStore from '../../../store/authStore';
 import styles from './Logout.module.css';
+import useAuthStore from '../store/authStore';
+import {  useLogout } from '../hooks/useAuth';
 
 const { Title, Paragraph } = Typography;
 
 const Logout: React.FC = () => {
-  const { logout, loading, isAuthenticated } = useAuthStore();
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated());
+  const { mutate: logout, isPending } = useLogout();
   
   useEffect(() => {
-    const performLogout = async () => {
-      if (isAuthenticated) {
-        try {
-          await logout();
-          console.log('User logged out successfully');
-        } catch (error) {
-          console.error('Logout failed:', error);
-        }
-      }
-    };
-    
-    performLogout();
+    if (isAuthenticated) {
+      logout();
+    }
   }, [logout, isAuthenticated]);
 
   // If not authenticated and not in the process of logging out, redirect to login
-  if (!isAuthenticated && !loading) {
+  if (!isAuthenticated && !isPending) {
     return <Navigate to="/login" />;
   }
 
@@ -38,7 +31,7 @@ const Logout: React.FC = () => {
           <div className={styles.logoutBackground}>
             <LogoutIllustration />
           </div>
-          {loading ? (
+          {isPending ? (
             <div className={styles.loggingOutContent}>
               <div className={styles.loadingIcon}>
                 <LoadingSpinner />
