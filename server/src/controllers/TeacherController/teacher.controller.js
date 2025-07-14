@@ -139,7 +139,7 @@ export const getTeacher = asyncWrapper(async (req, res) => {
   sendSuccess(res, {
     statusCode: 200,
     message: "Teacher found Successfully",
-    data: { teacher: _.omit(teacher, ["passwordHash"]) },
+    data: { user: _.omit(teacher, ["passwordHash"]) },
   });
 });
 export const getAllTeacher = asyncWrapper(async (req, res) => {

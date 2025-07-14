@@ -12,6 +12,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import SIDEBAR_MENU from "../../../constants/menu";
 import { Role } from "../../../constants/role";
 import useAuthStore from "../../../module/authentication/store/authStore";
+import { useAuthState, useLogout } from "../../../module/authentication/hooks/useAuth";
 const { Sider } = Layout;
 
 interface SidebarProps {
@@ -28,10 +29,11 @@ interface MenuItem {
 const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, logout } = useAuthStore();
+  const { user,  } = useAuthStore();
+  const {mutate : logout }= useLogout();
   
   const {
-    token: { colorBgContainer, borderRadiusLG, Layout, colorBorder },
+    token: {  borderRadiusLG, Layout, colorBorder },
   } = theme.useToken();
 
   // Get menu items based on user role
@@ -41,20 +43,26 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
   // Handle menu item click
   const handleMenuClick = async (item: { key: string }) => {
     const menuItem = menuItems.find((menu: MenuItem) => menu.key.toString() === item.key);
-    
-    if (menuItem) {
-      if (menuItem.path === "/logout") {
-        // Handle logout
+    if (!menuItem) return;
+
+    switch (menuItem.path) {
+      case '/dashboard':
+        navigate('/dashboard');
+        break;
+      case '/logout':
         try {
           await logout();
-          navigate("/login");
+          navigate('/login');
         } catch (error) {
-          console.error("Logout failed:", error);
+          console.error('Logout failed:', error);
         }
-      } else {
-        // Navigate to the specified path
+        break;
+      case '/profile':
+        navigate('/profile')
+        break;
+      default:
         navigate(menuItem.path);
-      }
+        break;
     }
   };
 
@@ -112,3 +120,4 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
 };
 
 export default Sidebar;
+

@@ -65,50 +65,6 @@ const SIDEBAR_MENU = {
   [Role.TEACHER]: [
     {
       key: 1,
-      label: "My Classes",
-      path: "/classes",
-      icon: "CalendarOutlined",
-    },
-    {
-      key: 2,
-      label: "My Assignments",
-      path: "/assignments",
-      icon: "FileOutlined",
-    },
-    {
-      key: 3,
-      label: "Calendar",
-      path: "/calendar",
-      icon: "CalendarOutlined",
-    },
-    {
-      key: 4,
-      label: "My Students",
-      path: "/students",
-      icon: "UserOutlined",
-    },
-    {
-      key: 5,
-      label: "Settings",
-      path: "/settings",
-      icon: "SettingOutlined",
-    },
-    {
-      key: 6,
-      label: "My Profile",
-      path: "/profile",
-      icon: "UserOutlined",
-    },
-    {
-      key: 7,
-      label: "Logout",
-      path: "/logout",
-      icon: "LogoutOutlined",
-    },
-  ],
-  [Role.STUDENT]: [
-    {
-      key: 1,
       label: "Dashboard",
       path: "/dashboard",
       icon: "DashboardOutlined",
@@ -133,12 +89,68 @@ const SIDEBAR_MENU = {
     },
     {
       key: 5,
+      label: "My Students",
+      path: "/students",
+      icon: "UserOutlined",
+    },
+    {
+      key: 6,
+      label: "Settings",
+      path: "/settings",
+      icon: "SettingOutlined",
+    },
+    {
+      key: 7,
       label: "My Profile",
       path: "/profile",
       icon: "UserOutlined",
     },
     {
+      key: 8,
+      label: "Logout",
+      path: "/logout",
+      icon: "LogoutOutlined",
+    },
+  ],
+  [Role.STUDENT]: [
+    {
+      key: 1,
+      label: "Dashboard",
+      path: "/dashboard",
+      icon: "DashboardOutlined",
+    },
+    {
+      key: 2,
+      label: "Dashboard",
+      path: "/dashboard",
+      icon: "DashboardOutlined",
+    },
+    {
+      key: 3,
+      label: "My Classes",
+      path: "/classes",
+      icon: "CalendarOutlined",
+    },
+    {
+      key: 4,
+      label: "My Assignments",
+      path: "/assignments",
+      icon: "FileOutlined",
+    },
+    {
+      key: 5,
+      label: "Calendar",
+      path: "/calendar",
+      icon: "CalendarOutlined",
+    },
+    {
       key: 6,
+      label: "My Profile",
+      path: "/profile",
+      icon: "UserOutlined",
+    },
+    {
+      key: 7,
       label: "Logout",
       path: "/logout",
       icon: "LogoutOutlined",

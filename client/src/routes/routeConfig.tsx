@@ -3,6 +3,7 @@ import { Role } from '../constants/role';
 
 // Page Components (these would be imported from their actual locations)
 import Dashboard from '../components/dashboard/Dashboard';
+import Profile from '../pages/Profile';
 
 // Placeholder components (replace with actual components)
 const TeachersManagement = () => <div>Manage Teachers</div>;
@@ -12,8 +13,6 @@ const SubjectsManagement = () => <div>Manage Subjects</div>;
 const AssignmentsManagement = () => <div>Manage Assignments</div>;
 const Calendar = () => <div>Calendar</div>;
 const Settings = () => <div>Settings</div>;
-const Profile = () => <div>My Profile</div>;
-
 export interface RouteConfig {
   path: string;
   component: React.ComponentType;
