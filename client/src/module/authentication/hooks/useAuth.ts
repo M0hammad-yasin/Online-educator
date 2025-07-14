@@ -92,6 +92,7 @@ export const useProfile = () => {
     queryKey: ['auth', 'profile'],
     queryFn: async () => {
       const response = await authService.getProfile();
+      console.log(response);
       return response.data.user;
     },
   });

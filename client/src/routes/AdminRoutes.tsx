@@ -1,5 +1,6 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
+import Profile from '../pages/Profile';
 
 // Admin Placeholder Components
 // In a real app, you would import actual admin components
@@ -10,8 +11,6 @@ const SubjectsManagement = () => <div>Manage Subjects</div>;
 const AssignmentsManagement = () => <div>Manage Assignments</div>;
 const Calendar = () => <div>Calendar</div>;
 const Settings = () => <div>Settings</div>;
-const Profile = () => <div>My Profile</div>;
-
 const AdminRoutes: React.FC = () => {
   return (
     <Routes>

@@ -1,14 +1,13 @@
 // client/src/routes/StudentRoutes.tsx
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
+import Profile from '../pages/Profile';
 
 // Student Placeholder Components
 // In a real app, you would import actual student components
 const MyClasses = () => <div>My Classes</div>;
 const MyAssignments = () => <div>My Assignments</div>;
 const Calendar = () => <div>Calendar</div>;
-const Profile = () => <div>My Profile</div>;
-
 const StudentRoutes: React.FC = () => {
   return (
     <Routes>

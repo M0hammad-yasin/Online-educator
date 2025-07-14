@@ -4,6 +4,10 @@ import { UserOutlined, MailOutlined } from "@ant-design/icons";
 import { useProfile } from "../../module/authentication/hooks/useAuth";
 import { authService } from "../../services/api";
 import useAuthStore from "../../module/authentication/store/authStore";
+import type { Admin } from "../../module/admin/types";
+import type { Teacher } from "../../module/teacher/types";
+import type { Student } from "../../module/student/types";
+import type { Moderator } from "../../module/moderator/types";
 
 const { Title, Text } = Typography;
 
@@ -14,9 +18,22 @@ const roleColors: Record<string, string> = {
   MODERATOR: "#722ed1",
 };
 
+type UserType = Admin | Teacher | Student | Moderator;
+
 const Profile: React.FC = () => {
-    const { user: authUser } = useAuthStore();
-  const { data: user, isLoading, isError, error } = useProfile();
+  const { user: authUser } = useAuthStore();
+  const { data: userRaw, isLoading, isError, error } = useProfile();
+
+  // Narrow user type based on authUser.role
+  let user: UserType | undefined = undefined;
+  if (userRaw && authUser?.role === "ADMIN") user = userRaw as Admin;
+  if (userRaw && authUser?.role === "TEACHER") user = userRaw as Teacher;
+  if (userRaw && authUser?.role === "STUDENT") user = userRaw as Student;
+  if (userRaw && authUser?.role === "MODERATOR") user = userRaw as Moderator;
+
+  useEffect(() => {
+    authService.setRole(authUser?.role ?? null);
+  }, []);
 
   if (isLoading) {
     return <Spin tip="Loading profile..." style={{ display: "block", margin: "80px auto" }} />;
@@ -25,7 +42,6 @@ const Profile: React.FC = () => {
     let errorMessage = "Failed to load profile.";
     let errorType = undefined;
     if (error && typeof error === 'object') {
-      // Handle custom ApiError
       if ('type' in error && 'message' in error) {
         errorMessage = (error as any).message;
         errorType = (error as any).type;
@@ -44,26 +60,25 @@ const Profile: React.FC = () => {
   if (!user) {
     return <Card style={{ maxWidth: 500, margin: "40px auto" }}><Text type="danger">No user data found.</Text></Card>;
   }
-  useEffect(()=>{
-    authService.setRole(authUser?.role ?? null);
-  },[])
 
-  // Role-specific fields (extend as needed)
+  // Role-specific fields
   const extraFields: { label: string; value: React.ReactNode }[] = [];
-  const userAny = user as any;
   if (user.role === "TEACHER") {
-    if (userAny.qualification) extraFields.push({ label: "Qualification", value: userAny.qualification });
-    if (userAny.classRate) extraFields.push({ label: "Class Rate", value: userAny.classRate });
-    if (userAny.address) extraFields.push({ label: "Address", value: userAny.address });
+    const teacher = user as Teacher;
+    if (teacher.qualification) extraFields.push({ label: "Qualification", value: teacher.qualification });
+    if (teacher.classRate) extraFields.push({ label: "Class Rate", value: teacher.classRate });
+    if (teacher.address) extraFields.push({ label: "Address", value: teacher.address });
   }
   if (user.role === "STUDENT") {
-    if (userAny.grade !== undefined) extraFields.push({ label: "Grade", value: userAny.grade });
-    if (userAny.parentEmail) extraFields.push({ label: "Parent Email", value: userAny.parentEmail });
-    if (userAny.address) extraFields.push({ label: "Address", value: userAny.address });
-    if (userAny.region) extraFields.push({ label: "Region", value: userAny.region });
+    const student = user as Student;
+    if (student.grade !== undefined) extraFields.push({ label: "Grade", value: student.grade });
+    if (student.parentEmail) extraFields.push({ label: "Parent Email", value: student.parentEmail });
+    if (student.address) extraFields.push({ label: "Address", value: student.address });
+    if (student.region) extraFields.push({ label: "Region", value: student.region });
   }
   if (user.role === "MODERATOR") {
-    if (userAny.address) extraFields.push({ label: "Address", value: userAny.address });
+    const moderator = user as Moderator;
+    if (moderator.address) extraFields.push({ label: "Address", value: moderator.address });
   }
 
   return (
@@ -91,7 +106,6 @@ const Profile: React.FC = () => {
             size="middle"
             labelStyle={{ fontWeight: 500, width: 120 }}
           >
-            <Descriptions.Item label="User ID">{user.id}</Descriptions.Item>
             {extraFields.map((field) => (
               <Descriptions.Item key={field.label} label={field.label}>{field.value}</Descriptions.Item>
             ))}

@@ -6,7 +6,7 @@ import Register from '../module/authentication/components/Register';
 import { AppHeader, MainContent, Sidebar } from '../components/layout';
 import useAuthStore, { UserRole } from '../module/authentication/store/authStore';
 import { protectedRoutes, RouteConfig } from './routeConfig';
-
+import Profile from '../pages/Profile';
 // Components
 const NotFound = () => <div>Page Not Found</div>;
 

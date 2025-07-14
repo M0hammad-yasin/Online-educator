@@ -2,6 +2,7 @@
 // client/src/routes/TeacherRoutes.tsx
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
+import Profile from '../pages/Profile';
 
 // Teacher Placeholder Components
 // In a real app, you would import actual teacher components
@@ -10,8 +11,6 @@ const MyAssignments = () => <div>My Assignments</div>;
 const Calendar = () => <div>Calendar</div>;
 const MyStudents = () => <div>My Students</div>;
 const Settings = () => <div>Settings</div>;
-const Profile = () => <div>My Profile</div>;
-
 const TeacherRoutes: React.FC = () => {
   return (
     <Routes>
