@@ -2,7 +2,7 @@ import { UserRole } from '../module/authentication/store/authStore';
 import { Role } from '../constants/role';
 
 // Page Components (these would be imported from their actual locations)
-import Dashboard from '../components/dashboard/Dashboard';
+import Dashboard from '../pages/dashboard/Dashboard';
 import Profile from '../pages/Profile';
 
 // Placeholder components (replace with actual components)

@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Layout } from 'antd';
 import { AppHeader, MainContent, Sidebar } from './components/layout';
-import Dashboard from './components/dashboard/Dashboard';
+import Dashboard from './pages/dashboard/Dashboard';
 import { Login, ForgotPassword, Logout } from './pages';
 
 // Layout component that includes the sidebar and header

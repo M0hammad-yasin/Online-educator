@@ -79,7 +79,7 @@ const Login: React.FC = () => {
                 name="role"
                 label="Role"
                 rules={[{ required: true, message: 'Please select your role!' }]}
-                initialValue={role}
+                // initialValue={role}
               >
                 <Select value={role} onChange={setRole}>
                   <Option value="ADMIN">Admin</Option>
