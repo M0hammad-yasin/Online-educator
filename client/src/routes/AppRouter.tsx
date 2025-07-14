@@ -1,41 +1,40 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { Layout} from 'antd';
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { Layout } from 'antd';
 import { Login, ForgotPassword, Logout } from '../module/authentication/components';
 import Register from '../module/authentication/components/Register';
-import AdminRoutes from './AdminRoutes';
-import TeacherRoutes from './TeacherRoutes';
-import StudentRoutes from './StudentRoutes';
 import { AppHeader, MainContent, Sidebar } from '../components/layout';
-import Dashboard from '../components/dashboard/Dashboard';
 import useAuthStore, { UserRole } from '../module/authentication/store/authStore';
-import { Role } from '../constants/role';
+import { protectedRoutes, RouteConfig } from './routeConfig';
 
-// Auth guard for protected routes
-const AuthGuard = ({ children, role, redirectUrl }: {
-  children: React.ReactNode,
-  role?: UserRole | UserRole[] | null,
-  redirectUrl?: string,
-}) => {
+// Components
+const NotFound = () => <div>Page Not Found</div>;
+
+// Auth Guard Component
+const AuthGuard = ({ allowedRoles }: { allowedRoles?: UserRole | UserRole[] }) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated());
   const user = useAuthStore((state) => state.user);
-
-  if (!isAuthenticated) {
-    return <Navigate to="/login" />;
+  const isInitialized = useAuthStore((state) => state.isInitialized);
+  if (!isInitialized) {
+    return <div>Loading...</div>;
   }
 
-  if (role && user?.role) {
-    const roles = Array.isArray(role) ? role : [role];
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (allowedRoles && user?.role) {
+    const roles = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles];
     if (!roles.includes(user.role)) {
-      return <Navigate to={redirectUrl || "/dashboard"} />;
+      return <Navigate to="/dashboard" replace />;
     }
   }
 
-  return <>{children}</>;
+  return <Outlet />;
 };
 
-// App layout component for authenticated routes
-const AppLayout = ({ children }: { children: React.ReactNode }) => {
+// App Layout Component
+const AppLayout = () => {
   const [collapsed, setCollapsed] = React.useState(false);
   
   return (
@@ -44,165 +43,102 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
       <Layout>
         <AppHeader collapsed={collapsed} setCollapsed={setCollapsed} />
         <MainContent>
-          {children}
+          <Outlet />
         </MainContent>
       </Layout>
     </Layout>
   );
 };
 
+// Root redirect
+const RootRedirect = () => {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated());
+  const isInitialized = useAuthStore((state) => state.isInitialized);
+
+  if (!isInitialized) {
+    return <div>Loading...</div>;
+  }
+
+  return isAuthenticated ? <Navigate to="/dashboard" replace /> : <Navigate to="/login" replace />;
+};
+
+// Auth initialization wrapper
+const AuthInitializer = ({ children }: { children: React.ReactNode }) => {
+  const initializeAuth = useAuthStore((state) => state.initializeAuth);
+  const isInitialized = useAuthStore((state) => state.isInitialized);
+
+  useEffect(() => {
+    if (!isInitialized) {
+      initializeAuth();
+    }
+  }, [initializeAuth, isInitialized]);
+
+  return <>{children}</>;
+};
+
+// Helper function to group routes by permissions
+const groupRoutesByPermissions = (routes: RouteConfig[]) => {
+  const groups = new Map<string, RouteConfig[]>();
+  
+  routes.forEach(route => {
+    const key = route.allowedRoles ? 
+      Array.isArray(route.allowedRoles) ? 
+        route.allowedRoles.sort().join(',') : 
+        route.allowedRoles.toString() 
+      : 'public';
+    
+    if (!groups.has(key)) {
+      groups.set(key, []);
+    }
+    groups.get(key)!.push(route);
+  });
+  
+  return groups;
+};
+
 const AppRouter: React.FC = () => {
+  const routeGroups = groupRoutesByPermissions(protectedRoutes);
 
   return (
     <BrowserRouter>
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/logout" element={<Logout />} />
+      <AuthInitializer>
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/logout" element={<Logout />} />
+          
+          {/* Root redirect */}
+          <Route path="/" element={<RootRedirect />} />
 
-        {/* Default route - redirect to dashboard if authenticated, login if not */}
-        <Route
-          path="/"
-          element={
-            <AuthGuard>
-              <Navigate to="/dashboard" replace />
-            </AuthGuard>
-          }
-        />
+          {/* Protected Routes with Layout */}
+          <Route element={<AppLayout />}>
+            {Array.from(routeGroups.entries()).map(([permissions, routes]) => {
+              const allowedRoles = permissions === 'public' ? 
+                undefined : 
+                permissions.includes(',') ? 
+                  permissions.split(',') as UserRole[] : 
+                  permissions as UserRole;
 
-        {/* Protected Routes with Layout */}
-        <Route
-          path="/dashboard"
-          element={
-            <AuthGuard>
-              <AppLayout>
-                <Dashboard />
-              </AppLayout>
-            </AuthGuard>
-          }
-        />
+              return (
+                <Route key={permissions} element={<AuthGuard allowedRoles={allowedRoles} />}>
+                  {routes.map(route => (
+                    <Route 
+                      key={route.path} 
+                      path={route.path} 
+                      element={<route.component />} 
+                    />
+                  ))}
+                </Route>
+              );
+            })}
+          </Route>
 
-        {/* Admin Routes */}
-        <Route
-          path="/teachers"
-          element={
-            <AuthGuard role={Role.ADMIN}>
-              <AppLayout>
-                <div>Manage Teachers</div>
-              </AppLayout>
-            </AuthGuard>
-          }
-        />
-        <Route
-          path="/students"
-          element={
-            <AuthGuard role={[Role.ADMIN, Role.TEACHER]}>
-              <AppLayout>
-                <div>Manage Students</div>
-              </AppLayout>
-            </AuthGuard>
-          }
-        />
-        <Route
-          path="/classes"
-          element={
-            <AuthGuard role={[Role.ADMIN, Role.TEACHER, Role.STUDENT]}>
-              <AppLayout>
-                <div>Manage Classes</div>
-              </AppLayout>
-            </AuthGuard>
-          }
-        />
-        <Route
-          path="/subjects"
-          element={
-            <AuthGuard role={Role.ADMIN}>
-              <AppLayout>
-                <div>Manage Subjects</div>
-              </AppLayout>
-            </AuthGuard>
-          }
-        />
-        <Route
-          path="/assignments"
-          element={
-            <AuthGuard role={[Role.ADMIN, Role.TEACHER, Role.STUDENT]}>
-              <AppLayout>
-                <div>Manage Assignments</div>
-              </AppLayout>
-            </AuthGuard>
-          }
-        />
-        <Route
-          path="/calendar"
-          element={
-            <AuthGuard role={[Role.ADMIN, Role.TEACHER, Role.STUDENT]}>
-              <AppLayout>
-                <div>Calendar</div>
-              </AppLayout>
-            </AuthGuard>
-          }
-        />
-        <Route
-          path="/settings"
-          element={
-            <AuthGuard role={[Role.ADMIN, Role.TEACHER, Role.STUDENT]}>
-              <AppLayout>
-                <div>Settings</div>
-              </AppLayout>
-            </AuthGuard>
-          }
-        />
-        <Route
-          path="/profile"
-          element={
-            <AuthGuard role={[Role.ADMIN, Role.TEACHER, Role.STUDENT]}>
-              <AppLayout>
-                <div>My Profile</div>
-              </AppLayout>
-            </AuthGuard>
-          }
-        />
-
-        {/* Legacy Role-based Routes (keeping for backward compatibility) */}
-        <Route
-          path="/admin/*"
-          element={
-            <AuthGuard role={Role.ADMIN}>
-              <AppLayout>
-                <AdminRoutes />
-              </AppLayout>
-            </AuthGuard>
-          }
-        />
-
-        <Route
-          path="/teacher/*"
-          element={
-            <AuthGuard role={Role.TEACHER}>
-              <AppLayout>
-                <TeacherRoutes />
-              </AppLayout>
-            </AuthGuard>
-          }
-        />
-
-        <Route
-          path="/student/*"
-          element={
-            <AuthGuard role={Role.STUDENT}>
-              <AppLayout>
-                <StudentRoutes />
-              </AppLayout>
-            </AuthGuard>
-          }
-        />
-
-        {/* 404 Catch All */}
-        <Route path="*" element={<div>Page Not Found</div>} />
-      </Routes>
+          {/* 404 Catch All */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </AuthInitializer>
     </BrowserRouter>
   );
 };

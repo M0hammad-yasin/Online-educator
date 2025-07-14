@@ -1,6 +1,5 @@
-import { Role } from '../../../constants/role';
-import { BaseService } from '../../../services';
-import { ApiResponse } from '../../../services/api/types';
+import { BaseService,ApiResponse } from '../../../services';
+import {User, UserRole} from '../store/authStore';
 
 export interface LoginCredentials {
   email: string;
@@ -11,23 +10,33 @@ export interface RegisterData {
   name: string;
   email: string;
   password: string;
-  role: 'TEACHER' | 'STUDENT';
+  role: UserRole;
 }
-export type UserRole = keyof typeof Role | null;
-
 export interface AuthResponse {
-  user: {
-    id: string;
-    name: string;
-    email: string;
-    role: UserRole;
-  };
+  user: User;
   accessToken: string;
 }
 
 class AuthService extends BaseService<any> {
   constructor() {
     super('/student');
+  }
+  setRole(role: UserRole | null) {
+    switch (role) {
+      case 'ADMIN':
+        this.endpoint = '/admin';
+        break;
+      case 'TEACHER':
+        this.endpoint = '/teacher';
+        break;
+      case 'MODERATOR':
+        this.endpoint='/moderator';
+        break;
+      case 'STUDENT':
+      default:
+        this.endpoint = '/student';
+        break;
+    }
   }
 
   async login(credentials: LoginCredentials): Promise<ApiResponse<AuthResponse>> {
