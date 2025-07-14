@@ -18,6 +18,7 @@ import {
   deleteStudentByAdmin,
   getStudentsForSelection,
   getAllStudent,
+  patchStudent,
 } from "../controllers/StudentController/student.controller.js";
 import { getUsersWithClasses as studentsWithClasses } from "../controllers/adminController/common.admin.controlller.js";
 import auth from "../Middleware/auth.js";
@@ -50,6 +51,13 @@ router.put(
   auth,
   hasRole(Role.STUDENT),
   updateStudent
+);
+router.patch(
+  "/me",
+  validateBody(studentUpdateSchema),
+  auth,
+  hasRole(Role.STUDENT),
+  patchStudent
 );
 router.get(
   "/classes",

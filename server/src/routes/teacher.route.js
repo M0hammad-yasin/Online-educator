@@ -2,7 +2,7 @@ import express from "express";
 import {
   teacherSchema,
   teacherUpdateSchema,
-} from "../Validation/teacher.validate.js";
+} from "../validation/teacher.validate.js";
 import { accessControlSchema } from "../Validation/access.validate.js";
 import { mongoIdSchema } from "../Validation/mongoId.validate.js";
 import { loginSchema } from "../Validation/login.validate.js";
@@ -19,6 +19,7 @@ import {
   getTeachersForSelection,
   updateTeacherByAdmin,
   deleteTeacherByAdmin,
+  patchTeacher,
 } from "../controllers/TeacherController/teacher.controller.js";
 import auth from "../Middleware/auth.js";
 import {
@@ -71,6 +72,13 @@ router.post("/login", loginTeacher);
 router.post("/logout", auth, logoutTeacher);
 
 router.get("/me", auth, getTeacher);
+router.patch(
+  "/me",
+  validateBody(teacherUpdateSchema),
+  auth,
+  hasRole(Role.TEACHER),
+  patchTeacher
+);
 
 router.get(
   "/classes",

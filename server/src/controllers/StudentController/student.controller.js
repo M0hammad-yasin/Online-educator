@@ -136,7 +136,7 @@ export const getStudent = asyncWrapper(async (req, res) => {
   sendSuccess(res, {
     statusCode: 200,
     message: "Student fetched Successfully",
-    data: { student: _(student).omit(["passwordHash"]) },
+    data: { user: _(student).omit(["passwordHash"]) },
   });
 });
 export const getAllStudent = asyncWrapper(async (req, res) => {
@@ -280,5 +280,32 @@ export const deleteStudentByAdmin = asyncWrapper(async (req, res) => {
     statusCode: 201,
     message: "student deleted Successfully",
     data: { delStudent: _.omit(delStudent, ["passwordHash"]) },
+  });
+});
+
+export const patchStudent = asyncWrapper(async (req, res) => {
+  const id = req.user.userId;
+  const data = req.body;
+  if (Object.keys(data).length !== 1) {
+    throw new BadRequestError("Only one field can be updated at a time.");
+  }
+  if (data.email) {
+    const existingStudent = await prisma.student.findUnique({ where: { email: data.email } });
+    if (existingStudent) {
+      throw new BadRequestError("email already registered");
+    }
+  }
+  const check = await prisma.student.findUnique({ where: { id } });
+  if (!check) {
+    throw new BadRequestError("student doesn't exist");
+  }
+  const student = await prisma.student.update({
+    where: { id },
+    data,
+  });
+  sendSuccess(res, {
+    statusCode: 200,
+    message: "Student field updated successfully",
+    data: _.omit(student, ["passwordHash"]),
   });
 });

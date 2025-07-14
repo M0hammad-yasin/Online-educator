@@ -176,3 +176,30 @@ export const logOutAdmin = asyncWrapper(async (req, res) => {
     data: null,
   });
 });
+
+export const patchAdmin = asyncWrapper(async (req, res) => {
+  const id = req.user.userId;
+  const data = req.body;
+  if (Object.keys(data).length !== 1) {
+    throw new BadRequestError("Only one field can be updated at a time.");
+  }
+  if (data.email) {
+    const existingAdmin = await prisma.admin.findUnique({ where: { email: data.email } });
+    if (existingAdmin) {
+      throw new BadRequestError("email already registered");
+    }
+  }
+  const check = await prisma.admin.findUnique({ where: { id } });
+  if (!check) {
+    throw new BadRequestError("admin doesn't exist");
+  }
+  const user = await prisma.admin.update({
+    where: { id },
+    data,
+  });
+  sendSuccess(res, {
+    statusCode: 200,
+    message: "Admin field updated successfully",
+    data: _.omit(user,['passwordHash']),
+  });
+});

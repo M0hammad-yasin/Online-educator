@@ -315,3 +315,30 @@ export const deleteTeacherByAdmin = asyncWrapper(async (req, res) => {
     data: { deletedTeacher: _.omit(deletedTeacher, ["passwordHash"]) },
   });
 });
+
+export const patchTeacher = asyncWrapper(async (req, res) => {
+  const id = req.user.userId;
+  const data = req.body;
+  if (Object.keys(data).length !== 1) {
+    throw new BadRequestError("Only one field can be updated at a time.");
+  }
+  if (data.email) {
+    const existTeacher = await prisma.teacher.findUnique({ where: { email: data.email } });
+    if (existTeacher) {
+      throw new BadRequestError("email is already registered");
+    }
+  }
+  const check = await prisma.teacher.findUnique({ where: { id } });
+  if (!check) {
+    throw new NotFoundError("teacher not found");
+  }
+  const teacher = await prisma.teacher.update({
+    where: { id },
+    data,
+  });
+  sendSuccess(res, {
+    statusCode: 200,
+    message: "Teacher field updated successfully",
+    data: _.omit(teacher, ["passwordHash"]),
+  });
+});

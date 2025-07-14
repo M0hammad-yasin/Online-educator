@@ -21,3 +21,4 @@ export const studentSchema = z.object({
     .lte(12, { message: "Grade must be at most 12" }),
 });
 export const studentUpdateSchema = studentSchema.partial();
+
