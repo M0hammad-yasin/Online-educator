@@ -76,7 +76,7 @@ class AuthService extends BaseService<any> {
   }
 
   async getProfile(): Promise<ApiResponse<{ user: AuthResponse['user'] }>> {
-    return await (this.customGet<{ user: AuthResponse['user'] }>('/me'));
+    return this.customGet<{ user: AuthResponse['user'] }>('/me');
   }
   async patchProfile(data: Partial<AllUserProps>): Promise<ApiResponse<AllUserProps>> {
     return await this.customPatch<AllUserProps>('/me', data);

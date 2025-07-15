@@ -16,7 +16,7 @@ export const CLASS_QUERY_KEYS = {
   list: (filters?: ClassFilters) => [...CLASS_QUERY_KEYS.lists(), { filters }] as const,
   details: () => [...CLASS_QUERY_KEYS.all, 'detail'] as const,
   detail: (id: string) => [...CLASS_QUERY_KEYS.details(), id] as const,
-  selection: () => [...CLASS_QUERY_KEYS.all, 'selection'] as const,
+  selection: (filters: ClassFilters) => [...CLASS_QUERY_KEYS.all, 'selection',{filters}] as const,
   count: (filters?: ClassFilters) => [...CLASS_QUERY_KEYS.all, 'count', { filters }] as const,
   countByGroup: (params: ClassCountByGroup) => [...CLASS_QUERY_KEYS.all, 'countByGroup', params] as const,
   grouped: (filters?: ClassFilters) => [...CLASS_QUERY_KEYS.all, 'grouped', { filters }] as const,
@@ -42,10 +42,10 @@ export const useClass = (id: string) => {
 };
 
 // Fetch Classes for Selection
-export const useClassesForSelection = () => {
+export const useClassesForSelection = (filters:ClassFilters) => {
   return useQuery({
-    queryKey: CLASS_QUERY_KEYS.selection(),
-    queryFn: () => classService.getClassesForSelection(),
+    queryKey: CLASS_QUERY_KEYS.selection(filters),
+    queryFn: () => classService.getClassesForSelection(filters),
     staleTime: 10 * 60 * 1000, // 10 minutes
   });
 };

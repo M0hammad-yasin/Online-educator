@@ -110,11 +110,11 @@ const ClassList: React.FC = () => {
     },
     {
       title: 'Status',
-      dataIndex: 'classStatus',
+      dataIndex: 'status',
       key: 'classStatus',
       render: (status: ClassStatus) => (
         <Tag color={getStatusColor(status)}>
-          {status?.replace('_', ' ')}
+          {status}
         </Tag>
       ),
     },
@@ -160,12 +160,12 @@ const ClassList: React.FC = () => {
   return (
     <Table
       columns={columns}
-      dataSource={classesData?.data.classes || []}
+      dataSource={classesData?.data || []}
       rowKey="id"
       loading={isLoading}
       pagination={{
-        current: filters.page,
-        pageSize: filters.limit,
+        current: classesData?.pagination.page,
+        pageSize: classesData?.pagination.limit,
         total: classesData?.pagination?.total || 0,
         showSizeChanger: true,
         showQuickJumper: true,

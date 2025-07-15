@@ -1,19 +1,20 @@
 export interface ApiResponse<T = any> {
   data: T;
-  success: boolean;
+  isSuccess: boolean;
   message?: string;
-  error?: string;
+  error?: ApiErrorResponse|string;
 }
 
 export interface PaginatedResponse<T = any> {
   data: T[];
+  error?:ApiErrorResponse|string;
   pagination: {
     page: number;
     limit: number;
     total: number;
     totalPages: number;
   };
-  success: boolean;
+  isSuccess: boolean;
 }
 
 export interface QueryParams {
