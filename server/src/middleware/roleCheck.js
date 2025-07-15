@@ -74,6 +74,7 @@ export const roleBasedController = (roleControllers) => {
   const roleMap = new Map(Object.entries(roleControllers));
   return asyncWrapper(async (req, res, next) => {
     const userRole = req.user?.role;
+    console.log('userRole', req.user);
     const controller = roleMap.get(userRole);
 
     if (!controller)

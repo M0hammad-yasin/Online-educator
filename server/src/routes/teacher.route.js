@@ -114,6 +114,17 @@ router.put(
     [Role.TEACHER]: updateTeacher,
   })
 );
+router.put(
+  "/me",
+  validate(mongoIdSchema, (req) => req.params),
+  validateBody(teacherUpdateSchema),
+  auth,
+  roleBasedController({
+    [Role.ADMIN]: updateTeacherByAdmin,
+    [Role.MODERATOR]: updateTeacherByAdmin,
+    [Role.TEACHER]: updateTeacher,
+  })
+);
 router.delete(
   "/:id",
   validate(mongoIdSchema, (req) => req.params),

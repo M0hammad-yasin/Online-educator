@@ -5,7 +5,7 @@ import {
   classFilterQuerySchema,
   classSchema,
   updateClassSchema,
-} from "../Validation/class.validate.js"; // Your Zod schema for Class
+} from "../validation/class.validate.js"; // Your Zod schema for Class
 import { mongoIdSchema } from "../Validation/mongoId.validate.js";
 import {
   calendarViewClassData,
