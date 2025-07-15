@@ -4,7 +4,7 @@ import { useState } from "react";
 // Import the CSS file for styling
 import "./style/App.css";
 import { AppHeader, MainContent, Sidebar } from "./components/layout";
-import Dashboard from "./pages/dashboard/Dashboard";
+import Dashboard from "./pages/Dashboard/Dashboard";
 import AppRouter from "./routes/AppRouter";
 const App = () => {
   const [collapsed, setCollapsed] = useState(false);
