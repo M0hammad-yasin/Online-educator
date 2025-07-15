@@ -1,9 +1,13 @@
 import Login from './Login';
 import ForgotPassword from './ForgotPassword';
-import Logout from './Logout';
+import ClassPage from './class/ClassPage';
+import Profile from './Profile';
+import Dashboard from './Dashboard/Dashboard';
 
 export {
   Login,
   ForgotPassword,
-  Logout
+  ClassPage,
+  Profile,
+  Dashboard,
 };

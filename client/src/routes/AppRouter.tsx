@@ -1,12 +1,11 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { Layout } from 'antd';
-import { Login, ForgotPassword, Logout } from '../module/authentication/components';
+import { Login, ForgotPassword } from '../module/authentication/components';
 import Register from '../module/authentication/components/Register';
 import { AppHeader, MainContent, Sidebar } from '../components/layout';
 import useAuthStore, { UserRole } from '../module/authentication/store/authStore';
 import { protectedRoutes, RouteConfig } from './routeConfig';
-import Profile from '../pages/Profile';
 // Components
 const NotFound = () => <div>Page Not Found</div>;
 
@@ -107,8 +106,6 @@ const AppRouter: React.FC = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/logout" element={<Logout />} />
-          
           {/* Root redirect */}
           <Route path="/" element={<RootRedirect />} />
 

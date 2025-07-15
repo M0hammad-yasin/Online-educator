@@ -119,7 +119,7 @@ export const classFilterQuerySchema = z.object({
     .string()
     .refine(
       (val) => {
-        return /^\d+$/.test(val) && parseInt(val, 10) > 1;
+        return /^\d+$/.test(val) && parseInt(val, 10) > 0;
       },
       { message: "Page number must be a greater than 1" }
     )
