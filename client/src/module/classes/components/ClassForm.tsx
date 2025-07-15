@@ -1,0 +1,220 @@
+// client/src/module/classes/components/ClassForm.tsx
+
+import React, { useEffect } from 'react';
+import { Form, Input, Select, DatePicker, InputNumber, Button, Space, message } from 'antd';
+import { useCreateClass, useUpdateClass, useClass } from '../hooks/useClasses';
+import { useClassStore, useClassStoreSelectors } from '../store/useClassStore';
+import { CreateClassRequest, UpdateClassRequest, ClassStatus } from '../index';
+import dayjs from 'dayjs';
+
+const { Option } = Select;
+
+interface ClassFormProps {
+  isEdit?: boolean;
+  onSuccess?: () => void;
+  onCancel?: () => void;
+}
+
+const ClassForm: React.FC<ClassFormProps> = ({ 
+  isEdit = false, 
+  onSuccess, 
+  onCancel 
+}) => {
+  const [form] = Form.useForm();
+  const selectedClassId = useClassStoreSelectors.selectedClassId();
+  const { setSelectedClassId } = useClassStore();
+  
+  const { data: classData, isLoading: isLoadingClass } = useClass(
+    selectedClassId || '', 
+    // { enabled: isEdit && !!selectedClassId }
+  );
+  
+  const createClassMutation = useCreateClass();
+  const updateClassMutation = useUpdateClass();
+
+  const isLoading = createClassMutation.isPending || updateClassMutation.isPending;
+
+  // Populate form when editing
+  useEffect(() => {
+    if (isEdit && classData?.data) {
+      const classItem = classData.data;
+      form.setFieldsValue({
+        subject: classItem.subject,
+        scheduledAt: classItem.scheduledAt ? dayjs(classItem.scheduledAt) : null,
+        startTime: classItem.startTime ? dayjs(classItem.startTime) : null,
+        teacherId: classItem.teacherId,
+        studentId: classItem.studentId,
+        classLink: classItem.classLink,
+        duration: parseInt(classItem.duration),
+        classStatus: classItem.classStatus,
+      });
+    }
+  }, [isEdit, classData, form]);
+
+  const handleSubmit = async (values: any) => {
+    try {
+      const formattedValues = {
+        ...values,
+        scheduledAt: values.scheduledAt?.toISOString(),
+        startTime: values.startTime?.toISOString(),
+        duration: values.duration.toString(),
+      };
+
+      if (isEdit && selectedClassId) {
+        await updateClassMutation.mutateAsync({
+          id: selectedClassId,
+          data: formattedValues as UpdateClassRequest,
+        });
+        message.success('Class updated successfully');
+      } else {
+        await createClassMutation.mutateAsync(formattedValues as CreateClassRequest);
+        message.success('Class created successfully');
+      }
+
+      form.resetFields();
+      setSelectedClassId(null);
+      onSuccess?.();
+    } catch (error: any) {
+      message.error(error.message || 'Failed to save class');
+    }
+  };
+
+  const handleCancel = () => {
+    form.resetFields();
+    setSelectedClassId(null);
+    onCancel?.();
+  };
+
+  const classStatusOptions: { value: ClassStatus; label: string }[] = [
+    { value: 'SCHEDULED', label: 'Scheduled' },
+    { value: 'IN_PROGRESS', label: 'In Progress' },
+    { value: 'LIVE', label: 'Live' },
+    { value: 'COMPLETED', label: 'Completed' },
+    { value: 'CANCELLED', label: 'Cancelled' },
+  ];
+
+  return (
+    <Form
+      form={form}
+      layout="vertical"
+      onFinish={handleSubmit}
+      disabled={isLoading || isLoadingClass}
+    >
+      <Form.Item
+        name="subject"
+        label="Subject"
+        rules={[
+          { required: true, message: 'Please enter the subject' },
+          { min: 3, message: 'Subject must be at least 3 characters' },
+        ]}
+      >
+        <Input placeholder="Enter subject" />
+      </Form.Item>
+
+      <Form.Item
+        name="teacherId"
+        label="Teacher"
+        rules={[{ required: true, message: 'Please select a teacher' }]}
+      >
+        <Select placeholder="Select teacher">
+          {/* Add teacher options here - you might want to fetch from API */}
+          <Option value="teacher1">Teacher 1</Option>
+          <Option value="teacher2">Teacher 2</Option>
+        </Select>
+      </Form.Item>
+
+      <Form.Item
+        name="studentId"
+        label="Student"
+        rules={[{ required: true, message: 'Please select a student' }]}
+      >
+        <Select placeholder="Select student">
+          {/* Add student options here - you might want to fetch from API */}
+          <Option value="student1">Student 1</Option>
+          <Option value="student2">Student 2</Option>
+        </Select>
+      </Form.Item>
+
+      <Form.Item
+        name="scheduledAt"
+        label="Scheduled Date & Time"
+        rules={[{ required: true, message: 'Please select scheduled time' }]}
+      >
+        <DatePicker
+          showTime
+          format="YYYY-MM-DD HH:mm"
+          placeholder="Select scheduled time"
+          style={{ width: '100%' }}
+        />
+      </Form.Item>
+
+      <Form.Item
+        name="startTime"
+        label="Start Time"
+      >
+        <DatePicker
+          showTime
+          format="YYYY-MM-DD HH:mm"
+          placeholder="Select start time"
+          style={{ width: '100%' }}
+        />
+      </Form.Item>
+
+      <Form.Item
+        name="duration"
+        label="Duration (minutes)"
+        rules={[
+          { required: true, message: 'Please enter duration' },
+          { type: 'number', min: 40, message: 'Duration must be at least 40 minutes' },
+        ]}
+      >
+        <InputNumber
+          min={40}
+          max={300}
+          placeholder="Enter duration in minutes"
+          style={{ width: '100%' }}
+        />
+      </Form.Item>
+
+      <Form.Item
+        name="classStatus"
+        label="Class Status"
+        rules={[{ required: true, message: 'Please select class status' }]}
+      >
+        <Select placeholder="Select class status">
+          {classStatusOptions.map((option) => (
+            <Option key={option.value} value={option.value}>
+              {option.label}
+            </Option>
+          ))}
+        </Select>
+      </Form.Item>
+
+      <Form.Item
+        name="classLink"
+        label="Class Link"
+        rules={[
+          {
+            pattern: /^https:\/\/app\.conceptboard\.com\/board\/(?:[A-Za-z0-9]{4}-){4}[A-Za-z0-9]{4}$/,
+            message: 'classLink must follow the pattern https://app.conceptboard.com/board/XXXX-XXXX-XXXX-XXXX-XXXX',
+          },
+        ]}
+      >
+        <Input placeholder="https://app.conceptboard.com/board/..." />
+      </Form.Item>
+
+      <Form.Item>
+        <Space>
+          <Button type="primary" htmlType="submit" loading={isLoading}>
+            {isEdit ? 'Update' : 'Create'} Class
+          </Button>
+          <Button onClick={handleCancel}>
+            Cancel
+          </Button>
+        </Space>
+      </Form.Item>
+    </Form>
+  );
+};
+
+export default ClassForm;
