@@ -21,7 +21,7 @@ import { authService } from "../../services/api";
 import useAuthStore from "../../module/authentication/store/authStore";
 import type { Admin } from "../../module/admin/types";
 import type { Teacher } from "../../module/teacher/types";
-import type { Student } from "../../module/student/types";
+import type { Student } from "../../module/student/types/student.types";
 import type { Moderator } from "../../module/moderator/types";
 
 const { Title, Text } = Typography;

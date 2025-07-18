@@ -1,10 +1,12 @@
 // Define StatCard options constants
 
+import { SelectClassOption } from "../module/classes/components/ClassStatsCard";
+
 export const CLASS_TITLE_OPTIONS = [
-  { value: "allClasses", label: "Total Classes" },
-  { value: "activeClass", label: "Active Class" },
-  { value: "upcomingClass", label: "Upcoming Class" },
-  { value: "classCompleted", label: "Class Completed" },
+  { value: "allClasses", label: "Total Classes" }as unknown as SelectClassOption,
+  { value: "activeClass", label: "Active Class" }as unknown as SelectClassOption,
+  { value: "upcomingClass", label: "Upcoming Class" }as unknown as SelectClassOption,
+  { value: "classCompleted", label: "Class Completed" }as unknown as SelectClassOption,
 ];
 
 export const STUDENT_TITLE_OPTIONS = [

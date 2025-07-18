@@ -1,8 +1,10 @@
-// client/src/pages/dashboard/Dashboard.tsx
+// client/src/components/dashboard/Dashboard.tsx
 import React, { useState } from "react";
 import { Row, Col, Card, Typography, Select } from "antd";
 import StatCard from "./StatCard";
 import ItemList from "./ItemList";
+import ClassesBarChart from "./charts/ClassesBarChart";
+import RecentActivities from "./RecentActivities";
 import StudentsPieChart from "./charts/StudentsPieChart";
 import RevenueLineChart from "./charts/RevenueLineChart";
 import styles from "./Dashboard.module.css";
@@ -21,17 +23,8 @@ import {
   STUDENT_TITLE_OPTIONS,
   TEACHER_TITLE_OPTIONS,
   COURSE_TITLE_OPTIONS,
+  // PERIOD_OPTIONS, // Removed
 } from "../../constants/statCardOptions";
-
-// Import class components
-import {
-  ClassStatsCard,
-  ClassListCard,
-  ClassBarChart,
-  ClassRecentActivities,
-} from "../../module/classes/components";
-import { ClassStatus } from "../../module/classes";
-import { useClassStore } from "../../module/classes/store/useClassStore";
 
 const { Title } = Typography;
 
@@ -39,64 +32,40 @@ const Dashboard: React.FC = () => {
   const [selectedStatus, setSelectedStatus] = useState<string>(
     CLASS_STATUS.UPCOMING
   );
-  const handlePeriodChange = (date: any, dateString: string | string[]) => {
-    console.log('Period changed:', date, dateString);
-    // Handle period changes if needed
-  };
-  const classFilters =useClassStore(state=>state.filters);
-
-  // Static data for student/teacher/courses (as in DashboardCopy)
-  const staticListItems: any[] = [
-    { label: "class1", time: "3 pm", status: "success" },
-    { label: "class1", time: "12 pm", status: "warning" },
-    { label: "class1", time: "6:20", status: "error" },
-    { label: "class1", time: "6 jul", status: "success" },
-    { label: "class1", time: "6 jul", status: "error" },
-    { label: "class1", time: "6 jul", status: "default" },
-    { label: "class1", time: "6 jul", status: "default" },
-  ];
-  const studentsPieData = [
-    { name: "United States", value: 52.1 },
-    { name: "Canada", value: 22.8 },
-    { name: "Mexico", value: 13.9 },
-    { name: "Other", value: 11.2 },
-  ];
-
   return (
     <div className={styles.dashboard}>
       {/* Stat Cards Row */}
       <Row gutter={[40, 40]} className={styles.equalHeightRow}>
         <Col xs={24} sm={12} md={12} lg={6} className={styles.equalHeightCol}>
-          {/* Class stat card (dynamic) */}
-          <ClassStatsCard
+          <StatCard
             icon={<FaBookOpen />}
+            value={23}
             titleOptions={CLASS_TITLE_OPTIONS}
-            statType="total"
-            onPeriodChange={handlePeriodChange}
+            // periodOptions={PERIOD_OPTIONS} // Removed
           />
         </Col>
         <Col xs={24} sm={12} md={12} lg={6} className={styles.equalHeightCol}>
-          {/* Student stat card (static) */}
           <StatCard
             icon={<FaUserGraduate />}
             value={23}
             titleOptions={STUDENT_TITLE_OPTIONS}
+            // periodOptions={PERIOD_OPTIONS} // Removed
           />
         </Col>
         <Col xs={24} sm={12} md={12} lg={6} className={styles.equalHeightCol}>
-          {/* Teacher stat card (static) */}
           <StatCard
             icon={<FaChalkboardTeacher />}
             value={23}
             titleOptions={TEACHER_TITLE_OPTIONS}
+            // periodOptions={PERIOD_OPTIONS} // Removed
           />
         </Col>
         <Col xs={24} sm={12} md={12} lg={6} className={styles.equalHeightCol}>
-          {/* Course stat card (static) */}
           <StatCard
             icon={<FaBook />}
             value={23}
             titleOptions={COURSE_TITLE_OPTIONS}
+            // periodOptions={PERIOD_OPTIONS} // Removed
           />
         </Col>
       </Row>
@@ -107,41 +76,57 @@ const Dashboard: React.FC = () => {
         style={{ marginTop: 16 }}
         className={styles.equalHeightRow}
       >
-        {/* List items (class dynamic, student/teacher static) */}
+        {/* First three List items */}
         <Col xs={24} lg={14} className={styles.equalHeightCol}>
           <Row gutter={[16, 16]} className={styles.equalHeightRow}>
             <Col xs={24} lg={8} className={styles.equalHeightCol}>
-              {/* Class list card (dynamic) */}
-              <ClassListCard
+              <ItemList
                 titleOptions={CLASS_TITLE_OPTIONS}
                 icon={<FaBookOpen />}
-                filters={{
-                  ...classFilters,
-                  classStatus: 'SCHEDULED',
-                  limit: 7,
-                }}
-                onViewMore={() => console.log('View more classes')}
+                items={[
+                  { label: "class1", time: "3 pm", status: "success" },
+                  { label: "class1", time: "12 pm", status: "warning" },
+                  { label: "class1", time: "6:20", status: "error" },
+                  { label: "class1", time: "6 jul", status: "success" },
+                  { label: "class1", time: "6 jul", status: "error" },
+                  { label: "class1", time: "6 jul", status: "default" },
+                  { label: "class1", time: "6 jul", status: "default" },
+                ]}
               />
             </Col>
             <Col xs={24} lg={8} className={styles.equalHeightCol}>
-              {/* Student list (static) */}
               <ItemList
                 titleOptions={STUDENT_TITLE_OPTIONS}
                 icon={<FaUserGraduate />}
-                items={staticListItems}
+                items={[
+                  { label: "class1", time: "3 pm", status: "success" },
+                  { label: "class1", time: "12 pm", status: "warning" },
+                  { label: "class1", time: "6:20", status: "error" },
+                  { label: "class1", time: "6 jul", status: "success" },
+                  { label: "class1", time: "6 jul", status: "error" },
+                  { label: "class1", time: "6 jul", status: "default" },
+                  { label: "class1", time: "6 jul", status: "default" },
+                ]}
               />
             </Col>
             <Col xs={24} lg={8} className={styles.equalHeightCol}>
-              {/* Teacher list (static) */}
               <ItemList
                 titleOptions={TEACHER_TITLE_OPTIONS}
                 icon={<FaChalkboardTeacher />}
-                items={staticListItems}
+                items={[
+                  { label: "class1", time: "3 pm", status: "success" },
+                  { label: "class1", time: "12 pm", status: "warning" },
+                  { label: "class1", time: "6:20", status: "error" },
+                  { label: "class1", time: "6 jul", status: "success" },
+                  { label: "class1", time: "6 jul", status: "error" },
+                  { label: "class1", time: "6 jul", status: "default" },
+                  { label: "class1", time: "6 jul", status: "default" },
+                ]}
               />
             </Col>
           </Row>
         </Col>
-        {/* Bar Chart col (dynamic) */}
+        {/* Bar Chart col */}
         <Col xs={24} lg={10} className={styles.equalHeightCol}>
           <Card
             className={styles.equalHeightCard}
@@ -174,7 +159,7 @@ const Dashboard: React.FC = () => {
                 }))}
               />
             </div>
-            <ClassBarChart status={selectedStatus as ClassStatus} />
+            <ClassesBarChart status={selectedStatus} />
           </Card>
         </Col>
       </Row>
@@ -185,14 +170,15 @@ const Dashboard: React.FC = () => {
         style={{ marginTop: 16 }}
         className={styles.equalHeightRow}
       >
-        {/* Recent Activities (dynamic) */}
+        {/* Recent Activities - 3/5 of the width */}
         <Col xs={24} lg={14} className={styles.equalHeightCol}>
-          <ClassRecentActivities />
+          <RecentActivities />
         </Col>
-        {/* Charts (static) */}
+
+        {/* Charts - 2/5 of the width */}
         <Col xs={24} lg={10} className={styles.equalHeightCol}>
           <Row gutter={[16, 16]} className={styles.equalHeightRow}>
-            {/* Students by Location (static) */}
+            {/* Students by Location */}
             <Col xs={24}>
               <Card
                 title="Students by Location"
@@ -206,10 +192,18 @@ const Dashboard: React.FC = () => {
                   },
                 }}
               >
-                <StudentsPieChart data={studentsPieData} />
+                <StudentsPieChart
+                  data={[
+                    { name: "United States", value: 52.1 },
+                    { name: "Canada", value: 22.8 },
+                    { name: "Mexico", value: 13.9 },
+                    { name: "Other", value: 11.2 },
+                  ]}
+                />
               </Card>
             </Col>
-            {/* Revenue vs Payouts (static) */}
+
+            {/* Revenue vs Payouts */}
             <Col xs={24}>
               <Card
                 title="Revenue vs. Payouts"
