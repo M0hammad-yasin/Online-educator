@@ -5,7 +5,7 @@ export default z.object({
     .string()
     .refine(
       (val) => {
-        return /^\d+$/.test(val) && parseInt(val, 10) > 1;
+        return /^\d+$/.test(val) && parseInt(val, 10) > 0;
       },
       { message: "Page number must be a greater than 1" }
     )
@@ -14,7 +14,7 @@ export default z.object({
     .string()
     .refine(
       (val) => {
-        return /^\d+$/.test(val) && parseInt(val, 10) > 1;
+        return /^\d+$/.test(val) && parseInt(val, 10) > 5;
       },
       { message: "Limit must be a greater than 1" }
     )

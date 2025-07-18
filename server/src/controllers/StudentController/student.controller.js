@@ -279,7 +279,7 @@ export const deleteStudentByAdmin = asyncWrapper(async (req, res) => {
   sendSuccess(res, {
     statusCode: 201,
     message: "student deleted Successfully",
-    data: { delStudent: _.omit(delStudent, ["passwordHash"]) },
+    data:  _.omit(delStudent, ["passwordHash"]) ,
   });
 });
 

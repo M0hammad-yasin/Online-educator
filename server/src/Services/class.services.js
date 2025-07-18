@@ -417,11 +417,12 @@ class ClassService {
       }),
       prisma.class.count({ where: filter }),
     ]);
+    console.log(classCount);
 
     const from = skip + 1;
-    const to = Math.min(skip + classCount.length, totalClasses);
+    const to = Math.min(skip + classCount, totalClasses);
     const paginationData = {
-      total: classes.length,
+      total: totalClasses,
       range: `${from} to ${to} of ${totalClasses}`,
       currentPage: page,
       pageSize: limit,
