@@ -1,6 +1,6 @@
 import React from "react";
 import { ConfigProvider, theme as antTheme } from "antd";
-import useThemeStore from "../store/themeStore";
+import useThemeStore from "../module/store/themeStore";
 
 interface ThemeProviderProps {
   children: React.ReactNode;

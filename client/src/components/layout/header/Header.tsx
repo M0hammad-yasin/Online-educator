@@ -23,7 +23,7 @@ import {
   SettingOutlined,
   LogoutOutlined,
 } from "@ant-design/icons";
-import useThemeStore from "../../../store/themeStore";
+import useThemeStore from "../../../module/store/themeStore";
 import "../../../style/header.css";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import UserManagement from '../../../module/authentication/components/UserManagement';
