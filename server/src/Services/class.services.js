@@ -6,6 +6,7 @@ import {
   ConflictError,
   NotFoundError,
 } from "../Lib/custom.error.js";
+import parseOrderBy from "../utils/parseOrderBy.js";
 class ClassUtilities {
   /**
    * Generate a class ID based on grade and subject
@@ -61,6 +62,8 @@ class ClassUtilities {
   buildClassFilters(query, user = null) {
     let { teacherId, studentId, subject, classStatus, startDate, endDate } =
       query;
+      //remove filter.classStatus for classStatus=all-classes
+      if(classStatus=='all-classes') classStatus=null;
     const filter = {};
 
     // Role-based filtering
@@ -89,7 +92,6 @@ class ClassUtilities {
 
     return filter;
   }
-
   /**
    * Get pagination parameters from query
    */
@@ -266,19 +268,16 @@ class ClassService {
     return { updatedClass };
   }
   async getAllClassesForAdmin(query) {
-    const { sortBy, sortOrder } = query;
+    const orderBy = parseOrderBy(query);
     const filter = this.#cu.buildClassFilters(query);
     const { skip, take, page, limit } = this.#cu.getPaginationParams(query);
+  
     const [classes, totalClasses] = await Promise.all([
       prisma.class.findMany({
         where: filter,
         skip,
         take,
-        ...(sortBy && {
-          orderBy: {
-            [sortBy]: sortOrder,
-          },
-        }),
+        orderBy: orderBy && orderBy.length > 0 ? orderBy : undefined,
         include: {
           teacher: {
             select: {
@@ -294,7 +293,6 @@ class ClassService {
               name: true,
               email: true,
               profilePicture: true,
-
               grade: true,
             },
           },
@@ -302,14 +300,20 @@ class ClassService {
       }),
       prisma.class.count({ where: filter }),
     ]);
-    const from = skip + 1;
+  
+    // calculate pagination range
+    const from = totalClasses === 0 ? 0 : skip + 1;
     const to = Math.min(skip + classes.length, totalClasses);
+  
     const paginationData = {
-      total: classes.length,
-      range: `${from} to ${to} of ${totalClasses}`,
+      total: totalClasses,  
+      range: `${from} to ${to} of ${totalClasses}`, 
       currentPage: page,
       pageSize: limit,
+      totalPages: Math.ceil(totalClasses / limit),   
     };
+  
+  
     return {
       classes,
       metaData: {
@@ -318,19 +322,19 @@ class ClassService {
       },
     };
   }
+  
 
   async getAllClasses(query, user) {
-    const { sortBy = "createdAt", sortOrder = "asc" } = query;
+    const orderBy = parseOrderBy(query);
     const filter = this.#cu.buildClassFilters(query, user);
     const { skip, take, page, limit } = this.#cu.getPaginationParams(query);
+  
     const [classes, totalClasses] = await Promise.all([
       prisma.class.findMany({
         where: filter,
         skip,
         take,
-        orderBy: {
-          [sortBy]: sortOrder,
-        },
+        orderBy: orderBy && orderBy.length > 0 ? orderBy : undefined,
         include: {
           teacher: {
             select: {
@@ -353,14 +357,18 @@ class ClassService {
       }),
       prisma.class.count({ where: filter }),
     ]);
-    const from = skip + 1;
+  
+    const from = totalClasses === 0 ? 0 : skip + 1;
     const to = Math.min(skip + classes.length, totalClasses);
+  
     const paginationData = {
-      total: classes.length,
-      range: `${from} to ${to} of ${totalClasses}`,
+      total: totalClasses,  
+      range: `${from} to ${to} of ${totalClasses}`, 
       currentPage: page,
       pageSize: limit,
+      totalPages: Math.ceil(totalClasses / limit),
     };
+  
     return {
       classes,
       metaData: {
@@ -369,6 +377,7 @@ class ClassService {
       },
     };
   }
+  
 
   async deleteClass(filter) {
     if (!filter.id) throw new ValidationError("Class ID is required");

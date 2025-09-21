@@ -96,7 +96,6 @@ export const getClassById = asyncWrapper(async (req, res) => {
   });
 });
 export const getAllClasses = asyncWrapper(async (req, res) => {
-  console.log('req.query', req.query);
   const { classes, metaData } = await classService.getAllClasses(
     req.query,
     req.user

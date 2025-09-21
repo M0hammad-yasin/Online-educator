@@ -19,12 +19,14 @@ const auth = (req, res, next) => {
   }
 
   // If not in cookies, check Authorization header
-  if (!token && req.header("Authorization")) {
-    const authHeader = req.header("Authorization");
-    if (authHeader.startsWith("Bearer ")) {
-      token = authHeader.substring(7); // Remove "Bearer " prefix
-    } else {
-      token = authHeader; // If it's just the token without "Bearer"
+  if (!token) {
+    if (req.header("Authorization")) {
+      const authHeader = req.header("Authorization");
+      if (authHeader.startsWith("Bearer ")) {
+        token = authHeader.substring(7); // Remove "Bearer " prefix
+      } else {
+        token = authHeader; // If it's just the token without "Bearer"
+      }
     }
   }
   if (!token) throw new AuthenticationError("No token provided");

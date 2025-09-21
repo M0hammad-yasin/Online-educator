@@ -4,7 +4,7 @@ import {
   studentSchema,
   studentUpdateSchema,
 } from "../Validation/student.validate.js";
-import { classFilterQuerySchema } from "../Validation/class.validate.js";
+import { classFilterQuerySchema } from "../validation/class.validate.js";
 import { getUsersWithClasses as getStudentsWithClasses } from "../controllers/adminController/common.admin.controlller.js";
 import paginationSchema from "../Validation/pagination.validate.js";
 import { mongoIdSchema } from "../Validation/mongoId.validate.js";

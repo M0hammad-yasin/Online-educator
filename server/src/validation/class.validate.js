@@ -58,25 +58,46 @@ export const classSchema = z.object({
     .default("SCHEDULED"),
 });
 export const updateClassSchema = classSchema.partial();
+// allowed fields for sorting
+const sortFieldEnum = z.enum([
+  "teacher",
+  "student",
+  "classStatus",
+  "subject",
+  "startTime",
+  "day",
+  "hour",
+  "month",
+  "grade",
+]);
+
+// single orderBy object
+const orderBySchema = z.record(sortFieldEnum, z.enum(["asc", "desc"]));
+
+// array of orderBy objects
+const orderByArraySchema = z.array(orderBySchema);
+
+// parse stringified JSON from query
+const orderByQuerySchema = z
+  .string()
+  .transform((val, ctx) => {
+    try {
+      const parsed = JSON.parse(val);
+      return orderByArraySchema.parse(parsed);
+    } catch (e) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Invalid orderBy format. Must be a JSON array like [{\"startTime\":\"desc\"}]",
+      });
+      return z.NEVER;
+    }
+  })
+  .optional();
+
 export const classFilterQuerySchema = z.object({
-  startDate: dateTimeString.optional(),
-  endDate: dateTimeString.optional(),
-  sortBy: z
-    .enum([
-      "teacher",
-      "student",
-      "classStatus",
-      "subject",
-      "startTime",
-      "day",
-      "hour",
-      "month",
-      "grade",
-    ])
-    .optional(),
-  order: z
-    .enum(["asc", "desc"], { message: "order must be 'asc' or 'desc'" })
-    .optional(),
+  startDate: z.string().optional(),
+  endDate: z.string().optional(),
+  orderBy: orderByQuerySchema, 
   studentId: z
     .string({ message: "id must be string" })
     .min(24, { message: "id should be 24 characters" })
@@ -90,7 +111,6 @@ export const classFilterQuerySchema = z.object({
       "startTime",
       "day",
       "hour",
-      "status",
       "month",
       "grade",
     ])
@@ -107,7 +127,7 @@ export const classFilterQuerySchema = z.object({
       ],
       {
         message:
-          "Status must be one of: SCHEDULED, IN_PROGRESS, CANCELLED,COMPLETED, LIVE, all-classes",
+          "Status must be one of: SCHEDULED, IN_PROGRESS, CANCELLED, COMPLETED, LIVE, all-classes",
       }
     )
     .optional(),
@@ -117,20 +137,14 @@ export const classFilterQuerySchema = z.object({
     .optional(),
   page: z
     .string()
-    .refine(
-      (val) => {
-        return /^\d+$/.test(val) && parseInt(val, 10) > 0;
-      },
-      { message: "Page number must be a greater than 1" }
-    )
+    .refine((val) => /^\d+$/.test(val) && parseInt(val, 10) > 0, {
+      message: "Page number must be a greater than 1",
+    })
     .optional(),
   limit: z
     .string()
-    .refine(
-      (val) => {
-        return /^\d+$/.test(val) && parseInt(val, 10) > 1;
-      },
-      { message: "Limit must be a greater than 1" }
-    )
+    .refine((val) => /^\d+$/.test(val) && parseInt(val, 10) > 1, {
+      message: "Limit must be a greater than 1",
+    })
     .optional(),
 });
