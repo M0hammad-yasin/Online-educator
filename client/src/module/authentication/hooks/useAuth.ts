@@ -93,7 +93,8 @@ export const useProfile = () => {
     queryFn: async () => {
       const response = await authService.getProfile();
       console.log(response);
-      return response.data.user;
+      console.log(response.data);
+      return response.data;
     },
   });
 };

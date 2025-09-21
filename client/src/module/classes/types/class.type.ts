@@ -54,8 +54,21 @@ export interface UpdateClassRequest {
 export interface ClassFilters {
   startDate?: string;
   endDate?: string;
-  sortBy?: 'teacher' | 'student' | 'classStatus' | 'subject' | 'startTime' | 'day' | 'hour' | 'month' | 'grade';
-  order?: 'asc' | 'desc';
+
+  // ✅ Prisma-ready orderBy format
+  orderBy?: Array<{
+      teacher: 'asc' | 'desc';
+      student: 'asc' | 'desc';
+      classStatus: 'asc' | 'desc';
+      subject: 'asc' | 'desc';
+      startTime: 'asc' | 'desc';
+      day: 'asc' | 'desc';
+      hour: 'asc' | 'desc';
+      month: 'asc' | 'desc';
+      grade: 'asc' | 'desc';
+    }
+  >;
+
   studentId?: string;
   teacherId?: string;
   classStatus?: ClassStatus | 'all-classes';

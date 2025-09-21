@@ -15,7 +15,7 @@ const ClassList: React.FC = () => {
   console.log('filters', filters);
   const { setSelectedClassId, setEditModalOpen, setDeleteModalOpen } = useClassStore();
   
-  const { data: classesData, isLoading, error } = useClasses();
+  const { data: classesData, isLoading, error } = useClasses(filters);
   console.log('classesData', classesData);
 //   const deleteClassMutation = useDeleteClass();
 

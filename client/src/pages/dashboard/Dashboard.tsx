@@ -11,6 +11,7 @@ import {
   FaUserGraduate,
   FaChalkboardTeacher,
   FaBook,
+  FaAngleDown,
 } from "react-icons/fa";
 import {
   CLASS_STATUS,
@@ -114,7 +115,7 @@ const Dashboard: React.FC = () => {
               {/* Class list card (dynamic) */}
               <ClassListCard
                 titleOptions={CLASS_TITLE_OPTIONS}
-                icon={<FaBookOpen />}
+                icons={<FaAngleDown />}
                 filters={{
                   ...classFilters,
                   classStatus: 'SCHEDULED',

@@ -28,7 +28,7 @@ import {
 
 const { Title } = Typography;
 
-const Dashboard: React.FC = () => {
+const DashboardCopy: React.FC = () => {
   const [selectedStatus, setSelectedStatus] = useState<string>(
     CLASS_STATUS.UPCOMING
   );
@@ -227,4 +227,4 @@ const Dashboard: React.FC = () => {
   );
 };
 
-export default Dashboard;
+export default DashboardCopy;

@@ -391,8 +391,7 @@ GET /class/
 **Query Parameters:**
 - `startDate`: Filter by start date
 - `endDate`: Filter by end date
-- `sortBy`: teacher, student, classStatus, subject, startTime, day, hour, month, grade
-- `order`: asc, desc
+- `orderBy`: Array of sort objects. Example: [{"startTime":"desc"},{"teacher":"asc"}]
 - `studentId`: Filter by student ID
 - `teacherId`: Filter by teacher ID
 - `classStatus`: SCHEDULED, LIVE, CANCELLED, COMPLETED, IN_PROGRESS, all-classes

@@ -2,7 +2,8 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { Role } from '../../../constants/role';
 import { authService } from '../services/auth.service';
-import {mountStoreDevtool} from 'simple-zustand-devtools'
+import { mountStoreDevtool } from 'simple-zustand-devtools';
+
 export type UserRole = (typeof Role)[keyof typeof Role];
 
 export interface User {
@@ -10,7 +11,7 @@ export interface User {
   name: string;
   email: string;
   role: UserRole;
- profilePicture:string; 
+  profilePicture: string;
 }
 
 interface AuthState {
@@ -29,64 +30,73 @@ const useAuthStore = create<AuthState>()(
       token: null,
       user: null,
       isInitialized: false,
-      
+
       setAuth: (data) => {
-        // Store token in localStorage for API calls
         localStorage.setItem('accessToken', data.token);
-        set({ 
-          token: data.token, 
+
+        // IMPORTANT: keep authService in sync
+        authService.setRole(data.user.role);
+
+        set({
+          token: data.token,
           user: data.user,
-          isInitialized: true 
+          isInitialized: true,
         });
       },
-      
+
       clearAuth: () => {
         localStorage.removeItem('accessToken');
-        set({ 
-          token: null, 
+
+        set({
+          token: null,
           user: null,
-          isInitialized: true 
+          isInitialized: true,
         });
       },
-      
+
       isAuthenticated: () => {
         const { token } = get();
         return !!token && isTokenValid(token);
       },
-      
+
       initializeAuth: async () => {
-        const { token } = get();
-        
+        const { token, user } = get();
+
         if (!token) {
           set({ isInitialized: true });
           return;
         }
-        
-        // Validate token format first
+
         if (!isTokenValid(token)) {
-          set({ 
+          set({
             token: null,
             user: null,
-            isInitialized: true 
+            isInitialized: true,
           });
           localStorage.removeItem('accessToken');
           return;
         }
-        
+
         try {
-          // Verify token with backend
+          // keep endpoint in sync before calling
+          debugger;
+          if (user?.role) {
+            authService.setRole(user.role);
+          }
+
           const response = await authService.getProfile();
+
           localStorage.setItem('accessToken', token);
-          set({ 
-            user: response.data.user,
-            isInitialized: true 
+
+          set({
+            user: response.data,
+            isInitialized: true,
           });
         } catch (error) {
-          // Clear invalid token
-          set({ 
+          set({
             token: null,
             user: null,
-            isInitialized: true 
+            isInitialized: true,
           });
           localStorage.removeItem('accessToken');
         }
@@ -94,31 +104,36 @@ const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'auth-storage',
-      partialize: (state) => ({ 
-        token: state.token 
+      // ✅ Save both token and user
+      partialize: (state) => ({
+        token: state.token,
+        user: state.user,
       }),
+      // ✅ Restore role into authService before init
       onRehydrateStorage: () => (state) => {
-        // Initialize auth after rehydration
+        if (state?.user?.role) {
+          authService.setRole(state.user.role);
+        }
         state?.initializeAuth();
-      }
+      },
     }
   )
 );
+
 if (process.env.NODE_ENV === 'development') {
   mountStoreDevtool('AuthStore', useAuthStore);
 }
 
-// Helper function for JWT token validation
 function isTokenValid(token: string): boolean {
   if (!token) return false;
-  
+
   try {
     const parts = token.split('.');
     if (parts.length !== 3) return false;
-    
+
     const payload = JSON.parse(atob(parts[1]));
     const now = Math.floor(Date.now() / 1000);
-    
+
     return payload.exp > now;
   } catch {
     return false;

@@ -50,6 +50,9 @@ class AuthService extends BaseService<any> {
         break;
     }
   }
+  getRole(){
+    return this.endpoint;
+  }
 
   async login(credentials: LoginCredentials): Promise<ApiResponse<AuthResponse>> {
     return this.customPost<AuthResponse>('/login', credentials);
@@ -75,8 +78,8 @@ class AuthService extends BaseService<any> {
     return this.customPost<void>('/reset-password', { token, password });
   }
 
-  async getProfile(): Promise<ApiResponse<{ user: AuthResponse['user'] }>> {
-    return this.customGet<{ user: AuthResponse['user'] }>('/me');
+  async getProfile(): Promise<ApiResponse<User>> {
+    return this.customGet<User>('/me');
   }
   async patchProfile(data: Partial<AllUserProps>): Promise<ApiResponse<AllUserProps>> {
     return await this.customPatch<AllUserProps>('/me', data);

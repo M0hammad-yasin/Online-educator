@@ -1,13 +1,14 @@
 // client/src/module/classes/components/ClassListCard.tsx
 
-import React from 'react';
-import { Card, Typography, List, Avatar, Tag, Flex, Button, theme, Skeleton } from 'antd';
+import React, { useState } from 'react';
+import { Card, Typography, List, Avatar, Tag, Flex, Button, theme, Skeleton, DatePicker } from 'antd';
 import { useClasses } from '../hooks/useClasses';
 import { ClassFilters, ClassStatus } from '../types/class.type';
-import { FaClock, FaUser, FaBook } from 'react-icons/fa';
+import { FaClock, FaUser, FaAngleDown, FaBook } from 'react-icons/fa';
 import dayjs from 'dayjs';
-
-const { Title, Text } = Typography;
+import {CalendarOutlined} from '@ant-design/icons'
+import { IconBaseProps } from 'react-icons';
+ const { Title, Text } = Typography;
 
 interface SelectOption {
   value: string;
@@ -16,7 +17,7 @@ interface SelectOption {
 
 interface ClassListCardProps {
   titleOptions: SelectOption[];
-  icon: React.ReactNode;
+  icons: React.ReactNode;
   filters?: ClassFilters;
   maxItems?: number;
   onViewMore?: () => void;
@@ -58,15 +59,16 @@ const getStatusText = (status: ClassStatus): string => {
 
 const ClassListCard: React.FC<ClassListCardProps> = ({
   titleOptions,
-  icon,
+  icons,
   filters = { limit: 7, page: 1 },
   maxItems = 7,
   onViewMore,
 }) => {
   const { token } = theme.useToken();
-  const [selectedTitle, setSelectedTitle] = React.useState<string>(
+  const [selectedTitle, setSelectedTitle] = useState<string>(
     titleOptions[0].label
   );
+  const [selectedPeriod, setSelectedPeriod] = useState<dayjs.Dayjs>(dayjs());
 
   const { data: classesData, isLoading } = useClasses({
     ...filters,
@@ -77,6 +79,7 @@ const ClassListCard: React.FC<ClassListCardProps> = ({
   return (
     <Card
       title={
+        <Flex justify='space-between' align='center' vertical>
         <Flex justify="space-between" align="center">
           <Title level={5} style={{ margin: 0 }}>
             {selectedTitle}
@@ -93,9 +96,30 @@ const ClassListCard: React.FC<ClassListCardProps> = ({
               fontSize: 16,
             }}
           >
-            {icon}
+            {icons}
           </div>
         </Flex>
+         {/* Date Picker */}
+          <Flex align="center">
+            <DatePicker
+              picker="month"
+              defaultValue={selectedPeriod}
+              format="MMM YYYY"
+              style={{
+                width: 120,
+                borderRadius: token.borderRadiusLG,
+              }}
+              onChange={(date) => {
+                if (date) setSelectedPeriod(date);
+              }}
+              allowClear={false}
+              suffixIcon={
+                <CalendarOutlined style={{ color: token.colorPrimary }} />
+              }
+              size="small"
+            />
+          </Flex>
+          </Flex>
       }
       style={{
         height: "100%",

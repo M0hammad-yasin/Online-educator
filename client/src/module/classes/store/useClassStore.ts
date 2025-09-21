@@ -32,9 +32,8 @@ interface ClassStoreState {
 const initialFilters: ClassFilters = {
   page: 1,
   limit: 10,
-  sortBy: 'startTime',
-  order: 'desc',
-  classStatus: 'SCHEDULED',
+  classStatus: 'all-classes',
+  // orderBy: [], 
 };
 
 export const useClassStore = create<ClassStoreState>((set, _) => ({
@@ -100,16 +99,17 @@ export const useClassStoreSelectors = {
     state.isCreateModalOpen || state.isEditModalOpen || state.isDeleteModalOpen
   ),
   
-  hasActiveFilters: () => useClassStore((state) => {
-    const { filters } = state;
-    return !!(
-      filters.startDate ||
-      filters.endDate ||
-      filters.studentId ||
-      filters.teacherId ||
-      (filters.classStatus && filters.classStatus !== 'all-classes') ||
-      (filters.sortBy && filters.sortBy !== 'startTime') ||
-      (filters.order && filters.order !== 'desc')
-    );
-  }),
+  hasActiveFilters: () =>
+    useClassStore((state) => {
+      const { filters } = state;
+  
+      return !!(
+        filters.startDate ||
+        filters.endDate ||
+        filters.studentId ||
+        filters.teacherId ||
+        (filters.classStatus && filters.classStatus !== 'all-classes') ||
+        (filters.orderBy && filters.orderBy.length > 0) 
+      );
+    }),
 };
