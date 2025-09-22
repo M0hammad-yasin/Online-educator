@@ -43,8 +43,11 @@ class ClassService extends BaseService<Class> {
     return this.customGet<CalendarClass[]>('/calander-view', filters);
   }
 
-  async getClassesCount(filters?: ClassFilters): Promise<ApiResponse<ClassCount>> {
-    return this.customGet<ClassCount>('/count', filters);
+  async getClassesCount(filters?: ClassFilters): Promise<ApiResponse<Number>> {
+
+    const response = await this.customGet<Number>('/count', filters);
+    console.log("response : ",response.data);
+    return response;
   }
 
   async getClassById(id: string): Promise<ApiResponse<Class>> {

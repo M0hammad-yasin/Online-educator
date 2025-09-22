@@ -60,8 +60,8 @@ export const classSchema = z.object({
 export const updateClassSchema = classSchema.partial();
 // allowed fields for sorting
 const sortFieldEnum = z.enum([
-  "teacher",
-  "student",
+  "teacherName",
+  "studentName",
   "status",
   "subject",
   "startTime",
@@ -117,7 +117,6 @@ export const classFilterQuerySchema = z.object({
     .enum(
       [
         "SCHEDULED",
-        "LIVE",
         "CANCELLED",
         "COMPLETED",
         "IN_PROGRESS",
@@ -125,7 +124,7 @@ export const classFilterQuerySchema = z.object({
       ],
       {
         message:
-          "Status must be one of: SCHEDULED, IN_PROGRESS, CANCELLED, COMPLETED, LIVE, all-classes",
+          "Status must be one of: SCHEDULED, IN_PROGRESS, CANCELLED, COMPLETED, all-classes",
       }
     )
     .optional(),

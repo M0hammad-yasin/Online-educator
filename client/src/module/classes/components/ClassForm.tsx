@@ -2,6 +2,7 @@
 
 import React, { useEffect } from 'react';
 import { Form, Input, Select, DatePicker, InputNumber, Button, Space, message } from 'antd';
+import type { FormInstance } from 'antd/es/form';
 import { useCreateClass, useUpdateClass, useClass } from '../hooks/useClasses';
 import { useClassStore, useClassStoreSelectors } from '../store/useClassStore';
 import { CreateClassRequest, UpdateClassRequest, ClassStatus } from '../index';
@@ -13,14 +14,19 @@ interface ClassFormProps {
   isEdit?: boolean;
   onSuccess?: () => void;
   onCancel?: () => void;
+  form?: FormInstance;
+  showActions?: boolean;
 }
 
 const ClassForm: React.FC<ClassFormProps> = ({ 
   isEdit = false, 
   onSuccess, 
-  onCancel 
+  onCancel,
+  form: providedForm,
+  showActions = true,
 }) => {
-  const [form] = Form.useForm();
+  const [internalForm] = Form.useForm();
+  const form = providedForm || internalForm;
   const selectedClassId = useClassStoreSelectors.selectedClassId();
   const { setSelectedClassId } = useClassStore();
   
@@ -88,7 +94,6 @@ const ClassForm: React.FC<ClassFormProps> = ({
   const classStatusOptions: { value: ClassStatus; label: string }[] = [
     { value: 'SCHEDULED', label: 'Scheduled' },
     { value: 'IN_PROGRESS', label: 'In Progress' },
-    { value: 'LIVE', label: 'Live' },
     { value: 'COMPLETED', label: 'Completed' },
     { value: 'CANCELLED', label: 'Cancelled' },
   ];
@@ -203,16 +208,18 @@ const ClassForm: React.FC<ClassFormProps> = ({
         <Input placeholder="https://app.conceptboard.com/board/..." />
       </Form.Item>
 
-      <Form.Item>
-        <Space>
-          <Button type="primary" htmlType="submit" loading={isLoading}>
-            {isEdit ? 'Update' : 'Create'} Class
-          </Button>
-          <Button onClick={handleCancel}>
-            Cancel
-          </Button>
-        </Space>
-      </Form.Item>
+      {showActions && (
+        <Form.Item>
+          <Space>
+            <Button type="primary" htmlType="submit" loading={isLoading}>
+              {isEdit ? 'Update' : 'Create'} Class
+            </Button>
+            <Button onClick={handleCancel}>
+              Cancel
+            </Button>
+          </Space>
+        </Form.Item>
+      )}
     </Form>
   );
 };

@@ -33,8 +33,6 @@ const getStatusColor = (status: ClassStatus): string => {
       return 'green';
     case 'CANCELLED':
       return 'red';
-    case 'LIVE':
-      return 'purple';
     default:
       return 'default';
   }
@@ -50,8 +48,6 @@ const getStatusText = (status: ClassStatus): string => {
       return 'Completed';
     case 'CANCELLED':
       return 'Cancelled';
-    case 'LIVE':
-      return 'Live';
     default:
       return status;
   }

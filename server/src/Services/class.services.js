@@ -60,10 +60,10 @@ class ClassUtilities {
    * Build filters for class queries based on user role and query parameters
    */
   buildClassFilters(query, user = null) {
-    let { teacherId, studentId, subject, classStatus, startDate, endDate } =
+    let { teacherId, studentId, subject, status,grade, startDate, endDate } =
       query;
       //remove filter.classStatus for classStatus=all-classes
-      if(classStatus=='all-classes') classStatus=null;
+      if(status=='all-classes') status=null;
     const filter = {};
 
     // Role-based filtering
@@ -87,7 +87,8 @@ class ClassUtilities {
       ...(teacherId && { teacherId }),
       ...(studentId && { studentId }),
       ...(subject && { subject }),
-      ...(classStatus && { status: classStatus }),
+      ...(status && { status: status }),
+      ...(grade && { student: { grade: Number(grade) } }),
     });
 
     return filter;

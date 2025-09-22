@@ -2,11 +2,12 @@
 
 import React from 'react';
 import { Table, Tag, Button, Space, Typography, Tooltip } from 'antd';
-import { EditOutlined, DeleteOutlined, EyeOutlined, CaretUpOutlined, CaretDownOutlined } from '@ant-design/icons';
+import { EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import { format } from 'date-fns';
 import { useClasses } from '../hooks/useClasses';
 import { useClassStore, useClassStoreSelectors } from '../store/useClassStore';
 import { Class, ClassOrderBy, ClassStatus } from '../index';
+import SortableHeader from './SortableHeader';
 
 const { Text } = Typography;
 
@@ -16,66 +17,15 @@ const SORTABLE_FIELDS = {
   scheduledAt: 'startTime',
   duration: 'duration',
   classStatus: 'status',
+  teacher:'teacherName',
+  student:'studentName',
 } as const;
 
 type SortableField = keyof typeof SORTABLE_FIELDS;
 
-interface SortableHeaderProps {
-  title: string;
-  field: SortableField;
-  currentOrderBy: ClassOrderBy;
-  onSort: (field: SortableField) => void;
-}
-
-const SortableHeader: React.FC<SortableHeaderProps> = ({ title, field, currentOrderBy, onSort }) => {
-  const getCurrentSortOrder = () => {
-    const orderByField = SORTABLE_FIELDS[field];
-    const sortEntry = currentOrderBy.find(item => item[orderByField]);
-    return sortEntry ? sortEntry[orderByField] : null;
-  };
-
-  const currentOrder = getCurrentSortOrder();
-  const isActive = currentOrder !== null;
-
-  const getArrowIcon = () => {
-    return currentOrder === 'desc' ? <CaretUpOutlined /> : <CaretDownOutlined />;
-  };
-
-  const getArrowColor = () => {
-    return isActive ? '#1890ff' : '#949191';
-  };
-
-  return (
-    <div 
-      style={{ 
-        display: 'flex', 
-        alignItems: 'center', 
-        gap: '4px',
-        cursor: 'pointer',
-        userSelect: 'none',
-        padding: '4px 8px',
-        borderRadius: '4px',
-        transition: 'background-color 0.2s ease',
-      }}
-      onClick={() => onSort(field)}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.backgroundColor = '#f5f5f5';
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.backgroundColor = 'transparent';
-      }}
-    >
-      <span style={{ fontWeight: isActive ? 600 : 400 }}>{title}</span>
-      <span style={{ color: getArrowColor(), fontSize: '12px' }}>
-        {getArrowIcon()}
-      </span>
-    </div>
-  );
-};
-
 const ClassList: React.FC = () => {
   const filters = useClassStoreSelectors.filters();
-  console.log('filters', filters.orderBy);
+  console.log('filters', filters);
   const { setSelectedClassId, setEditModalOpen, setDeleteModalOpen, setFilters } = useClassStore();
   
   const { data: classesData, isLoading, error } = useClasses(filters);
@@ -83,8 +33,7 @@ const ClassList: React.FC = () => {
   const getStatusColor = (status: ClassStatus): string => {
     const colors = {
       SCHEDULED: 'blue',
-      IN_PROGRESS: 'orange',
-      LIVE: 'green',
+      IN_PROGRESS: 'green',
       COMPLETED: 'success',
       CANCELLED: 'error',
     };
@@ -133,6 +82,12 @@ const ClassList: React.FC = () => {
     setFilters({ orderBy: newOrderBy });
   };
 
+  const getCurrentSortOrder = (field: SortableField): 'asc' | 'desc' | null => {
+    const orderByField = SORTABLE_FIELDS[field];
+    const sortEntry = (filters.orderBy || []).find((item) => item[orderByField]);
+    return sortEntry ? (sortEntry[orderByField] as 'asc' | 'desc') : null;
+  };
+
 //   const confirmDelete = async (id: string) => {
 //     try {
 //       await deleteClassMutation.mutateAsync(id);
@@ -147,9 +102,8 @@ const ClassList: React.FC = () => {
       title: (
         <SortableHeader
           title="Subject"
-          field="subject"
-          currentOrderBy={filters.orderBy || []}
-          onSort={handleSort}
+          currentOrder={getCurrentSortOrder('subject')}
+          onClick={() => handleSort('subject')}
         />
       ),
       dataIndex: 'subject',
@@ -160,7 +114,11 @@ const ClassList: React.FC = () => {
     },
     {
       title: (
-        <span style={{ fontWeight: 400 }}>Teacher</span>
+        <SortableHeader
+          title="Teacher"
+          currentOrder={getCurrentSortOrder('teacher')}
+          onClick={() => handleSort('teacher')}
+        />
       ),
       dataIndex: 'teacher',
       key: 'teacher',
@@ -175,7 +133,11 @@ const ClassList: React.FC = () => {
     },
     {
       title: (
-        <span style={{ fontWeight: 400 }}>Student</span>
+        <SortableHeader
+          title="Student"
+          currentOrder={getCurrentSortOrder('student')}
+          onClick={() => handleSort('student')}
+        />
       ),
       dataIndex: 'student',
       key: 'student',
@@ -192,9 +154,8 @@ const ClassList: React.FC = () => {
       title: (
         <SortableHeader
           title="Scheduled Time"
-          field="scheduledAt"
-          currentOrderBy={filters.orderBy || []}
-          onSort={handleSort}
+          currentOrder={getCurrentSortOrder('scheduledAt')}
+          onClick={() => handleSort('scheduledAt')}
         />
       ),
       dataIndex: 'scheduledAt',
@@ -212,9 +173,8 @@ const ClassList: React.FC = () => {
       title: (
         <SortableHeader
           title="Duration"
-          field="duration"
-          currentOrderBy={filters.orderBy || []}
-          onSort={handleSort}
+          currentOrder={getCurrentSortOrder('duration')}
+          onClick={() => handleSort('duration')}
         />
       ),
       dataIndex: 'duration',
@@ -225,9 +185,8 @@ const ClassList: React.FC = () => {
       title: (
         <SortableHeader
           title="Status"
-          field="classStatus"
-          currentOrderBy={filters.orderBy || []}
-          onSort={handleSort}
+          currentOrder={getCurrentSortOrder('classStatus')}
+          onClick={() => handleSort('classStatus')}
         />
       ),
       dataIndex: 'status',
@@ -278,7 +237,8 @@ const ClassList: React.FC = () => {
   }
 
   return (
-    <Table
+    <div>
+      <Table
       columns={columns}
       dataSource={classesData?.data || []}
       rowKey="id"
@@ -297,6 +257,7 @@ const ClassList: React.FC = () => {
       }}
       scroll={{ x: 1000 }}
     />
+    </div>
   );
 };
 
