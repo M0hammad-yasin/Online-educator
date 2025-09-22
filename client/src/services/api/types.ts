@@ -1,3 +1,5 @@
+import { ClassOrderBy } from "../../module/classes";
+
 export interface ApiResponse<T = any> {
   data: T;
   isSuccess: boolean;
@@ -20,8 +22,7 @@ export interface PaginatedResponse<T = any> {
 export interface QueryParams {
   page?: number;
   limit?: number;
-  sort?: string;
-  order?: 'asc' | 'desc';
+  orderBy?:ClassOrderBy;
   search?: string;
   [key: string]: any;
 }

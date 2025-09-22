@@ -20,7 +20,12 @@ export abstract class BaseService<T extends BaseEntity> {
     const searchParams = new URLSearchParams();
     Object.entries(params).forEach(([key, value]) => {
       if (value !== undefined && value !== null && value !== '') {
-        searchParams.append(key, String(value));
+        if (typeof value === "object") {
+          // For arrays or objects
+          searchParams.append(key, JSON.stringify(value));
+        } else {
+          searchParams.append(key, String(value));
+        }
       }
     });
     

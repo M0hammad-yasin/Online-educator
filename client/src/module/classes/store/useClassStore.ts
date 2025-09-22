@@ -32,7 +32,7 @@ interface ClassStoreState {
 const initialFilters: ClassFilters = {
   page: 1,
   limit: 10,
-  classStatus: 'all-classes',
+  status: 'all-classes',
   // orderBy: [], 
 };
 
@@ -108,7 +108,7 @@ export const useClassStoreSelectors = {
         filters.endDate ||
         filters.studentId ||
         filters.teacherId ||
-        (filters.classStatus && filters.classStatus !== 'all-classes') ||
+        (filters.status && filters.status !== 'all-classes') ||
         (filters.orderBy && filters.orderBy.length > 0) 
       );
     }),

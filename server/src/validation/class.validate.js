@@ -62,12 +62,10 @@ export const updateClassSchema = classSchema.partial();
 const sortFieldEnum = z.enum([
   "teacher",
   "student",
-  "classStatus",
+  "status",
   "subject",
   "startTime",
-  "day",
-  "hour",
-  "month",
+  "duration",
   "grade",
 ]);
 

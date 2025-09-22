@@ -50,28 +50,28 @@ export interface UpdateClassRequest {
   duration?: string;
   classStatus?: ClassStatus;
 }
+// types/OrderByTypes.ts
+export type ClassOrderBy = Array<
+  Partial<
+    Record<
+      | "status"
+      | "subject"
+      | "startTime"
+      | "duration"
+      | "grade",
+      "asc" | "desc"
+    >
+  >
+>;
+
 
 export interface ClassFilters {
   startDate?: string;
   endDate?: string;
-
-  // ✅ Prisma-ready orderBy format
-  orderBy?: Array<{
-      teacher: 'asc' | 'desc';
-      student: 'asc' | 'desc';
-      classStatus: 'asc' | 'desc';
-      subject: 'asc' | 'desc';
-      startTime: 'asc' | 'desc';
-      day: 'asc' | 'desc';
-      hour: 'asc' | 'desc';
-      month: 'asc' | 'desc';
-      grade: 'asc' | 'desc';
-    }
-  >;
-
+  orderBy?: ClassOrderBy;
   studentId?: string;
   teacherId?: string;
-  classStatus?: ClassStatus | 'all-classes';
+  status?: ClassStatus | 'all-classes';
   page?: number;
   limit?: number;
 }

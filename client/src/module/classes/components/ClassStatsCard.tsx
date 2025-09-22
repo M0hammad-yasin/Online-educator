@@ -33,7 +33,6 @@ const ClassStatsCard: React.FC<ClassStatsCardProps> = ({
   );
   const classFilters = useClassStore((state) => state.filters);
   const [selectedPeriod, setSelectedPeriod] = React.useState<dayjs.Dayjs>(dayjs());
-console.log(classFilters.page);
   const { data: classCount, isLoading } = useClassesCount(classFilters);
   console.log(classCount)
 
@@ -102,7 +101,7 @@ console.log(classFilters.page);
               value={selectedTitle.label}
               onChange={(value) => {
                 setSelectedTitle(titleOptions.find((option) => option.value === value) as SelectClassOption);
-                classFilters.classStatus = SetTitle(selectedTitle.value);
+                classFilters.status = SetTitle(selectedTitle.value);
               }}
               options={titleOptions}
             />

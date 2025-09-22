@@ -79,7 +79,6 @@ const useAuthStore = create<AuthState>()(
 
         try {
           // keep endpoint in sync before calling
-          debugger;
           if (user?.role) {
             authService.setRole(user.role);
           }
