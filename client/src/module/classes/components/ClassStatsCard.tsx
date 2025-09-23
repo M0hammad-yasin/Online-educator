@@ -4,13 +4,13 @@ import React from 'react';
 import { Card, Typography, theme, Flex, Select, DatePicker, Skeleton } from 'antd';
 import dayjs from 'dayjs';
 import { useClassesCount } from '../hooks/useClasses';
-import { ClassStatus } from '../types/class.type';
+import { ClassFilters, ClassStatus } from '../types/class.type';
 import { useClassStore } from '../store/useClassStore';
 
 const { Title } = Typography;
 
 export interface SelectClassOption {
-  value: ClassStatus | 'all-classes';
+  value: ClassStatus;
   label: string;
 }
 
@@ -18,7 +18,7 @@ interface ClassStatsCardProps {
   icon: React.ReactNode;
   titleOptions: SelectClassOption[];
   onPeriodChange?: (date: dayjs.Dayjs, dateString: string | string[]) => void;
-  statType?: 'total' | 'scheduled' | 'completed' | 'cancelled' | 'inProgress';
+  statType?: 'total' | 'scheduled' | 'completed' | 'cancelled' | 'live' | 'inProgress';
 }
 
 const ClassStatsCard: React.FC<ClassStatsCardProps> = ({
@@ -31,28 +31,40 @@ const ClassStatsCard: React.FC<ClassStatsCardProps> = ({
   const [selectedTitle, setSelectedTitle] = React.useState<SelectClassOption>(
     titleOptions[0]
   );
-  const setFilters = useClassStore((state) => state.setFilters);
+  const classFilters = useClassStore((state) => state.filters);
   const [selectedPeriod, setSelectedPeriod] = React.useState<dayjs.Dayjs>(dayjs());
-  const { data: classCount, isLoading } = useClassesCount();
+console.log(classFilters.page);
+  const { data: classCount, isLoading } = useClassesCount(classFilters);
+  console.log(classCount)
+
   const getStatValue = () => {
     if (!classCount?.data) return 0;
     
-    const counts = classCount.data;
-    switch (statType) {
-      case 'total':
-        return counts;
-      case 'scheduled':
-        return counts;
-      case 'completed':
-        return counts;
-      case 'cancelled':
-        return counts;
-      case 'inProgress':
-        return counts;
-      default:
-        return counts;
-    }
+    return classCount;
+    // switch (statType) {
+    //   case 'total':
+    //     return counts.total;
+    //   case 'scheduled':
+    //     return counts.scheduled;
+    //   case 'completed':
+    //     return counts.completed;
+    //   case 'cancelled':
+    //     return counts.cancelled;
+    //   case 'live':
+    //     return counts.live;
+    //   case 'inProgress':
+    //     return counts.inProgress;
+    //   default:
+    //     return counts.total;
+    // }
   };
+
+  function SetTitle(label: any): ClassStatus | "all-classes" | undefined {
+    if (label === "All Classes") {
+      return "all-classes";
+    }
+    return 
+  }
 
   return (
     <Card
@@ -87,19 +99,15 @@ const ClassStatsCard: React.FC<ClassStatsCardProps> = ({
           <Title level={4} style={{ margin: 0, fontSize: 20 }}>
             <Select
               style={{ width: 160, textAlign: "left" }}
-              value={selectedTitle.value}
+              value={selectedTitle.label}
               onChange={(value) => {
-                const found = titleOptions.find((option) => option.value === value) as SelectClassOption;
-                setSelectedTitle(found);
-                if (found?.value && found.value !== 'all-classes') {
-                  setFilters({ status: found.value, page: 1 });
-                } else {
-                  setFilters({ status: undefined, page: 1 });
-                }
+                setSelectedTitle(titleOptions.find((option) => option.value === value) as SelectClassOption);
+                classFilters.status = SetTitle(selectedTitle.value);
               }}
               options={titleOptions}
             />
           </Title>
+          
         </Flex>
         
         <Flex
@@ -127,10 +135,11 @@ const ClassStatsCard: React.FC<ClassStatsCardProps> = ({
             <Skeleton.Input active size="small"  />
           ) : (
             <Title level={1} style={{ margin: 0 }}>
-              {String(getStatValue())}
+              {getStatValue().toString()}
             </Title>
           )}
         </Flex>
+        
         <Flex 
           justify="center" 
           align="center" 

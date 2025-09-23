@@ -7,6 +7,7 @@ import { useCreateClass, useUpdateClass, useClass } from '../hooks/useClasses';
 import { useClassStore, useClassStoreSelectors } from '../store/useClassStore';
 import { CreateClassRequest, UpdateClassRequest, ClassStatus } from '../index';
 import dayjs from 'dayjs';
+import { useStudentsForSelection } from '../../student';
 
 const { Option } = Select;
 
@@ -37,6 +38,8 @@ const ClassForm: React.FC<ClassFormProps> = ({
   
   const createClassMutation = useCreateClass();
   const updateClassMutation = useUpdateClass();
+
+const {data,isLoading:isStudentLoading,error}=useStudentsForSelection();
 
   const isLoading = createClassMutation.isPending || updateClassMutation.isPending;
 
@@ -135,8 +138,11 @@ const ClassForm: React.FC<ClassFormProps> = ({
       >
         <Select placeholder="Select student">
           {/* Add student options here - you might want to fetch from API */}
-          <Option value="student1">Student 1</Option>
-          <Option value="student2">Student 2</Option>
+          {data?.data.map((student)=>(
+          <Option  key={student.id} value={student.id}>{student.name}</Option> 
+          ))}
+          {/* <Option value="student1">Student 1</Option>
+          <Option value="student2">Student 2</Option> */}
         </Select>
       </Form.Item>
 
