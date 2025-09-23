@@ -118,7 +118,7 @@ const Dashboard: React.FC = () => {
                 icons={<FaAngleDown />}
                 filters={{
                   ...classFilters,
-                  classStatus: 'SCHEDULED',
+                  status: 'SCHEDULED',
                   limit: 7,
                 }}
                 onViewMore={() => console.log('View more classes')}
