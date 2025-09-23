@@ -3,14 +3,9 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { studentService } from '../services/student.service';
 import {
-  Student,
-  StudentWithClasses,
   CreateStudentRequest,
   UpdateStudentRequest,
   StudentFilters,
-  StudentForSelection,
-  StudentCount,
-  GroupedStudent,
 } from '../types/student.types';
 
 // Query Keys

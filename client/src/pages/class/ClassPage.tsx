@@ -1,4 +1,3 @@
-import ClassForm from "../../module/classes/components/ClassForm";
 import ClassList from "../../module/classes/components/ClassList";
 import ClassFilters from "../../module/classes/components/ClassFilters";
 import ClassPerDayChart from "../../module/classes/components/ClassPerDayChart";
@@ -9,34 +8,36 @@ import { Row, Col } from "antd";
 
 const ClassPage: React.FC = () => {
   return (
-    <div>
-       <Row gutter={[16,16]} >
-        <Col xs={24} md={5}>
+    <>
+      <Row gutter={[12, 12]} align="stretch" justify={'space-between'} >
+        <Col xs={24} md={16}>
+          <ClassQuickActions />
+        </Col>
+        <Col xs={24} md={8}>
           <ClassMiniStatsRow />
         </Col>
-        <Col xs={24} md={9}>
+      </Row>
+      <div style={{ margin: "24px 0" }} />
+      <Row gutter={[16, 16]} >
+        <Col xs={24} md={10}>
           <ClassLiveList />
         </Col>
-        <Col xs={24} md={10}>
+        <Col xs={24} md={14}>
           <ClassPerDayChart />
         </Col>
       </Row>
-      <Row gutter={[16,16]}>
+      <Row gutter={[16, 16]}>
         <Col xs={24}>
           <ClassFilters />
         </Col>
       </Row>
-      <Row gutter={[16,16]}>
+      <Row gutter={[16, 16]}>
         <Col xs={24}>
           <ClassList />
         </Col>
       </Row>
-      <Row gutter={[16,16]} justify="end">
-        <Col xs={24} md={16}>
-          <ClassQuickActions />
-        </Col>
-      </Row>
-    </div>
+      
+    </>
   );
 };
 export default ClassPage;

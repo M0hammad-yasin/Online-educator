@@ -8,7 +8,6 @@ import {
   ClassFilters, 
   ClassCountByGroup, 
   ClassSelection, 
-  ClassCount, 
   GroupedClass, 
   CalendarClass 
 } from '../types/class.type';
