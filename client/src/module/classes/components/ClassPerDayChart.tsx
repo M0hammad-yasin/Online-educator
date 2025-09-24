@@ -16,13 +16,12 @@ const PADDING = { top: 16, right: 16, bottom: 36, left: 32 };
 
 const ClassPerDayChart: React.FC = () => {
   const { data, isLoading } = useClassesCountByGroup({ groupBy: 'day' });
-
   const last12Days: string[] = React.useMemo(() => {
     return Array.from({ length: 12 }, (_, i) => dayjs().subtract(11 - i, 'day').format('YYYY-MM-DD'));
   }, []);
 
   const serverItems: Record<string, number> = React.useMemo(() => {
-    const raw = (data as any)?.data;
+    const raw = data;
     const map: Record<string, number> = {};
     if (!raw) return map;
 
@@ -37,19 +36,33 @@ const ClassPerDayChart: React.FC = () => {
     }
 
     // If the API returns an object map like { '2025-09-10': 3, ... }
-    if (typeof raw === 'object') {
-      Object.entries(raw).forEach(([k, v]) => {
-        const date = dayjs(k).isValid() ? dayjs(k).format('YYYY-MM-DD') : undefined;
-        const c = typeof v === 'number' ? v : undefined;
-        if (date && typeof c === 'number') map[date] = c;
-      });
-      return map;
+   if (typeof raw === 'object') {
+  Object.entries(raw).forEach(([k, v]) => {
+    const date = dayjs(k).isValid() ? dayjs(k).format('YYYY-MM-DD') : undefined;
+
+    let c: number | undefined;
+
+    if (typeof v === 'number') {
+      c = v;
+    } else if (typeof v === 'object' && v !== null && 'classCount' in v) {
+      c = (v as { classCount: number }).classCount;
     }
+
+    if (date && typeof c === 'number') {
+      map[date] = c;
+    }
+  });
+  return map;
+}
+
+
 
     return map;
   }, [data]);
 
   const series: DayCount[] = last12Days.map((date) => ({ date, count: serverItems[date] ?? 0 }));
+  console.log(series);
+  console.log(data);
   const maxY = Math.max(12, ...series.map((d) => d.count));
 
   const innerW = WIDTH - PADDING.left - PADDING.right;

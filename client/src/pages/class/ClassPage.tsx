@@ -1,5 +1,5 @@
-import ClassList from "../../module/classes/components/ClassList";
-import ClassFilters from "../../module/classes/components/ClassFilters";
+import ClassList from "../../module/classes/components/classList/ClassList";
+import ClassFilters from "../../module/classes/components/classList/ClassFilters";
 import ClassPerDayChart from "../../module/classes/components/ClassPerDayChart";
 import ClassLiveList from "../../module/classes/components/ClassLiveList";
 import ClassMiniStatsRow from "../../module/classes/components/ClassMiniStatsRow";

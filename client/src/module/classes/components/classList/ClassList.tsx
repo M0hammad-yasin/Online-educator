@@ -4,12 +4,32 @@ import React from 'react';
 import { Table, Tag, Button, Space, Typography, Tooltip } from 'antd';
 import { EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import { format } from 'date-fns';
-import { useClasses } from '../hooks/useClasses';
-import { useClassStore, useClassStoreSelectors } from '../store/useClassStore';
-import { Class, ClassOrderBy, ClassStatus } from '../index';
+import { useClasses } from '../../hooks/useClasses';
+import { useClassStore, useClassStoreSelectors } from '../../store/useClassStore';
+import { Class, ClassOrderBy, ClassStatus } from '../../index';
 import SortableHeader from './SortableHeader';
 
 const { Text } = Typography;
+
+// helper to highlight search matches
+const highlightMatch = (text: string | undefined, search: string | undefined) => {
+  if (!text || !search) return text;
+  const regex = new RegExp(`(${search})`, 'gi');
+  const parts = text.split(regex);
+  return (
+    <>
+      {parts.map((part, i) =>
+        regex.test(part) ? (
+          <mark key={i} style={{ backgroundColor: '#ffe58f', padding: 0 }}>
+            {part}
+          </mark>
+        ) : (
+          part
+        )
+      )}
+    </>
+  );
+};
 
 // Define sortable fields mapping
 const SORTABLE_FIELDS = {
@@ -17,15 +37,14 @@ const SORTABLE_FIELDS = {
   scheduledAt: 'startTime',
   duration: 'duration',
   classStatus: 'status',
-  teacher:'teacherName',
-  student:'studentName',
+  teacher: 'teacherName',
+  student: 'studentName',
 } as const;
 
 type SortableField = keyof typeof SORTABLE_FIELDS;
 
 const ClassList: React.FC = () => {
   const filters = useClassStoreSelectors.filters();
-  console.log('filters', filters);
   const { setSelectedClassId, setEditModalOpen, setDeleteModalOpen, setFilters } = useClassStore();
   
   const { data: classesData, isLoading, error } = useClasses(filters);
@@ -65,17 +84,13 @@ const ClassList: React.FC = () => {
     let newOrderBy: ClassOrderBy;
     
     if (existingIndex === -1) {
-      // First click: Add field with 'asc' order
       newOrderBy = [...currentOrderBy, { [orderByField]: 'asc' }];
     } else {
       const currentOrder = currentOrderBy[existingIndex][orderByField];
-      
       if (currentOrder === 'asc') {
-        // Second click: Change from 'asc' to 'desc'
         newOrderBy = [...currentOrderBy];
         newOrderBy[existingIndex] = { [orderByField]: 'desc' };
       } else {
-        // Third click: Remove field from sorting
         newOrderBy = currentOrderBy.filter((_, index) => index !== existingIndex);
       }
     }
@@ -87,15 +102,6 @@ const ClassList: React.FC = () => {
     const sortEntry = (filters.orderBy || []).find((item) => item[orderByField]);
     return sortEntry ? (sortEntry[orderByField] as 'asc' | 'desc') : null;
   };
-
-//   const confirmDelete = async (id: string) => {
-//     try {
-//       await deleteClassMutation.mutateAsync(id);
-//       message.success('Class deleted successfully');
-//     } catch (error) {
-//       message.error('Failed to delete class');
-//     }
-//   };
 
   const columns = [
     {
@@ -109,7 +115,9 @@ const ClassList: React.FC = () => {
       dataIndex: 'subject',
       key: 'subject',
       render: (subject: string) => (
-        <Text strong>{subject}</Text>
+        <Text strong>
+          {highlightMatch(subject, filters.searchData)}
+        </Text>
       ),
     },
     {
@@ -124,7 +132,7 @@ const ClassList: React.FC = () => {
       key: 'teacher',
       render: (teacher: Class['teacher']) => (
         <div>
-          <div>{teacher?.name}</div>
+          <div>{highlightMatch(teacher?.name, filters.searchData)}</div>
           <Text type="secondary" style={{ fontSize: '12px' }}>
             {teacher?.qualification}
           </Text>
@@ -143,7 +151,7 @@ const ClassList: React.FC = () => {
       key: 'student',
       render: (student: Class['student']) => (
         <div>
-          <div>{student?.name}</div>
+          <div>{highlightMatch(student?.name, filters.searchData)}</div>
           <Text type="secondary" style={{ fontSize: '12px' }}>
             Grade {student?.grade}
           </Text>
@@ -200,7 +208,7 @@ const ClassList: React.FC = () => {
     {
       title: 'Actions',
       key: 'actions',
-      render: (_:any, record: Class) => (
+      render: (_: any, record: Class) => (
         <Space size="small">
           <Tooltip title="View Details">
             <Button 
@@ -239,24 +247,24 @@ const ClassList: React.FC = () => {
   return (
     <div>
       <Table
-      columns={columns}
-      dataSource={classesData?.data || []}
-      rowKey="id"
-      loading={isLoading}
-      pagination={{
-        current: classesData?.pagination.page,
-        pageSize: classesData?.pagination.limit,
-        total: classesData?.pagination?.total || 0,
-        showSizeChanger: true,
-        showQuickJumper: true,
-        showTotal: (total, range) => 
-          `${range[0]}-${range[1]} of ${total} classes`,
-        onChange: (page, pageSize) => {
-          useClassStore.getState().setFilters({ page, limit: pageSize });
-        },
-      }}
-      scroll={{ x: 1000 }}
-    />
+        columns={columns}
+        dataSource={classesData?.data || []}
+        rowKey="id"
+        loading={isLoading}
+        pagination={{
+          current: classesData?.pagination.page,
+          pageSize: classesData?.pagination.limit,
+          total: classesData?.pagination?.total || 0,
+          showSizeChanger: true,
+          showQuickJumper: true,
+          showTotal: (total, range) => 
+            `${range[0]}-${range[1]} of ${total} classes`,
+          onChange: (page, pageSize) => {
+            useClassStore.getState().setFilters({ page, limit: pageSize });
+          },
+        }}
+        scroll={{ x: 1000 }}
+      />
     </div>
   );
 };

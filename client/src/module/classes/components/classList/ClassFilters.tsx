@@ -1,10 +1,11 @@
 // client/src/module/classes/components/ClassFilters.tsx
 
 import React from 'react';
-import { Card, Row, Col, Input, Select, Typography, Space, Button } from 'antd';
-import { SearchOutlined, FilterOutlined, ClearOutlined } from '@ant-design/icons';
-import { useClassStore, useClassStoreSelectors } from '../store/useClassStore';
-import { ClassStatus } from '../types/class.type';
+import { Card, Row, Col, Select, Typography, Space, Button, Divider } from 'antd';
+import { FilterOutlined, ClearOutlined } from '@ant-design/icons';
+import { useClassStore, useClassStoreSelectors } from '../../store/useClassStore';
+import { ClassStatus } from '../../types/class.type';
+import SearchBox from './SearchBox'; // ✅ your extracted component
 
 const { Text } = Typography;
 
@@ -12,7 +13,6 @@ const ClassFilters: React.FC = () => {
   const filters = useClassStoreSelectors.filters();
   const setFilters = useClassStore((state) => state.setFilters);
 
-  const [searchValue, setSearchValue] = React.useState<string>(filters.searchData || '');
   const [statusFilter, setStatusFilter] = React.useState<string>(filters.status || 'all-classes');
   const [gradeFilter, setGradeFilter] = React.useState<number | undefined>(filters.grade);
 
@@ -29,12 +29,7 @@ const ClassFilters: React.FC = () => {
     value: i + 1,
   }));
 
-  const hasActiveFilters = Boolean(searchValue) || statusFilter !== 'all-classes' || Boolean(gradeFilter);
-
-  const handleSearchChange = (value: string) => {
-    setSearchValue(value);
-    setFilters({ searchData: value || undefined, page: 1 });
-  };
+  const hasActiveFilters = Boolean(filters.searchData) || statusFilter !== 'all-classes' || Boolean(gradeFilter);
 
   const handleStatusChange = (value: string) => {
     setStatusFilter(value);
@@ -47,7 +42,6 @@ const ClassFilters: React.FC = () => {
   };
 
   const handleClearFilters = () => {
-    setSearchValue('');
     setStatusFilter('all-classes');
     setGradeFilter(undefined);
     setFilters({ status: undefined, searchData: undefined, grade: undefined, page: 1 });
@@ -59,63 +53,54 @@ const ClassFilters: React.FC = () => {
       style={{ marginBottom: 16, borderRadius: 8 }}
       styles={{ body: { padding: '16px' } }}
     >
-      <Row gutter={[16, 16]} align="middle">
-        <Col xs={24} sm={12} md={8}>
-          <Input
-            placeholder="Search classes by subject, teacher, or student..."
-            prefix={<SearchOutlined style={{ color: '#bfbfbf' }} />}
-            value={searchValue}
-            onChange={(e) => handleSearchChange(e.target.value)}
-            allowClear
-            style={{ borderRadius: 6 }}
-          />
+      <Row gutter={[16, 16]} align="middle" justify="space-between">
+        {/* Left side: filters grouped */}
+        <Col xs={24} md={18}>
+          <Space wrap>
+            <SearchBox />
+            <Select
+              placeholder="Status"
+              value={statusFilter}
+              onChange={handleStatusChange}
+              options={statusOptions}
+              style={{ minWidth: 150 }}
+              suffixIcon={<FilterOutlined />}
+            />
+            <Select
+              placeholder="Grade"
+              value={gradeFilter}
+              onChange={handleGradeChange}
+              options={gradeOptions}
+              style={{ minWidth: 120 }}
+              allowClear
+            />
+          </Space>
         </Col>
-        
-        <Col xs={12} sm={6} md={4}>
-          <Select
-            placeholder="Status"
-            value={statusFilter}
-            onChange={handleStatusChange}
-            options={statusOptions}
-            style={{ width: '100%' }}
-            suffixIcon={<FilterOutlined />}
-          />
-        </Col>
-        
-        <Col xs={12} sm={6} md={4}>
-          <Select
-            placeholder="Grade"
-            value={gradeFilter}
-            onChange={handleGradeChange}
-            options={gradeOptions}
-            style={{ width: '100%' }}
-            allowClear
-          />
-        </Col>
-        
-        <Col xs={24} sm={12} md={8} style={{ textAlign: 'right' }}>
-          <Space>
+
+        {/* Right side: Clear + status text */}
+        <Col xs={24} md={6} style={{ textAlign: 'right' }}>
+          <Space size="small" direction="horizontal">
             {hasActiveFilters && (
               <Button
                 icon={<ClearOutlined />}
                 onClick={handleClearFilters}
                 size="small"
-                type="text"
-                danger
+                type="default"
               >
-                Clear Filters
+                Clear
               </Button>
             )}
-            <Text type="secondary" style={{ fontSize: '12px' }}>
+            <Text type="secondary" style={{ fontSize: 12 }}>
               {hasActiveFilters ? 'Filters applied' : 'No filters'}
             </Text>
           </Space>
         </Col>
       </Row>
+
+      {/* Divider only visible on small screens to separate rows */}
+      <Divider className="lg:hidden" style={{ margin: '8px 0' }} />
     </Card>
   );
 };
 
 export default ClassFilters;
-
-
