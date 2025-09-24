@@ -60,39 +60,51 @@ class ClassUtilities {
    * Build filters for class queries based on user role and query parameters
    */
   buildClassFilters(query, user = null) {
-    let { teacherId, studentId, subject, status,grade, startDate, endDate } =
-      query;
-      //remove filter.classStatus for classStatus=all-classes
-      if(status=='all-classes') status=null;
-    const filter = {};
+  let { teacherId, studentId, subject, status, grade, startDate, endDate, searchData } = query;
 
-    // Role-based filtering
-    if (user && (user.role === Role.ADMIN || user.role === Role.MODERATOR)) {
-      teacherId = studentId = null;
-    } else if (user && user.role === Role.TEACHER) {
-      teacherId = user.userId;
-      studentId = null;
-    } else if (user && user.role === Role.STUDENT) {
-      studentId = user.userId;
-      teacherId = null;
-    }
-    if (startDate || endDate) {
-      filter.startTime = {};
-      if (startDate) filter.startTime.gte = this.dateObject(startDate);
-      if (endDate) filter.startTime.lte = this.dateObject(endDate);
-    }
+  if (status === 'all-classes') status = null;
 
-    // Additional filters
-    Object.assign(filter, {
-      ...(teacherId && { teacherId }),
-      ...(studentId && { studentId }),
-      ...(subject && { subject }),
-      ...(status && { status: status }),
-      ...(grade && { student: { grade: Number(grade) } }),
-    });
+  const filter = {};
 
-    return filter;
+  // Role-based filtering
+  if (user && (user.role === Role.ADMIN || user.role === Role.MODERATOR)) {
+    teacherId = studentId = null;
+  } else if (user && user.role === Role.TEACHER) {
+    teacherId = user.userId;
+    studentId = null;
+  } else if (user && user.role === Role.STUDENT) {
+    studentId = user.userId;
+    teacherId = null;
   }
+
+  // Date filters
+  if (startDate || endDate) {
+    filter.startTime = {};
+    if (startDate) filter.startTime.gte = this.dateObject(startDate);
+    if (endDate) filter.startTime.lte = this.dateObject(endDate);
+  }
+
+  // Additional filters
+  Object.assign(filter, {
+    ...(teacherId && { teacherId }),
+    ...(studentId && { studentId }),
+    ...(subject && { subject }),
+    ...(status && { status }),
+    ...(grade && { student: { grade: Number(grade) } }),
+  });
+
+  // 🔎 Search filter across subject, teacher name, and student name
+  if (searchData) {
+    filter.OR = [
+      { subject: { contains: searchData, mode: 'insensitive' } },
+      { teacher: { name: { contains: searchData, mode: 'insensitive' } } },
+      { student: { name: { contains: searchData, mode: 'insensitive' } } },
+    ];
+  }
+
+  return filter;
+}
+
   /**
    * Get pagination parameters from query
    */
