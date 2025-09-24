@@ -44,12 +44,13 @@ export const useStudent = (id: string) => {
   });
 };
 
-export const useStudentsForSelection = (filters: StudentFilters = {}) => {
+export const useStudentsForSelection = (filters: StudentFilters = {},enable=true) => {
   return useQuery({
     queryKey: STUDENT_KEYS.selectionFiltered(filters),
     queryFn: () => studentService.getStudentsForSelection(filters),
     staleTime: 10 * 60 * 1000, // 10 minutes (selection data changes less frequently)
     gcTime: 15 * 60 * 1000, // 15 minutes
+    enabled:enable,
   });
 };
 

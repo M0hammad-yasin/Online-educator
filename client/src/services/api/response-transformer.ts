@@ -8,7 +8,7 @@ export class ResponseTransformer {
    */
   static transformApiResponse<T>(serverResponse: any): ApiResponse<T> {
     const { data, error, isSuccess } = serverResponse;
-    
+  
     // If data is an object with a single key, extract that value
     if (data && typeof data === 'object' && !Array.isArray(data)) {
       const keys = Object.keys(data);

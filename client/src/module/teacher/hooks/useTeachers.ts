@@ -44,10 +44,11 @@ export const useTeacher = (id: string) => {
   });
 };
 
-export const useTeachersForSelection = (filters: TeacherFilters = {}) => {
+export const useTeachersForSelection = (filters: TeacherFilters = {},enable=true) => {
   return useQuery({
     queryKey: TEACHER_KEYS.selectionFiltered(filters),
     queryFn: () => teacherService.getTeachersForSelection(filters),
+    enabled:enable,
     staleTime: 10 * 60 * 1000, // 10 minutes (selection data changes less frequently)
     gcTime: 15 * 60 * 1000, // 15 minutes
   });
@@ -62,23 +63,23 @@ export const useTeachersWithClasses = (filters: TeacherFilters = {}) => {
   });
 };
 
-export const useTeacherCount = (filters: TeacherFilters = {}) => {
-  return useQuery({
-    queryKey: TEACHER_KEYS.countFiltered(filters),
-    queryFn: () => teacherService.getTeacherCount(filters),
-    staleTime: 2 * 60 * 1000, // 2 minutes (stats change less frequently)
-    gcTime: 5 * 60 * 1000, // 5 minutes
-  });
-};
+// export const useTeacherCount = (filters: TeacherFilters = {}) => {
+//   return useQuery({
+//     queryKey: TEACHER_KEYS.countFiltered(filters),
+//     queryFn: () => teacherService.getTeacherCount(filters),
+//     staleTime: 2 * 60 * 1000, // 2 minutes (stats change less frequently)
+//     gcTime: 5 * 60 * 1000, // 5 minutes
+//   });
+// };
 
-export const useGroupedTeachers = (filters: TeacherFilters = {}) => {
-  return useQuery({
-    queryKey: TEACHER_KEYS.groupedFiltered(filters),
-    queryFn: () => teacherService.getGroupedTeachers(filters),
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000, // 10 minutes
-  });
-};
+// export const useGroupedTeachers = (filters: TeacherFilters = {}) => {
+//   return useQuery({
+//     queryKey: TEACHER_KEYS.groupedFiltered(filters),
+//     queryFn: () => teacherService.getGroupedTeachers(filters),
+//     staleTime: 5 * 60 * 1000, // 5 minutes
+//     gcTime: 10 * 60 * 1000, // 10 minutes
+//   });
+// };
 
 export const useCurrentTeacherProfile = () => {
   return useQuery({

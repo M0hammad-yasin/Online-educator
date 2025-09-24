@@ -17,7 +17,7 @@ export {
   useTeachers,
   useTeacher,
   useTeachersForSelection,
-  useTeacherCount,
+  // useTeacherCount,
   useCreateTeacher,
   useUpdateTeacher,
   useDeleteTeacher,

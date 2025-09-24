@@ -3,10 +3,10 @@ import {
   teacherSchema,
   teacherUpdateSchema,
 } from "../validation/teacher.validate.js";
-import { accessControlSchema } from "../Validation/access.validate.js";
+import { accessControlSchema } from "../validation/access.validate.js";
 import { mongoIdSchema } from "../Validation/mongoId.validate.js";
 import { loginSchema } from "../Validation/login.validate.js";
-import { classFilterQuerySchema } from "../Validation/class.validate.js";
+import { classFilterQuerySchema } from "../validation/class.validate.js";
 
 import {
   registerTeacher,
@@ -38,8 +38,9 @@ import {
   roleBasedController,
 } from "../middleware/roleCheck.js";
 import { Role } from "../constant.js";
-
+import { BadRequestError } from "../Lib/custom.error.js";
 const router = express.Router();
+
 router.get(
   "/",
   auth,
@@ -47,17 +48,19 @@ router.get(
   hasRole([Role.ADMIN, Role.MODERATOR]),
   getAllTeacher
 );
-router.post(
+router.get(
   "/select",
   validate(paginationSchema, (req) => req.query),
   auth,
-  hasRole(["ADMIN", "MODERATOR"], getTeachersForSelection)
+  hasRole(["ADMIN", "MODERATOR"]),
+  getTeachersForSelection
 );
 router.post(
   "/class-day-count",
   validate(paginationSchema, (req) => req.query),
   auth,
-  hasRole(["ADMIN", "MODERATOR"], getTeacherClassCountForDay)
+  hasRole(["ADMIN", "MODERATOR"], ),
+  getTeacherClassCountForDay
 );
 
 // router.post(

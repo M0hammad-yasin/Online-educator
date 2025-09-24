@@ -11,5 +11,15 @@ export default function (app) {
   app.use("/api/teacher", teacherRoutes);
   app.use("/api/class", classRoutes);
   app.use("/api/admin", adminRoutes);
+  
+  // Handle 404 - Route not found
+  app.use((req, _, next) => {
+    const err = new Error(`Route ${req.originalUrl} not found`);
+    err.statusCode = 404;
+    err.name = "NotFoundError";
+    next(err);
+  });
+  
+  // Global error handler
   app.use(error);
 }

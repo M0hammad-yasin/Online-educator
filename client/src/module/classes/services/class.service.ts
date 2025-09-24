@@ -19,7 +19,7 @@ class ClassService extends BaseService<Class> {
   }
 
   async createClass(data: CreateClassRequest): Promise<ApiResponse<Class>> {
-    return this.customPost<Class>('/create', data);
+    return this.customPost('/create', data);
   }
 
   async getAllClasses(filters?: ClassFilters): Promise<PaginatedResponse<Class>> {
@@ -45,7 +45,6 @@ class ClassService extends BaseService<Class> {
   async getClassesCount(filters?: ClassFilters): Promise<ApiResponse<Number>> {
 
     const response = await this.customGet<Number>('/count', filters);
-    console.log("response : ",response.data);
     return response;
   }
 

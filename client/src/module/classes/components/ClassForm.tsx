@@ -1,6 +1,6 @@
 // client/src/module/classes/components/ClassForm.tsx
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Form, Input, Select, DatePicker, InputNumber, Button, Space, message } from 'antd';
 import type { FormInstance } from 'antd/es/form';
 import { useCreateClass, useUpdateClass, useClass } from '../hooks/useClasses';
@@ -8,6 +8,7 @@ import { useClassStore, useClassStoreSelectors } from '../store/useClassStore';
 import { CreateClassRequest, UpdateClassRequest, ClassStatus } from '../index';
 import dayjs from 'dayjs';
 import { useStudentsForSelection } from '../../student';
+import { useTeachersForSelection } from '../../teacher';
 
 const { Option } = Select;
 
@@ -39,7 +40,21 @@ const ClassForm: React.FC<ClassFormProps> = ({
   const createClassMutation = useCreateClass();
   const updateClassMutation = useUpdateClass();
 
-const {data,isLoading:isStudentLoading,error}=useStudentsForSelection();
+  const [studentDropdownOpen, setStudentDropdownOpen] = useState(false);
+const [teacherDropdownOpen, setTeacherDropdownOpen] = useState(false);
+
+// Get student and teacher data using hooks
+const { data: studentData, isLoading: isStudentLoading, error: studentError } = useStudentsForSelection({},studentDropdownOpen);
+const { data: teacherData, isLoading: isTeacherLoading, error: teacherError } = useTeachersForSelection({},teacherDropdownOpen);
+
+// Functions to handle dropdown visibility changes
+const handleStudentDropdownVisibleChange = (open: boolean) => {
+  setStudentDropdownOpen(open);
+};
+
+const handleTeacherDropdownVisibleChange = (open: boolean) => {
+  setTeacherDropdownOpen(open);
+};
 
   const isLoading = createClassMutation.isPending || updateClassMutation.isPending;
 
@@ -68,7 +83,7 @@ const {data,isLoading:isStudentLoading,error}=useStudentsForSelection();
         startTime: values.startTime?.toISOString(),
         duration: values.duration.toString(),
       };
-
+      console.log("formatted value : ", formattedValues);
       if (isEdit && selectedClassId) {
         await updateClassMutation.mutateAsync({
           id: selectedClassId,
@@ -123,11 +138,23 @@ const {data,isLoading:isStudentLoading,error}=useStudentsForSelection();
         name="teacherId"
         label="Teacher"
         rules={[{ required: true, message: 'Please select a teacher' }]}
+        help={teacherError ? 'Failed to load teachers' : undefined}
+        validateStatus={teacherError ? 'error' : undefined}
       >
-        <Select placeholder="Select teacher">
-          {/* Add teacher options here - you might want to fetch from API */}
-          <Option value="teacher1">Teacher 1</Option>
-          <Option value="teacher2">Teacher 2</Option>
+        <Select 
+          placeholder="Select teacher"
+          loading={isTeacherLoading}
+          showSearch
+          optionFilterProp="children"
+          onDropdownVisibleChange={handleTeacherDropdownVisibleChange}
+          filterOption={(input, option) => 
+            (option?.children?.toString().toLowerCase().includes(input.toLowerCase()) ?? false)
+          }
+          notFoundContent={teacherError ? 'Error loading teachers' : isTeacherLoading ? 'Loading...' : 'No teachers found'}
+        >
+          {teacherData?.data?.map((teacher) => (
+            <Option key={teacher.id} value={teacher.id}>{teacher.name}</Option> 
+          ))}
         </Select>
       </Form.Item>
 
@@ -135,14 +162,23 @@ const {data,isLoading:isStudentLoading,error}=useStudentsForSelection();
         name="studentId"
         label="Student"
         rules={[{ required: true, message: 'Please select a student' }]}
+        help={studentError ? 'Failed to load students' : undefined}
+        validateStatus={studentError ? 'error' : undefined}
       >
-        <Select placeholder="Select student">
-          {/* Add student options here - you might want to fetch from API */}
-          {data?.data.map((student)=>(
-          <Option  key={student.id} value={student.id}>{student.name}</Option> 
+        <Select 
+          placeholder="Select student"
+          loading={isStudentLoading}
+          showSearch
+          onDropdownVisibleChange={handleStudentDropdownVisibleChange}
+          optionFilterProp="children"
+          filterOption={(input, option) => 
+            (option?.children?.toString().toLowerCase().includes(input.toLowerCase())??false)
+          }
+          notFoundContent={studentError ? 'Error loading students' : isStudentLoading ? 'Loading...' : 'No students found'}
+        >
+          {studentData?.data?.map((student) => (
+            <Option key={student.id} value={student.id}>{student.name}</Option> 
           ))}
-          {/* <Option value="student1">Student 1</Option>
-          <Option value="student2">Student 2</Option> */}
         </Select>
       </Form.Item>
 
@@ -188,8 +224,9 @@ const {data,isLoading:isStudentLoading,error}=useStudentsForSelection();
       </Form.Item>
 
       <Form.Item
-        name="classStatus"
+        name="status"
         label="Class Status"
+        initialValue="SCHEDULED"
         rules={[{ required: true, message: 'Please select class status' }]}
       >
         <Select placeholder="Select class status">
