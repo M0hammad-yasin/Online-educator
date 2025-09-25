@@ -1,6 +1,6 @@
 import ClassList from "../../module/classes/components/classList/ClassList";
 import ClassFilters from "../../module/classes/components/classList/ClassFilters";
-import ClassPerDayChart from "../../module/classes/components/ClassPerDayChart";
+import ClassPerDayChart from "../../module/classes/components/ClassGraph/ClassPerDayChart";
 import ClassLiveList from "../../module/classes/components/ClassLiveList";
 import ClassMiniStatsRow from "../../module/classes/components/ClassMiniStatsRow";
 import ClassQuickActions from "../../module/classes/components/ClassQuickActions";

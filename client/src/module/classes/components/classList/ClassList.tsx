@@ -55,6 +55,7 @@ const ClassList: React.FC = () => {
       IN_PROGRESS: 'green',
       COMPLETED: 'success',
       CANCELLED: 'error',
+      'all-classes': 'default',
     };
     return colors[status] || 'default';
   };

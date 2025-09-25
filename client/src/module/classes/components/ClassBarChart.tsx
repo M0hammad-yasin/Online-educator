@@ -71,10 +71,6 @@ const ClassBarChart: React.FC<ClassBarChartProps> = ({
     return <Skeleton active paragraph={{ rows: 8 }} />;
   }
 
-  if (!transformedData.length) {
-    return <Empty description="No class data available" />;
-  }
-
   return (
     <ResponsiveContainer width="100%" height={height}>
       <BarChart

@@ -1,6 +1,6 @@
 // client/src/module/classes/types/index.ts
 
-export type ClassStatus = 'SCHEDULED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+export type ClassStatus = 'SCHEDULED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED'|'all-classes';
 
 export interface Class {
   id: string;
@@ -77,6 +77,7 @@ export interface ClassFilters {
   searchData?: string;
   grade?: number;
   page?: number;
+  groupBy?:'teacher' | 'student' | 'status' | 'subject' | 'startTime' | 'day' | 'hour' | 'month' | 'grade' ;
   limit?: number;
 }
 

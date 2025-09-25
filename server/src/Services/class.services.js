@@ -51,11 +51,6 @@ class ClassUtilities {
     const minutes = duration % 60;
     return `${hours}h ${minutes}m`;
   }
-  dateObject(dates) {
-    return dates.map((date) => new Date(date));
-  }
-
-  // Usage with object properties
   /**
    * Build filters for class queries based on user role and query parameters
    */
@@ -80,8 +75,8 @@ class ClassUtilities {
   // Date filters
   if (startDate || endDate) {
     filter.startTime = {};
-    if (startDate) filter.startTime.gte = this.dateObject(startDate);
-    if (endDate) filter.startTime.lte = this.dateObject(endDate);
+    if (startDate) filter.startTime.gte = new Date(startDate);
+    if (endDate) filter.startTime.lte = new Date(endDate);
   }
 
   // Additional filters
@@ -138,7 +133,8 @@ class ClassUtilities {
   ) {
     const filter = { [role]: userId };
     if (id) filter.id = { not: id };
-    [newStartTime, newEndTime] = this.dateObject([newStartTime, newEndTime]);
+    newStartTime = new Date(newStartTime);
+    newEndTime = new Date(newEndTime);
     const conflict = await prisma.class.findFirst({
       where: {
         ...filter,
@@ -191,12 +187,10 @@ class ClassService {
     if (!teacher) {
       throw new NotFoundError("Teacher not found");
     }
-    [classData.scheduledAt, classData.startTime, classData.endTime] =
-      this.#cu.dateObject([
-        classData.scheduledAt,
-        classData.startTime,
-        classData.endTime,
-      ]);
+        classData.scheduledAt = new Date(classData.scheduledAt);
+    classData.startTime = new Date(classData.startTime);
+    classData.endTime = new Date(classData.endTime);
+
 
     await Promise.all([
       this.#cu.checkSchedulingConflict(
@@ -228,10 +222,10 @@ class ClassService {
     const classData = await prisma.class.findUnique({ where: filter });
     if (!classData) throw new NotFoundError("Class not found");
     if (updateData.startTime) {
-      [updateData.startTime] = this.#cu.dateObject([updateData.startTime]);
+      updateData.startTime = new Date(updateData.startTime);
     }
     if (updateData.endTime) {
-      [updateData.endTime] = this.#cu.dateObject([updateData.endTime]);
+      updateData.endTime = new Date(updateData.endTime);
     }
     if (updateData.startTime || updateData.endTime) {
       const startTime = updateData.startTime || classData.startTime;
@@ -284,7 +278,6 @@ class ClassService {
     const orderBy = parseOrderBy(query);
     const filter = this.#cu.buildClassFilters(query);
     const { skip, take, page, limit } = this.#cu.getPaginationParams(query);
-  
     const [classes, totalClasses] = await Promise.all([
       prisma.class.findMany({
         where: filter,
@@ -610,7 +603,7 @@ class ClassService {
 
       groupedClassesCount = classes.reduce((acc, cls) => {
         const groupKey = format(
-          this.#cu.dateObject([cls.scheduledAt])[0],
+          new Date(cls.scheduledAt),
           groupKeyFormat
         );
         if (!acc[groupKey]) {

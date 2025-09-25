@@ -18,7 +18,7 @@ export const CLASS_QUERY_KEYS = {
   detail: (id: string) => [...CLASS_QUERY_KEYS.details(), id] as const,
   selection: (filters: ClassFilters) => [...CLASS_QUERY_KEYS.all, 'selection',{filters}] as const,
   count: (filters?: ClassFilters) => [...CLASS_QUERY_KEYS.all, 'count', { filters }] as const,
-  countByGroup: (params: ClassCountByGroup) => [...CLASS_QUERY_KEYS.all, 'countByGroup', params] as const,
+  countByGroup: (filters: ClassFilters) => [...CLASS_QUERY_KEYS.all, 'countByGroup', filters] as const,
   grouped: (filters?: ClassFilters) => [...CLASS_QUERY_KEYS.all, 'grouped', { filters }] as const,
   calendar: (filters?: ClassFilters) => [...CLASS_QUERY_KEYS.all, 'calendar', { filters }] as const,
 };
@@ -60,10 +60,10 @@ export const useClassesCount = (filters?: ClassFilters) => {
 };
 
 // Fetch Classes Count by Group
-export const useClassesCountByGroup = (params: ClassCountByGroup) => {
+export const useClassesCountByGroup = (filters: ClassFilters={}) => {
   return useQuery({
-    queryKey: CLASS_QUERY_KEYS.countByGroup(params),
-    queryFn: () => classService.getClassesCountByGroup(params),
+    queryKey: CLASS_QUERY_KEYS.countByGroup(filters),
+    queryFn: () => classService.getClassesCountByGroup(filters),
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };

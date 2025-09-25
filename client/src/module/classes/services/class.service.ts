@@ -30,8 +30,8 @@ class ClassService extends BaseService<Class> {
     return this.customGet<ClassSelection>('/select',filters);
   }
 
-  async getClassesCountByGroup(params: ClassCountByGroup): Promise<ApiResponse<any>> {
-    return this.customGet<any>('/count-by-group', params);
+  async getClassesCountByGroup(filters: ClassFilters): Promise<ApiResponse<any>> {
+    return this.customGet<any>('/count-by-group', filters);
   }
 
   async getGroupedClasses(filters?: ClassFilters): Promise<ApiResponse<GroupedClass>> {
