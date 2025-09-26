@@ -31,6 +31,8 @@ Directory structure:
     │       │   ├── menu.ts
     │       │   ├── role.ts
     │       │   └── statCardOptions.ts
+    │       ├── hooks/
+    │       │   └── useDebounce.ts
     │       ├── module/
     │       │   ├── admin/
     │       │   │   ├── index.ts
@@ -61,11 +63,23 @@ Directory structure:
     │       │   │   ├── components/
     │       │   │   │   ├── ClassBarChart.tsx
     │       │   │   │   ├── ClassForm.tsx
-    │       │   │   │   ├── ClassList.tsx
     │       │   │   │   ├── ClassListCard.tsx
+    │       │   │   │   ├── ClassLiveList.tsx
+    │       │   │   │   ├── ClassMiniStatsRow.tsx
+    │       │   │   │   ├── ClassQuickActions.tsx
     │       │   │   │   ├── ClassRecentActivities.tsx
     │       │   │   │   ├── ClassStatsCard.tsx
-    │       │   │   │   └── index.ts
+    │       │   │   │   ├── index.ts
+    │       │   │   │   ├── cards/
+    │       │   │   │   │   └── StatTile.tsx
+    │       │   │   │   ├── ClassGraph/
+    │       │   │   │   │   ├── ClassChartFilter.tsx
+    │       │   │   │   │   └── ClassPerDayChart.tsx
+    │       │   │   │   └── classList/
+    │       │   │   │       ├── ClassFilters.tsx
+    │       │   │   │       ├── ClassList.tsx
+    │       │   │   │       ├── SearchBox.tsx
+    │       │   │   │       └── SortableHeader.tsx
     │       │   │   ├── hooks/
     │       │   │   │   └── useClasses.ts
     │       │   │   ├── services/
@@ -89,8 +103,15 @@ Directory structure:
     │       │   │       └── student.types.ts
     │       │   ├── teacher/
     │       │   │   ├── index.ts
+    │       │   │   ├── hooks/
+    │       │   │   │   └── useTeachers.ts
+    │       │   │   ├── services/
+    │       │   │   │   └── teacher.service.ts
+    │       │   │   ├── store/
+    │       │   │   │   └── useTeacherStore.ts
     │       │   │   └── types/
-    │       │   │       └── index.ts
+    │       │   │       ├── index.ts
+    │       │   │       └── teacher.types.ts
     │       │   └── users/
     │       │       └── index.ts
     │       ├── pages/
@@ -149,7 +170,8 @@ Directory structure:
     │           ├── themeConfig.ts
     │           └── ThemeProvider.tsx
     ├── documentations/
-    │   └── api_docs.md
+    │   ├── api_docs.md
+    │   └── folder_structure.md
     └── server/
         ├── index.js
         ├── package.json
@@ -199,7 +221,8 @@ Directory structure:
             │   ├── bcrypt.js
             │   ├── controller.helper.js
             │   ├── jwt.user.js
-            │   └── pagination.js
+            │   ├── pagination.js
+            │   └── parseOrderBy.js
             └── validation/
                 ├── access.validate.js
                 ├── admin.validate.js
