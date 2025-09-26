@@ -26,6 +26,7 @@ const ClassPage: React.FC = () => {
           <ClassPerDayChart />
         </Col>
       </Row>
+      <div style={{ margin: "24px 0" }} />
       <Row gutter={[16, 16]}>
         <Col xs={24}>
           <ClassFilters />

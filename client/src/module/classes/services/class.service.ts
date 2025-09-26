@@ -43,8 +43,8 @@ class ClassService extends BaseService<Class> {
   }
 
   async getClassesCount(filters?: ClassFilters): Promise<ApiResponse<Number>> {
-
     const response = await this.customGet<Number>('/count', filters);
+    console.log(response);
     return response;
   }
 

@@ -33,33 +33,8 @@ const ClassStatsCard: React.FC<ClassStatsCardProps> = ({
   );
   const classFilters = useClassStore((state) => state.filters);
   const [selectedPeriod, setSelectedPeriod] = React.useState<dayjs.Dayjs>(dayjs());
-console.log(classFilters.page);
   const { data: classCount, isLoading } = useClassesCount(classFilters);
-  console.log(classCount)
-
-  const getStatValue = () => {
-    if (!classCount?.data) return 0;
-    
-    return classCount;
-    // switch (statType) {
-    //   case 'total':
-    //     return counts.total;
-    //   case 'scheduled':
-    //     return counts.scheduled;
-    //   case 'completed':
-    //     return counts.completed;
-    //   case 'cancelled':
-    //     return counts.cancelled;
-    //   case 'live':
-    //     return counts.live;
-    //   case 'inProgress':
-    //     return counts.inProgress;
-    //   default:
-    //     return counts.total;
-    // }
-  };
-
-  function SetTitle(label: any): ClassStatus | "all-classes" | undefined {
+    function SetTitle(label: any): ClassStatus | "all-classes" | undefined {
     if (label === "All Classes") {
       return "all-classes";
     }
@@ -135,7 +110,7 @@ console.log(classFilters.page);
             <Skeleton.Input active size="small"  />
           ) : (
             <Title level={1} style={{ margin: 0 }}>
-              {getStatValue().toString()}
+              {classCount?.data as number ?? 0 }
             </Title>
           )}
         </Flex>

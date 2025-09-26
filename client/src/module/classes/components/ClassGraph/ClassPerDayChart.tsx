@@ -29,7 +29,7 @@ interface DayCount {
 
 const WIDTH = 500;
 const HEIGHT = 380;
-const PADDING = { top: 16, right: 16, bottom: 36, left: 32 };
+const PADDING = { top: 20, right: 16, bottom: 45, left: -32 };
 const noOfBAr=10;
 
 const ClassPerDayChart: React.FC = () => {
@@ -37,37 +37,17 @@ const ClassPerDayChart: React.FC = () => {
   const [groupBy, setGroupBy] = React.useState<ClassFilters['groupBy']>('day');
   const [status, setStatus] = React.useState<ClassStatus>('all-classes');
   const [startDate, setStartDate] = React.useState(dayjs().subtract(3, 'day'));
-  const [endDate, setEndDate] = React.useState(dayjs().add(6,'day'));
+  const [endDate, setEndDate] = React.useState(dayjs().add(noOfBAr-3-1,'day'));
 
   // 🔹 date navigation
   const goPrev = () => {
-    let diff = 10;
-    
-    // Adjust navigation based on groupBy
-    if (groupBy === 'day') {
-      diff = 10;
-    } else if (groupBy === 'hour') {
-      diff = 10;
-    } else if (groupBy === 'month') {
-      diff = 10;
-    }
-    
+    const diff = 2;
     setStartDate(startDate.subtract(diff, groupBy as dayjs.ManipulateType));
     setEndDate(endDate.subtract(diff, groupBy as dayjs.ManipulateType));
   };
 
   const goNext = () => {
-    let diff = 10;
-    
-    // Adjust navigation based on groupBy
-    if (groupBy === 'day') {
-      diff = 10;
-    } else if (groupBy === 'hour') {
-      diff = 10;
-    } else if (groupBy === 'month') {
-      diff = 10;
-    }
-    
+    const diff = 2;
     setStartDate(startDate.add(diff, groupBy as dayjs.ManipulateType));
     setEndDate(endDate.add(diff, groupBy as dayjs.ManipulateType));
   };
@@ -158,6 +138,22 @@ const ClassPerDayChart: React.FC = () => {
     );
   }
 
+  function handleGroupByChange(val:ClassFilters['groupBy']) {
+      if(val==='month'){
+        setStartDate(dayjs().subtract(3, 'month'))
+        setEndDate(dayjs().add(noOfBAr-3-1,'month'))
+      }
+      else if(val==='day'){
+        setStartDate(dayjs().subtract(3, 'day'))
+        setEndDate(dayjs().add(noOfBAr-3-1,'day'))
+      }
+      else if (val==='hour'){
+        setStartDate(dayjs().hour(18).minute(0)) // Set start time to 6 PM today
+        setEndDate(dayjs().hour(18).minute(0).add(noOfBAr-1,'hour')) // End time will be noOfBar hours after 6 PM
+      }
+      setGroupBy(val);
+  }
+
   return (
     <Card style={{ borderRadius: 12 }}>
       {/* 🔹 Filter bar */}
@@ -166,7 +162,7 @@ const ClassPerDayChart: React.FC = () => {
         status={status}
         startDate={startDate}
         endDate={endDate}
-        onGroupByChange={setGroupBy}
+        onGroupByChange={handleGroupByChange}
         onStatusChange={setStatus}
         onPrev={goPrev}
         onNext={goNext}
@@ -182,21 +178,19 @@ const ClassPerDayChart: React.FC = () => {
           <BarChart
             data={series}
             margin={{
-              top: PADDING.top+5,
+              top: PADDING.top,
               right: 0,
               bottom: PADDING.bottom,
-              left: -PADDING.left,
+              left: PADDING.left,
             }}
-            barCategoryGap={2} // mimic spacing
+            barCategoryGap={2} 
           >
-            {/* 🔹 Grid lines same as manual */}
             <CartesianGrid
               stroke="#f0f0f0"
               vertical={false}
               strokeDasharray="0"
             />
 
-            {/* 🔹 Y Axis ticks (filtered like manual) */}
             <YAxis
               tick={{ fontSize: 10, fill: '#8c8c8c' }}
               tickLine={false}
@@ -210,7 +204,7 @@ const ClassPerDayChart: React.FC = () => {
             {/* 🔹 X Axis labels */}
             <XAxis
               dataKey="label"
-              tick={{ fontSize: 12, fill: '#8c8c8c',dy:8}}
+              tick={{ fontSize: 12, fill: '#8c8c8c',dy:6,dx:10,}}
               tickLine={false}
               axisLine={{ stroke: '#e8e8e8' }}
               angle={-45 }
@@ -218,7 +212,6 @@ const ClassPerDayChart: React.FC = () => {
               interval={0}
             />
 
-            {/* 🔹 Tooltip exactly like manual */}
             <Tooltip
               cursor={{ fill: 'rgba(0,0,0,0.05)' ,radius:8}}
               formatter={(value: number, _: string, props: any) =>
@@ -226,7 +219,6 @@ const ClassPerDayChart: React.FC = () => {
               }
             />
 
-            {/* 🔹 Bars with rounded corners */}
             <Bar
               dataKey="count"
               fill="#5955d8"
