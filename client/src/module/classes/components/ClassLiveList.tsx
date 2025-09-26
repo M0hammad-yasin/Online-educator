@@ -16,7 +16,7 @@ const ClassLiveList: React.FC = () => {
   const { data, isLoading } = useClasses({ ...filters, page: 1, limit: 10 });
 
   const items = React.useMemo(() => {
-    return (data?.data || []).slice(0, 4).map((c) => ({
+    return (data?.data || []).slice(0, 5).map((c) => ({
       id: c.id,
       title: c.subject,
       description: `${c.teacher?.name || ''} with ${c.student?.name || ''}`.trim(),
@@ -25,7 +25,7 @@ const ClassLiveList: React.FC = () => {
   }, [data]);
 
   return (
-    <Card style={{ borderRadius: 12 }} loading={isLoading}>
+    <Card style={{ borderRadius: 12, height: '100%',padding:10 }} loading={isLoading}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
         <Text strong style={{ fontSize: 16 }}>live Classes</Text>
       </div>
@@ -44,7 +44,7 @@ const ClassLiveList: React.FC = () => {
         )}
       />
       <div style={{ textAlign: 'center', marginTop: 8 }}>
-        <Button type="link" size="small">Show more</Button>
+        <Button  type="link" size="small">Show more</Button>
       </div>
     </Card>
   );

@@ -28,7 +28,7 @@ interface DayCount {
 }
 
 const WIDTH = 500;
-const HEIGHT = 380;
+const HEIGHT = 400;
 const PADDING = { top: 20, right: 16, bottom: 45, left: -32 };
 const noOfBAr=10;
 
