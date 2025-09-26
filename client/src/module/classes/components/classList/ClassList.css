@@ -1,0 +1,105 @@
+/* client/src/module/classes/components/classList/ClassList.css */
+
+.interactive-table .ant-table-row {
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.interactive-table .ant-table-row:hover {
+  background-color: #f0f7ff !important;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+}
+
+.interactive-table .ant-table-row:active {
+  background-color: #e6f7ff !important;
+  transform: translateY(0);
+}
+
+/* Accessibility focus styles */
+.interactive-table .ant-table-row:focus-visible {
+  outline: 2px solid #1890ff;
+  outline-offset: -2px;
+}
+
+/* Touch-friendly styles for mobile */
+@media (max-width: 768px) {
+  .interactive-table .ant-table-row {
+    padding: 12px 8px;
+  }
+  
+  .interactive-table .ant-table-cell {
+    padding: 16px 8px !important;
+  }
+  
+  .interactive-table .ant-btn {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 12px;
+    margin: 4px;
+  }
+  
+  /* Increase touch target size */
+  .interactive-table .ant-table-row-expand-icon,
+  .interactive-table .ant-pagination-item,
+  .interactive-table .ant-pagination-prev,
+  .interactive-table .ant-pagination-next,
+  .interactive-table .ant-select-selector {
+    min-height: 44px;
+    min-width: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Add touch feedback */
+  .interactive-table [role="button"]:active,
+  .interactive-table .ant-btn:active,
+  .interactive-table .ant-pagination-item:active {
+    transform: scale(0.96);
+    opacity: 0.8;
+  }
+}
+
+/* Visual feedback for loading state */
+.ant-spin-container {
+  transition: opacity 0.3s ease;
+}
+
+.ant-table-loading .ant-spin-container {
+  opacity: 0.7;
+}
+
+/* Animation classes */
+.fade-enter {
+  opacity: 0;
+}
+
+.fade-enter-active {
+  opacity: 1;
+  transition: opacity 300ms;
+}
+
+.fade-exit {
+  opacity: 1;
+}
+
+.fade-exit-active {
+  opacity: 0;
+  transition: opacity 300ms;
+}
+
+/* Visual feedback for interactions */
+.interactive-table .ant-table-row.row-selected {
+  background-color: #e6f7ff !important;
+  border-left: 3px solid #1890ff;
+}
+
+.interactive-table .ant-table-row .ant-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.interactive-table .ant-table-row .ant-btn:active {
+  transform: translateY(0);
+}

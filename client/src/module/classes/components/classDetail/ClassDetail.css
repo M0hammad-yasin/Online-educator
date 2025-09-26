@@ -1,0 +1,127 @@
+/* client/src/module/classes/components/classDetail/ClassDetail.css */
+
+.class-detail-container {
+  padding: 16px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.class-detail-card {
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.class-detail-header {
+  padding: 8px 0;
+}
+
+.class-title {
+  margin-top: 8px !important;
+  margin-bottom: 8px !important;
+  padding-right: 100px;
+}
+
+.back-button {
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+}
+
+.info-card {
+  height: 100%;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.info-card:hover {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+.info-space {
+  width: 100%;
+}
+
+.info-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 8px 0;
+}
+
+.info-icon {
+  font-size: 24px;
+  color: #1890ff;
+  margin-top: 4px;
+}
+
+.participant-name {
+  font-weight: 500;
+  font-size: 16px;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .class-detail-container {
+    padding: 8px;
+  }
+  
+  .class-title {
+    font-size: 20px !important;
+    padding-right: 80px;
+  }
+  
+  .info-item {
+    gap: 12px;
+  }
+  
+  .info-icon {
+    font-size: 20px;
+  }
+}
+
+/* Touch-friendly controls for mobile */
+@media (max-width: 576px) {
+  .back-button {
+    height: 40px;
+    padding: 8px 16px;
+  }
+  
+  .ant-btn {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .info-item {
+    padding: 12px 0;
+  }
+}
+
+/* Accessibility focus styles */
+.back-button:focus,
+.ant-btn:focus,
+a:focus {
+  outline: 2px solid #1890ff;
+  outline-offset: 2px;
+}
+
+/* Animation classes */
+.fade-enter {
+  opacity: 0;
+}
+
+.fade-enter-active {
+  opacity: 1;
+  transition: opacity 300ms;
+}
+
+.fade-exit {
+  opacity: 1;
+}
+
+.fade-exit-active {
+  opacity: 0;
+  transition: opacity 300ms;
+}
