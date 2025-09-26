@@ -21,9 +21,25 @@ const SIDEBAR_MENU = {
     },
     {
       key: 4,
-      label: "Manage Classes",
-      path: "/classes",
+      label: "Classes",
       icon: "CalendarOutlined",
+      children: [
+        {
+          key: "4-1",
+          label: "Overview",
+          path: "/classes/overview",
+        },
+        {
+          key: "4-2",
+          label: "Class List",
+          path: "/classes/list",
+        },
+        {
+          key: "4-3",
+          label: "Create Class",
+          path: "/classes/create",
+        },
+      ],
     },
     {
       key: 5,
@@ -72,8 +88,24 @@ const SIDEBAR_MENU = {
     {
       key: 2,
       label: "My Classes",
-      path: "/classes",
       icon: "CalendarOutlined",
+      children: [
+        {
+          key: "2-1",
+          label: "Overview",
+          path: "/classes/overview",
+        },
+        {
+          key: "2-2",
+          label: "Class List",
+          path: "/classes/list",
+        },
+        {
+          key: "2-3",
+          label: "Create Class",
+          path: "/classes/create",
+        },
+      ],
     },
     {
       key: 3,
@@ -122,8 +154,19 @@ const SIDEBAR_MENU = {
     {
       key: 2,
       label: "My Classes",
-      path: "/classes",
       icon: "CalendarOutlined",
+      children: [
+        {
+          key: "2-1",
+          label: "Overview",
+          path: "/classes/overview",
+        },
+        {
+          key: "2-2",
+          label: "Class List",
+          path: "/classes/list",
+        },
+      ],
     },
     {
       key: 3,

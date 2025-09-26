@@ -1,5 +1,7 @@
 import { UserRole } from '../module/authentication/store/authStore';
 import { Role } from '../constants/role';
+import { Navigate } from 'react-router-dom';
+
 
 // Page Components (these would be imported from their actual locations)
 import {Dashboard, Profile,ClassPage} from '../pages';
@@ -63,10 +65,29 @@ export const protectedRoutes: RouteConfig[] = [
     title: 'Manage Students'
   },
   
-  // All roles (Admin, Teacher, Student)
+  // Classes routes for all roles
+  {
+    path: '/classes/overview',
+    component: ClassPage,
+    allowedRoles: [Role.ADMIN, Role.TEACHER, Role.STUDENT],
+    title: 'Classes Overview'
+  },
+  {
+    path: '/classes/list',
+    component: ClassPage,
+    allowedRoles: [Role.ADMIN, Role.TEACHER, Role.STUDENT],
+    title: 'Class List'
+  },
+  {
+    path: '/classes/create',
+    component: ClassPage,
+    allowedRoles: [Role.ADMIN, Role.TEACHER],
+    title: 'Create Class'
+  },
+  // Legacy route for backward compatibility
   {
     path: '/classes',
-    component: ClassPage,
+    component: () => <Navigate to="/classes/overview" replace />,
     allowedRoles: [Role.ADMIN, Role.TEACHER, Role.STUDENT],
     title: 'Classes'
   },

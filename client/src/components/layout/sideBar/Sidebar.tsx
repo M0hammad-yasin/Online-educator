@@ -20,10 +20,11 @@ interface SidebarProps {
 }
 
 interface MenuItem {
-  key: number;
+  key: number | string;
   label: string;
-  path: string;
-  icon: string;
+  path?: string;
+  icon?: string;
+  children?: MenuItem[];
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
@@ -42,8 +43,22 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
 
   // Handle menu item click
   const handleMenuClick = async (item: { key: string }) => {
-    const menuItem = menuItems.find((menu: MenuItem) => menu.key.toString() === item.key);
-    if (!menuItem) return;
+    // Find the menu item in the flat structure (including children)
+    const findMenuItem = (items: MenuItem[]): MenuItem | undefined => {
+      for (const menuItem of items) {
+        if (menuItem.key.toString() === item.key) {
+          return menuItem;
+        }
+        if (menuItem.children) {
+          const found = findMenuItem(menuItem.children);
+          if (found) return found;
+        }
+      }
+      return undefined;
+    };
+
+    const menuItem = findMenuItem(menuItems);
+    if (!menuItem || !menuItem.path) return;
 
     switch (menuItem.path) {
       case '/dashboard':
@@ -66,11 +81,45 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
     }
   };
 
-  // Get current selected key based on location
-  const getSelectedKey = () => {
+  // Get current selected keys based on location
+  const getSelectedKeys = () => {
     const currentPath = location.pathname;
-    const menuItem = menuItems.find((item: MenuItem) => item.path === currentPath);
-    return menuItem ? [menuItem.key.toString()] : ["1"];
+    
+    // Find main menu item
+    const selectedKeys: string[] = [];
+    
+    // Check for submenu items first
+    menuItems.forEach((item: MenuItem) => {
+      if (item.children) {
+        const childItem = item.children.find((child) => child.path === currentPath);
+        if (childItem) {
+          selectedKeys.push(item.key.toString()); // Parent key
+          selectedKeys.push(childItem.key.toString()); // Child key
+        }
+      } else if (item.path === currentPath) {
+        selectedKeys.push(item.key.toString());
+      }
+    });
+    
+    // If no match found, default to first item
+    return selectedKeys.length > 0 ? selectedKeys : ["1"];
+  };
+
+  // Get open submenu keys
+  const getOpenKeys = () => {
+    const currentPath = location.pathname;
+    const openKeys: string[] = [];
+    
+    menuItems.forEach((item: MenuItem) => {
+      if (item.children) {
+        const hasMatch = item.children.some((child) => child.path === currentPath);
+        if (hasMatch) {
+          openKeys.push(item.key.toString());
+        }
+      }
+    });
+    
+    return openKeys;
   };
 
   return (
@@ -95,7 +144,8 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
       />
       <Menu
         mode="inline"
-        selectedKeys={getSelectedKey()}
+        selectedKeys={getSelectedKeys()}
+        defaultOpenKeys={getOpenKeys()}
         onClick={handleMenuClick}
         items={menuItems.map((item) => {
           const iconMap: { [key: string]: React.ComponentType<any> } = {
@@ -112,6 +162,10 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
             key: item.key,
             icon: IconComponent ? <IconComponent /> : null,
             label: <span style={{ fontWeight: 600 }}>{item.label}</span>,
+            children: item.children?.map((child) => ({
+              key: child.key,
+              label: child.label,
+            })),
           };
         })}
       />

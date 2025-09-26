@@ -83,7 +83,6 @@ const handleTeacherDropdownVisibleChange = (open: boolean) => {
         startTime: values.startTime?.toISOString(),
         duration: values.duration.toString(),
       };
-      console.log("formatted value : ", formattedValues);
       if (isEdit && selectedClassId) {
         await updateClassMutation.mutateAsync({
           id: selectedClassId,

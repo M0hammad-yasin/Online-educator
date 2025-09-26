@@ -1,17 +1,17 @@
 // client/src/module/classes/components/ClassList.tsx
 
 import React, { useState } from 'react';
-import { Table, Tag, Button, Space, Typography, Tooltip } from 'antd';
-import { EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
+import { Table, Tag, Button, Typography, Tooltip, message, Modal, Space } from 'antd';
 import { format } from 'date-fns';
-import { useClasses } from '../../hooks/useClasses';
-import { useClassStore, useClassStoreSelectors } from '../../store/useClassStore';
+import { useClasses, useDeleteClass } from '../../hooks/useClasses';
+import { useClassStore, useClassStoreSelectors, } from '../../store/useClassStore';
 import { Class, ClassOrderBy, ClassStatus } from '../../index';
 import SortableHeader from './SortableHeader';
 import ClassDetail from '../classDetail/ClassDetail';
 import { motion, AnimatePresence } from 'framer-motion';
 import './ClassList.css';
-
+import { DeleteOutlined,EditOutlined } from '@ant-design/icons';
+import { Navigate } from 'react-router-dom';
 const { Text } = Typography;
 
 // helper to highlight search matches
@@ -48,8 +48,8 @@ type SortableField = keyof typeof SORTABLE_FIELDS;
 
 const ClassList: React.FC = () => {
   const filters = useClassStoreSelectors.filters();
-  const { setSelectedClassId, setEditModalOpen, setDeleteModalOpen, setFilters } = useClassStore();
-  
+  const { setFilters } = useClassStore();
+
   const { data: classesData, isLoading, error } = useClasses(filters);
   const [selectedClass, setSelectedClass] = useState<string | null>(null);
 
@@ -63,22 +63,29 @@ const ClassList: React.FC = () => {
     };
     return colors[status] || 'default';
   };
+  //delete section
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [classToDelete, setClassToDelete] = useState<Class | null>(null);
+  const { mutate: deleteClass, isPending: isDeleting } = useDeleteClass();
 
+  const confirmDelete = () => {
+    if (!classToDelete) return;
+    deleteClass(classToDelete.id, {
+      onSuccess: () => {
+        message.success(`Class "${classToDelete.subject}" deleted successfully`);
+        setDeleteModalVisible(false);
+        setClassToDelete(null);
+      },
+      onError: (err: any) => {
+        message.error(err?.message || 'Failed to delete class');
+      },
+    });
+  };
+  //edit section
   const handleEdit = (classItem: Class) => {
-    setSelectedClassId(classItem.id);
-    setEditModalOpen(true);
-  };
+      setSelectedClass(classItem.id);
 
-  const handleDelete = (classItem: Class) => {
-    setSelectedClassId(classItem.id);
-    setDeleteModalOpen(true);
-  };
-
-  const handleView = (classItem: Class) => {
-    setSelectedClassId(classItem.id);
-    setSelectedClass(classItem.id);
-  };
-  
+};
   const handleRowClick = (record: Class) => {
     console.log('Click on class:', record);
     setSelectedClass(record.id);
@@ -106,12 +113,12 @@ const ClassList: React.FC = () => {
   const handleSort = (field: SortableField) => {
     const orderByField = SORTABLE_FIELDS[field];
     const currentOrderBy = filters.orderBy || [];
-    
+
     // Find existing sort entry for this field
     const existingIndex = currentOrderBy.findIndex(item => item[orderByField]);
-    
+
     let newOrderBy: ClassOrderBy;
-    
+
     if (existingIndex === -1) {
       newOrderBy = [...currentOrderBy, { [orderByField]: 'asc' }];
     } else {
@@ -235,38 +242,37 @@ const ClassList: React.FC = () => {
       ),
     },
     {
-      title: 'Actions',
-      key: 'actions',
-      render: (_: any, record: Class) => (
-        <Space size="small">
-          <Tooltip title="View Details">
-            <Button 
-              type="text" 
-              icon={<EyeOutlined />} 
-              size="small"
-              onClick={() => handleView(record)}
-            />
-          </Tooltip>
-          <Tooltip title="Edit Class">
-            <Button 
-              type="text" 
-              icon={<EditOutlined />} 
-              size="small"
-              onClick={() => handleEdit(record)}
-            />
-          </Tooltip>
-          <Tooltip title="Delete Class">
-            <Button 
-              type="text" 
-              icon={<DeleteOutlined />} 
-              size="small"
-              danger
-              onClick={() => handleDelete(record)}
-            />
-          </Tooltip>
-        </Space>
-      ),
-    },
+    key: 'actions',
+    render: (_: any, record: Class) => (
+      <Space>
+        <Tooltip title="Edit Class">
+          <Button
+            type="text"
+            size='small'
+            icon={<EditOutlined />}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleEdit(record);
+            }}
+          />
+        </Tooltip>
+        <Tooltip title="Delete Class">
+          <Button
+            type="text"
+            size='small'
+            danger
+            icon={<DeleteOutlined />}
+            loading={isDeleting}
+            onClick={(e) => {
+              e.stopPropagation();
+              setClassToDelete(record);
+              setDeleteModalVisible(true);
+            }}
+          />
+        </Tooltip>
+      </Space>
+    ),
+  },
   ];
 
   if (error) {
@@ -297,7 +303,7 @@ const ClassList: React.FC = () => {
                 total: classesData?.pagination?.total || 0,
                 showSizeChanger: true,
                 showQuickJumper: true,
-                showTotal: (total, range) => 
+                showTotal: (total, range) =>
                   `${range[0]}-${range[1]} of ${total} classes`,
                 onChange: (page, pageSize) => {
                   useClassStore.getState().setFilters({ page, limit: pageSize });
@@ -328,13 +334,35 @@ const ClassList: React.FC = () => {
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
           >
-            <ClassDetail 
-              classId={selectedClass} 
-              onBack={() => setSelectedClass(null)} 
+            <ClassDetail
+              classId={selectedClass}
+              onBack={() => setSelectedClass(null)}
             />
           </motion.div>
         )}
       </AnimatePresence>
+      <Modal
+        title="Confirm Delete"
+        visible={deleteModalVisible}
+        onOk={confirmDelete}
+        confirmLoading={isDeleting}
+        onCancel={() => {
+          setDeleteModalVisible(false);
+          setClassToDelete(null);
+        }}
+        okText="Delete"
+        okButtonProps={{ danger: true }}
+      >
+        {classToDelete && (
+          <div>
+            <p><strong>Subject:</strong> {classToDelete.subject}</p>
+            <p><strong>Teacher:</strong> {classToDelete.teacher?.name}</p>
+            <p><strong>Student:</strong> {classToDelete.student?.name}</p>
+            <p><strong>Scheduled At:</strong> {format(new Date(classToDelete.scheduledAt), 'MMM dd, yyyy hh:mm a')}</p>
+          </div>
+        )}
+      </Modal>
+
     </div>
   );
 };
