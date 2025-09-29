@@ -4,11 +4,11 @@ import { Navigate } from 'react-router-dom';
 
 
 // Page Components (these would be imported from their actual locations)
-import {Dashboard, Profile,ClassPage} from '../pages';
+import {Dashboard, Profile,ClassPage,ClassUpdatePage, StudentsPage} from '../pages';
 
 // Placeholder components (replace with actual components)
 const TeachersManagement = () => <div>Manage Teachers</div>;
-const StudentsManagement = () => <div>Manage Students</div>;
+const StudentsManagement = StudentsPage;
 const SubjectsManagement = () => <div>Manage Subjects</div>;
 const AssignmentsManagement = () => <div>Manage Assignments</div>;
 const Calendar = () => <div>Calendar</div>;
@@ -47,21 +47,21 @@ export const protectedRoutes: RouteConfig[] = [
   {
     path: '/teachers',
     component: TeachersManagement,
-    allowedRoles: Role.ADMIN,
+    allowedRoles:[ Role.ADMIN,Role.MODERATOR],
     title: 'Manage Teachers'
   },
   {
     path: '/subjects',
     component: SubjectsManagement,
-    allowedRoles: Role.ADMIN,
+    allowedRoles: [Role.ADMIN,Role.MODERATOR],
     title: 'Manage Subjects'
   },
   
-  // Admin & Teacher routes
+  // Admin, Moderator & Teacher routes
   {
     path: '/students',
     component: StudentsManagement,
-    allowedRoles: [Role.ADMIN, Role.TEACHER],
+    allowedRoles: [Role.ADMIN, Role.MODERATOR, Role.TEACHER],
     title: 'Manage Students'
   },
   
@@ -69,26 +69,32 @@ export const protectedRoutes: RouteConfig[] = [
   {
     path: '/classes/overview',
     component: ClassPage,
-    allowedRoles: [Role.ADMIN, Role.TEACHER, Role.STUDENT],
+    allowedRoles: [Role.ADMIN,Role.MODERATOR, Role.TEACHER, Role.STUDENT],
     title: 'Classes Overview'
   },
   {
     path: '/classes/list',
     component: ClassPage,
-    allowedRoles: [Role.ADMIN, Role.TEACHER, Role.STUDENT],
+    allowedRoles: [Role.ADMIN,Role.MODERATOR, Role.TEACHER, Role.STUDENT],
     title: 'Class List'
   },
   {
     path: '/classes/create',
     component: ClassPage,
-    allowedRoles: [Role.ADMIN, Role.TEACHER],
+    allowedRoles: [Role.ADMIN,Role.MODERATOR, Role.TEACHER],
     title: 'Create Class'
   },
+    {
+      path: '/classes/update/:id',
+      component: ClassUpdatePage,
+      allowedRoles: [Role.ADMIN,Role.MODERATOR, Role.TEACHER],
+      title: 'Update Class'
+    },
   // Legacy route for backward compatibility
   {
     path: '/classes',
     component: () => <Navigate to="/classes/overview" replace />,
-    allowedRoles: [Role.ADMIN, Role.TEACHER, Role.STUDENT],
+    allowedRoles: [Role.ADMIN,Role.MODERATOR, Role.TEACHER, Role.STUDENT],
     title: 'Classes'
   },
   {

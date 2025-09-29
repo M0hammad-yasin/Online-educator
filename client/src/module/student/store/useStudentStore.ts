@@ -2,6 +2,7 @@
 
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
+// no shallow equality to match store typing
 import { StudentFilters } from '../types/student.types';
 
 interface StudentStoreState {
