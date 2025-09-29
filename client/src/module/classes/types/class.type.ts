@@ -11,7 +11,7 @@ export interface Class {
   studentId: string;
   classLink?: string;
   duration: string;
-  classStatus: ClassStatus;
+  status: ClassStatus;
   teacher?: {
     id: string;
     name: string;

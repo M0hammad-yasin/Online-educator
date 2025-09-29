@@ -173,7 +173,6 @@ const ClassQuickActions: React.FC = () => {
                 ]}
             >
                 <ClassForm
-                    isEdit={false}
                     onSuccess={handleSuccessCreate}
                     onCancel={handleCancelCreate}
                     form={createForm}

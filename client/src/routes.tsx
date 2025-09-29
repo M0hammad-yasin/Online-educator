@@ -2,8 +2,9 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Layout } from 'antd';
 import { AppHeader, MainContent, Sidebar } from './components/layout';
-import Dashboard from './pages/Dashboard/Dashboard';
-import { Login, ForgotPassword, Logout } from './pages';
+import DashboardCopy from './pages/Dashboard/DashboardCopy1';
+import { Login, ForgotPassword, } from './pages';
+import { Logout } from './module/authentication';
 
 // Layout component that includes the sidebar and header
 const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -47,7 +48,7 @@ const AppRouter: React.FC = () => {
         <Route path="/dashboard" element={
           <ProtectedRoute element={
             <AppLayout>
-              <Dashboard />
+              <DashboardCopy />
             </AppLayout>
           } />
         } />

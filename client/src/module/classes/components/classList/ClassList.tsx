@@ -11,7 +11,7 @@ import ClassDetail from '../classDetail/ClassDetail';
 import { motion, AnimatePresence } from 'framer-motion';
 import './ClassList.css';
 import { DeleteOutlined,EditOutlined } from '@ant-design/icons';
-import { Navigate } from 'react-router-dom';
+import {  useNavigate,useParams} from 'react-router-dom';
 const { Text } = Typography;
 
 // helper to highlight search matches
@@ -82,10 +82,11 @@ const ClassList: React.FC = () => {
     });
   };
   //edit section
+   const navigate = useNavigate();
   const handleEdit = (classItem: Class) => {
-      setSelectedClass(classItem.id);
-
-};
+    window.location.href = `/classes/update/${classItem.id}`;
+    navigate(`/classes/update/${classItem.id}`);
+  };
   const handleRowClick = (record: Class) => {
     console.log('Click on class:', record);
     setSelectedClass(record.id);
@@ -243,6 +244,7 @@ const ClassList: React.FC = () => {
     },
     {
     key: 'actions',
+    title: "Actions",
     render: (_: any, record: Class) => (
       <Space>
         <Tooltip title="Edit Class">
