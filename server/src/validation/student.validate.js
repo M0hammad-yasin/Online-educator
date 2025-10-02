@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { emailSchema, passwordSchema } from "./general.validate.js";
+import { Role } from "../constant.js";
 // ✅ Student Validation Schema
 export const studentSchema = z.object({
   name: z
@@ -8,7 +9,7 @@ export const studentSchema = z.object({
   email: emailSchema,
   parentEmail: emailSchema.optional(),
   password: passwordSchema,
-  role: z.enum(["STUDENT"], { message: "Role must be 'STUDENT' only" }),
+  role: z.nativeEnum(Role).default(Role.STUDENT),
   isEmailVerified: z
     .boolean()
     .default(false)

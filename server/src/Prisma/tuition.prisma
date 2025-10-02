@@ -11,10 +11,11 @@ model Admin {
   name            String
   email           String        @unique
   passwordHash    String
-  role            String          @default("ADMIN")
+  role            Role          @default(ADMIN)
   profilePicture  String?       // Cloudinary URL
   isEmailVerified Boolean       @default(false)
   createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
 }
 model Teacher {
   id              String        @id @default(auto()) @map("_id") @db.ObjectId
@@ -29,7 +30,8 @@ model Teacher {
   address         String?
   accessControl   AccessControl?
   isEmailVerified Boolean       @default(false)
-  createdAt       DateTime      @default(now()) 
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
 }
 
 model Student {
@@ -43,14 +45,14 @@ model Student {
   address         String?
   role            Role          @default(STUDENT)// ADMIN, TEACHER, or STUDENT
   isEmailVerified Boolean       @default(false)
-  createdAt       DateTime      @default(now())   
-  bookedClasses   Class[]
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  classes         Class[]
   region          String?
 }
 
 model Class {
   id              String        @id @default(auto()) @map("_id") @db.ObjectId
-  classId         String        @unique
   subject         String
   scheduledAt     DateTime
   startTime       DateTime 
@@ -60,9 +62,10 @@ model Class {
   teacherId       String        @db.ObjectId
   student         Student       @relation(fields: [studentId], references: [id])
   studentId       String        @db.ObjectId
-  createdAt       DateTime      @default(now()) 
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
   classLink       String?
-  duration        String 
+  duration        Int 
   
   status          ClassStatus   @default(SCHEDULED)
 }
@@ -73,10 +76,11 @@ model Moderator{
   passwordHash    String
   address         String?
   accessControl   AccessControl?
-  role            String          @default("MODERATOR")
+  role            Role          @default(MODERATOR)
   profilePicture  String?       // Cloudinary URL
   isEmailVerified Boolean       @default(false)
   createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
 }
 model AccessControl {
   id              String        @id @default(auto()) @map("_id") @db.ObjectId
@@ -85,6 +89,7 @@ model AccessControl {
   teacherId   String  @db.ObjectId @unique
   teacher         Teacher   @relation(fields: [teacherId], references: [id])
   createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
   canSeeClass     Boolean       @default(false)
   canAddClass     Boolean       @default(false)
   canUpdateClass  Boolean       @default(false)
@@ -105,6 +110,7 @@ model AccessControl {
 
 
 enum Role {
+  ADMIN
   TEACHER
   STUDENT
   MODERATOR

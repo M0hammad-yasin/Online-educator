@@ -40,14 +40,10 @@ export const classSchema = z.object({
     )
     .optional(),
 
-  // Duration as a string that represents a number greater than 40 minutes
-  duration: z.string().refine(
-    (val) => {
-      const n = parseInt(val, 10);
-      return !isNaN(n) && n > 40;
-    },
-    { message: "Duration must be greater than 40 minutes" }
-  ),
+  // Duration as an integer greater than 40 minutes
+  duration: z.number().int().min(40, {
+    message: "Duration must be greater than 40 minutes"
+  }),
 
   // Status must be one of the allowed uppercase values
   classStatus: z

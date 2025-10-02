@@ -20,7 +20,6 @@ import {
   getAllStudent,
   patchStudent,
 } from "../controllers/StudentController/student.controller.js";
-import { getUsersWithClasses as studentsWithClasses } from "../controllers/adminController/common.admin.controlller.js";
 import auth from "../Middleware/auth.js";
 import { validate, validateBody } from "../Middleware/validate.middleware.js";
 import { hasRole, isStudent } from "../middleware/roleCheck.js";
@@ -58,13 +57,6 @@ router.patch(
   auth,
   hasRole(Role.STUDENT),
   patchStudent
-);
-router.get(
-  "/classes",
-  validate(classFilterQuerySchema, (req) => req.query),
-  auth,
-  hasRole(["ADMIN", "MODERATOR"]),
-  studentsWithClasses
 );
 router.post("/login", loginStudent);
 router.post("/logout", auth, hasRole(Role.STUDENT), logoutStudent);

@@ -10,6 +10,7 @@ import _ from "lodash";
 import { classUtil } from "../../services/class.services.js";
 import { controllerHelper } from "../../Utils/controller.helper.js";
 import config from "../../Config/config.js";
+import { Role } from "../../constant.js";
 // Register Teacher
 export const registerTeacher = asyncWrapper(async (req, res) => {
   // Check if teacher already exists
@@ -30,7 +31,7 @@ export const registerTeacher = asyncWrapper(async (req, res) => {
       profilePicture: req.body?.profilePicture || null,
       qualification: req.body.qualification,
       classRate: parseInt(req.body?.hourlyRate),
-      role: "TEACHER",
+      role: Role.TEACHER,
     },
   });
   sendSuccess(res, {

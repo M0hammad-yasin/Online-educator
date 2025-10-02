@@ -77,7 +77,7 @@ export const getUsersWithClasses = asyncWrapper(async (req, res) => {
       "Invalid user type. Must be 'teacher' or 'student'."
     );
   }
-  const userClass = user === "teacher" ? "classes" : "bookedClasses";
+  const userClass = "classes";
   const { page, limit, take, skip } = pagination(req.query);
   // Build the class filter from query if provided.
   // We assume the client sends a JSON string in ?filter=

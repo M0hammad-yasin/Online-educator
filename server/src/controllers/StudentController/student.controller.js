@@ -28,7 +28,7 @@ export const registerStudent = asyncWrapper(async (req, res) => {
       passwordHash: hashedPassword,
       parentEmail: req.body?.parentEmail,
       profilePicture: req.body?.profilePicture,
-      role: "STUDENT",
+      role: Role.STUDENT,
     },
   });
 
@@ -140,60 +140,66 @@ export const getStudent = asyncWrapper(async (req, res) => {
   });
 });
 export const getAllStudent = asyncWrapper(async (req, res) => {
-  const { sortBy = "name", order = "asc", classStatus } = req.query;
+  const { sortBy = "name", order = "asc" } = req.query;
+
+  // Build filters
   const classFilter = classUtil.buildClassFilters(req.query);
   const studentFilter = controllerHelper.buildFilter(req.user.role, req.query);
   const { skip, take, limit, page } = pagination(req.query);
-  let whereClause = studentFilter;
 
-  if (Object.keys(classFilter).length > 0) {
-    whereClause = {
-      AND: [
-        studentFilter,
-        {
-          bookedClasses: {
-            some: classStatus === "all-classes" ? {} : classFilter,
-          },
-        },
-      ],
-    };
-  }
-  const students = await prisma.student.findMany({
-    skip,
-    take,
-    orderBy: { [sortBy]: order },
-    where: whereClause,
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      profilePicture: true,
-      grade: true,
-    },
-  });
+  // Build where clause (combine student + class filters if needed)
+  const whereClause =
+    Object.keys(classFilter).length > 0
+      ? {
+          AND: [
+            studentFilter,
+            { classes: { some: classFilter } },
+          ],
+        }
+      : studentFilter;
 
-  const totalStudents = await prisma.student.count({
-    where: whereClause,
-  });
+  // Fetch students
+  const [students, total] = await Promise.all([
+    prisma.student.findMany({
+      skip,
+      take,
+      orderBy: { [sortBy]: order },
+      where: whereClause,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        profilePicture: true,
+        grade: true,
+        region: true,
+        parentEmail: true,
+        address: true,
+        createdAt: true,
+        updatedAt: true,
+        classes: true,
+      },
+    }),
+    prisma.student.count({ where: whereClause }),
+  ]);
+
+  // Pagination object
   const paginationData = {
     page,
     limit,
-    totalStudents: take,
-    totalStudents: totalStudents,
+    totalItems: total,
+    totalPages: Math.ceil(total / limit),
+    hasNextPage: page * limit < total,
+    hasPrevPage: page > 1,
   };
+
+  // Response
   sendSuccess(res, {
     statusCode: 200,
-    message: "Students fetched Successfully",
-    data: { students },
-    metaData: {
-      filter: {
-        classFilter,
-        paginationData,
-        studentFilter,
-      },
-    },
+    message: "Students fetched successfully",
+    data: {  students, pagination: paginationData },
   });
 });
+
 
 export const getStudentsForSelection = asyncWrapper(async (req, res) => {
   const { searchName = "" } = req.query;

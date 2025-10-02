@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { emailSchema, passwordSchema } from "./general.validate.js";
+import { Role } from "../constant.js";
 // ✅ Teacher Validation Schema
 export const teacherSchema = z.object({
   name: z
@@ -14,7 +15,7 @@ export const teacherSchema = z.object({
     .number({ invalid_type_error: "Hourly rate must be a number" })
     .min(300, { message: "Hourly rate must be at least 300" }).optional(),
   password: passwordSchema,
-  role: z.enum(["TEACHER"], { message: "Role must be 'TEACHER' only" }),
+  role: z.nativeEnum(Role).default(Role.TEACHER),
   isEmailVerified: z
     .boolean({ message: "isEmailVerified must be a boolean value" })
     .default(false)
