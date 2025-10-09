@@ -1,8 +1,5 @@
-import { sendSuccess } from "../../Lib/api.response.js";
-import { BadRequestError } from "../../Lib/custom.error.js";
 import prisma from "../../Prisma/prisma.client.js";
-import asyncWrapper from "../../Utils/asyncWrapper.js";
-
+import {asyncWrapper,sendSuccess,BadRequestError} from "../../utils/index.js";
 export const updateModeratorByAdmin = asyncWrapper(async (req, res) => {
   const { profilePicture, name, email, address } = req.body;
   const id = req.query.id;

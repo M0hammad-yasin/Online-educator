@@ -7,7 +7,7 @@
 //   next();
 
 import { ZodError } from "zod";
-import { ValidationError } from "../Lib/custom.error.js";
+import { ValidationError } from "../utils/index.js"
 export const validateBody = (schema) => (req, res, next) => {
   try {
     schema.parse(req.body);

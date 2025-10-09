@@ -2,11 +2,12 @@ import express from "express";
 import {
   teacherSchema,
   teacherUpdateSchema,
-} from "../validation/teacher.validate.js";
-import { accessControlSchema } from "../validation/access.validate.js";
-import { mongoIdSchema } from "../Validation/mongoId.validate.js";
-import { loginSchema } from "../Validation/login.validate.js";
-import { classFilterQuerySchema } from "../validation/class.validate.js";
+  accessControlSchema,
+  mongoIdSchema,
+  loginSchema,
+  classFilterQuerySchema,
+  paginationSchema,
+} from "../validation/index.js";
 
 import {
   registerTeacher,
@@ -20,25 +21,23 @@ import {
   updateTeacherByAdmin,
   deleteTeacherByAdmin,
   patchTeacher,
+  getTeachersWithClasses,
+  getTeachersWithClassCount,
 } from "../controllers/TeacherController/teacher.controller.js";
-import auth from "../Middleware/auth.js";
+import auth from "../middleware/auth.js";
 import {
   validate,
   validateBody,
-  validateQuery,
-} from "../Middleware/validate.middleware.js";
-import paginationSchema from "../Validation/pagination.validate.js";
+} from "../middleware/validate.middleware.js";
 import {
-  getUsersWithClasses as teachersWithClasses,
-  modifyAccess,
+  modifyAccess
 } from "../controllers/adminController/common.admin.controlller.js";
 import {
   isAdmin,
   hasRole,
-  roleBasedController,
+  roleBasedController
 } from "../middleware/roleCheck.js";
 import { Role } from "../constant.js";
-import { BadRequestError } from "../Lib/custom.error.js";
 const router = express.Router();
 
 router.get(
@@ -71,10 +70,17 @@ router.post(
 // );
 
 router.post("/register", validateBody(teacherSchema), registerTeacher);
-router.post("/login", loginTeacher);
+router.post("/login",validateBody(loginSchema, (req) => req.body), loginTeacher);
 router.post("/logout", auth, logoutTeacher);
 
-router.get("/me", auth, getTeacher);
+router.get("/me", auth,hasRole(Role.TEACHER), getTeacher);
+router.put(
+  "/me",
+  validate(teacherUpdateSchema, (req) => req.query),
+  auth,
+  hasRole(Role.TEACHER),
+  updateTeacher
+);
 router.patch(
   "/me",
   validateBody(teacherUpdateSchema),
@@ -82,15 +88,38 @@ router.patch(
   hasRole(Role.TEACHER),
   patchTeacher
 );
-
 router.get(
   "/classes",
-  validateQuery(classFilterQuerySchema),
+  validate(paginationSchema, (req) => req.query),
+  validate(classFilterQuerySchema, (req) => req.query),
   auth,
   hasRole([Role.ADMIN, Role.MODERATOR]),
-  teachersWithClasses
+  getTeachersWithClasses
 );
 
+router.get(
+  "/class-count",
+  validate(paginationSchema, (req) => req.query),
+  validate(classFilterQuerySchema, (req) => req.query),
+  auth,
+  hasRole([Role.ADMIN, Role.MODERATOR]),
+  getTeachersWithClassCount
+);
+router.get(
+  "/class-day-count",
+  validate(paginationSchema, (req) => req.query),
+  validate(classFilterQuerySchema, (req) => req.query),
+  auth,
+  hasRole([Role.ADMIN, Role.MODERATOR]),
+  getTeacherClassCountForDay
+);
+router.get(
+  '/select',
+  validate(paginationSchema, (req) => req.query),
+  auth,
+  hasRole([Role.ADMIN, Role.MODERATOR]),
+  getTeachersForSelection
+);
 router.get(
   "/:id",
   validate(mongoIdSchema, (req) => req.params),
@@ -109,29 +138,14 @@ router.put(
 router.put(
   "/:id",
   validate(mongoIdSchema, (req) => req.params),
-  validateBody(teacherUpdateSchema),
+  validate(teacherUpdateSchema, (req) => req.body),
   auth,
-  roleBasedController({
-    [Role.ADMIN]: updateTeacherByAdmin,
-    [Role.MODERATOR]: updateTeacherByAdmin,
-    [Role.TEACHER]: updateTeacher,
-  })
-);
-router.put(
-  "/me",
-  validate(mongoIdSchema, (req) => req.params),
-  validateBody(teacherUpdateSchema),
-  auth,
-  roleBasedController({
-    [Role.ADMIN]: updateTeacherByAdmin,
-    [Role.MODERATOR]: updateTeacherByAdmin,
-    [Role.TEACHER]: updateTeacher,
-  })
+  hasRole([Role.ADMIN, Role.MODERATOR]),
+  updateTeacherByAdmin
 );
 router.delete(
   "/:id",
   validate(mongoIdSchema, (req) => req.params),
-  validateBody(mongoIdSchema),
   auth,
   hasRole([Role.ADMIN, Role.MODERATOR]),
   deleteTeacherByAdmin

@@ -1,11 +1,6 @@
-import {
-  AuthorizationError,
-  BadRequestError,
-  ServerError,
-} from "../Lib/custom.error.js";
 import { Role } from "../constant.js";
 import prisma from "../Prisma/prisma.client.js";
-import { comparePassword, hashPassword } from "../Utils/bcrypt.js";
+import { AuthorizationError, BadRequestError,comparePassword, hashPassword, ServerError } from "../utils/index.js";
 
 export default async (req, res, next) => {
   const { existingPassword, password, confirmPassword } = req.body;
@@ -14,21 +9,14 @@ export default async (req, res, next) => {
     throw new ServerError("user is authenticated but not found");
   }
   const modelArr = [Role.ADMIN, Role.MODERATOR, Role.STUDENT, Role.TEACHER];
+  const modelIndex = modelArr.indexOf(req.user.role);
+  const model = String(modelArr[modelIndex]).toLowerCase();
   if (!modelArr.includes(req.user.role)) {
     throw new AuthorizationError(
       `you are not allowed to edit password of ${req.user.role}`
     );
   }
-  const modelIndex = modelArr.indexOf(req.user.role);
-  const model = String(modelArr[modelIndex]).toLowerCase();
-  // const model =
-  //   user.role === "STUDENT"
-  //     ? "student"
-  //     : user.role === "TEACHER"
-  //     ? "teacher"
-  //     : user.role === "ADMIN"
-  //     ? "admin"
-  //     : "moderator";
+
   const length = user.admin ? 12 : 8;
   if (!password && !confirmPassword) {
     throw new BadRequestError("Password and confirm password are required");

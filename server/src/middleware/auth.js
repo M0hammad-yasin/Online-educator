@@ -1,8 +1,4 @@
-import {
-  AuthenticationError,
-  AuthorizationError,
-} from "../Lib/custom.error.js";
-import { verifyToken } from "../Utils/jwt.user.js";
+import { verifyToken,AuthenticationError,AuthorizationError } from "../utils/index.js";
 
 const auth = (req, res, next) => {
   // Check for token in cookies

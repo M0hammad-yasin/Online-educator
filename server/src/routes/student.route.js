@@ -1,13 +1,11 @@
 import express from "express";
-import { loginSchema } from "../Validation/login.validate.js";
 import {
   studentSchema,
   studentUpdateSchema,
-} from "../Validation/student.validate.js";
-import { classFilterQuerySchema } from "../validation/class.validate.js";
-import { getUsersWithClasses as getStudentsWithClasses } from "../controllers/adminController/common.admin.controlller.js";
-import paginationSchema from "../Validation/pagination.validate.js";
-import { mongoIdSchema } from "../Validation/mongoId.validate.js";
+  classFilterQuerySchema,
+  paginationSchema,
+  mongoIdSchema,
+} from "../validation/index.js";
 import {
   registerStudent,
   loginStudent,
@@ -19,9 +17,11 @@ import {
   getStudentsForSelection,
   getAllStudent,
   patchStudent,
+  getStudentsWithClassCount,
+  getStudentsWithClasses
 } from "../controllers/StudentController/student.controller.js";
-import auth from "../Middleware/auth.js";
-import { validate, validateBody } from "../Middleware/validate.middleware.js";
+import auth from "../middleware/auth.js";
+import { validate, validateBody } from "../middleware/validate.middleware.js";
 import { hasRole, isStudent } from "../middleware/roleCheck.js";
 import { Role } from "../constant.js";
 
@@ -36,16 +36,25 @@ router.get(
 );
 
 router.get(
-  "/classes/",
+  "/classes",
+  validate(paginationSchema, (req) => req.query),
   validate(classFilterQuerySchema, (req) => req.query),
   auth,
   hasRole([Role.ADMIN, Role.MODERATOR]),
   getStudentsWithClasses
 );
+router.get(
+  "/class-count",
+  validate(paginationSchema, (req) => req.query),
+  validate(classFilterQuerySchema, (req) => req.query),
+  auth,
+  hasRole([Role.ADMIN, Role.MODERATOR]),
+  getStudentsWithClassCount
+);
 
 router.post("/register", validateBody(studentSchema), registerStudent);
 router.put(
-  "/me/update",
+  "/me",
   validate(studentUpdateSchema, (req) => req.query),
   auth,
   hasRole(Role.STUDENT),

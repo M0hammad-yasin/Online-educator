@@ -32,6 +32,7 @@ model Teacher {
   isEmailVerified Boolean       @default(false)
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
+  isDeleted Boolean @default(false)
 }
 
 model Student {
@@ -49,6 +50,7 @@ model Student {
   updatedAt       DateTime      @updatedAt
   classes         Class[]
   region          String?
+  isDeleted Boolean @default(false)
 }
 
 model Class {

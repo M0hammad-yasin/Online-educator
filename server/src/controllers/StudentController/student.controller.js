@@ -1,15 +1,9 @@
-import asyncWrapper from "../../Utils/asyncWrapper.js";
-import { comparePassword, hashPassword } from "../../Utils/bcrypt.js";
-import { generateToken } from "../../Utils/jwt.user.js";
+import {asyncWrapper,controllerHelper, getPagination,buildPaginationMeta,sendSuccess,BadRequestError,NotFoundError,comparePassword,hashPassword,generateToken} from "../../utils/index.js";
 import prisma from "../../Prisma/prisma.client.js";
 import _ from "lodash";
 import { Role } from "../../constant.js";
-import { BadRequestError, NotFoundError } from "../../Lib/custom.error.js";
-import { sendSuccess } from "../../Lib/api.response.js";
 import config from "../../Config/config.js";
 import { classUtil } from "../../services/class.services.js";
-import { controllerHelper } from "../../Utils/controller.helper.js";
-import pagination from "../../Utils/pagination.js";
 // Register Student
 export const registerStudent = asyncWrapper(async (req, res) => {
   // Hash Password
@@ -35,7 +29,7 @@ export const registerStudent = asyncWrapper(async (req, res) => {
   sendSuccess(res, {
     statusCode: 201,
     message: "Student registered successfully",
-    data: { student },
+    data: student ,
   });
 });
 export const updateStudent = asyncWrapper(async (req, res) => {
@@ -72,7 +66,7 @@ export const updateStudent = asyncWrapper(async (req, res) => {
   });
   sendSuccess(res, {
     statusCode: 200,
-    message: "teacher updated Successfully",
+    message: "Student updated Successfully",
     data: student,
   });
 });
@@ -136,7 +130,7 @@ export const getStudent = asyncWrapper(async (req, res) => {
   sendSuccess(res, {
     statusCode: 200,
     message: "Student fetched Successfully",
-    data: { user: _(student).omit(["passwordHash"]) },
+    data:  _.omit(student, ["passwordHash"]),
   });
 });
 export const getAllStudent = asyncWrapper(async (req, res) => {
@@ -145,7 +139,7 @@ export const getAllStudent = asyncWrapper(async (req, res) => {
   // Build filters
   const classFilter = classUtil.buildClassFilters(req.query);
   const studentFilter = controllerHelper.buildFilter(req.user.role, req.query);
-  const { skip, take, limit, page } = pagination(req.query);
+  const { skip, take, limit, page } = getPagination(req.query);
 
   // Build where clause (combine student + class filters if needed)
   const whereClause =
@@ -183,27 +177,21 @@ export const getAllStudent = asyncWrapper(async (req, res) => {
   ]);
 
   // Pagination object
-  const paginationData = {
-    page,
-    limit,
-    totalItems: total,
-    totalPages: Math.ceil(total / limit),
-    hasNextPage: page * limit < total,
-    hasPrevPage: page > 1,
-  };
+  const paginationData =buildPaginationMeta(total, page, limit );
 
   // Response
   sendSuccess(res, {
     statusCode: 200,
     message: "Students fetched successfully",
-    data: {  students, pagination: paginationData },
+    data: students,
+    pagination: paginationData,
   });
 });
 
 
 export const getStudentsForSelection = asyncWrapper(async (req, res) => {
   const { searchName = "" } = req.query;
-  const { skip, take, page, limit } = pagination(req.query);
+  const { skip, take, page, limit } = getPagination(req.query);
   const filter = {
     ...(searchName && { name: { contains: searchName, mode: "insensitive" } }),
   };
@@ -219,19 +207,13 @@ export const getStudentsForSelection = asyncWrapper(async (req, res) => {
       grade: true,
     },
   });
-  const paginationData = {
-    page,
-    totalTeacher: limit,
-  };
+  const paginationData = buildPaginationMeta(students.length, page, limit );
 
   sendSuccess(res, {
     statusCode: 200,
-    message: "Teachers fetched Successfully",
-    data: { students },
-    metaData: {
-      filter: req.query,
-      paginationData,
-    },
+    message: "Students fetched Successfully",
+    data: students,
+    pagination: paginationData,
   });
 });
 export const updateStudentByAdmin = asyncWrapper(async (req, res) => {
@@ -268,7 +250,7 @@ export const updateStudentByAdmin = asyncWrapper(async (req, res) => {
   });
   sendSuccess(res, {
     statusCode: 200,
-    message: "teacher updated Successfully",
+    message: "Student updated Successfully",
     data: { updateStudent: _.omit(student, ["passwordHash"]) },
   });
 });
@@ -279,13 +261,21 @@ export const deleteStudentByAdmin = asyncWrapper(async (req, res) => {
   if (!student) {
     throw new BadRequestError("student not found");
   }
-  const delStudent = await prisma.student.delete({
-    where: { id },
+  if(student.isDeleted) {
+    throw new BadRequestError("student already deleted");
+  }
+  const hasClasses = await prisma.class.count({ where: { studentId: id,status: {in: ["IN_PROGRESS", "SCHEDULED"] } } });
+  if (hasClasses > 0) {
+    throw new BadRequestError("Cannot delete student with ongoing or scheduled classes");
+  }
+  const updatedStudent = await prisma.student.update({
+      where: { id },
+    data: { isDeleted: true },
   });
   sendSuccess(res, {
     statusCode: 201,
     message: "student deleted Successfully",
-    data:  _.omit(delStudent, ["passwordHash"]) ,
+    data:  _.omit(updatedStudent, ["passwordHash"]) ,
   });
 });
 
@@ -313,5 +303,90 @@ export const patchStudent = asyncWrapper(async (req, res) => {
     statusCode: 200,
     message: "Student field updated successfully",
     data: _.omit(student, ["passwordHash"]),
+  });
+});
+/////////////////////////////////////////////////////////
+////////////////////student with classes//////////////////
+/////////////////////////////////////////////////////////
+/**
+ * Get students with their class count
+ * @route GET /api/admin/students/class-count
+ */
+export const getStudentsWithClassCount = asyncWrapper(async (req, res) => {
+  // Extract pagination parameters
+  const { page, limit, take, skip } = getPagination(req.query);
+  
+  // Build class filter from query parameters
+  const classFilter = classUtil.buildClassFilters(req.query);
+  // Fetch students with pagination and include class count
+  const [students, totalStudents] = await Promise.all([
+    prisma.student.findMany({
+      skip,
+      take,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        profilePicture: true,
+        _count: {
+          select: {
+            classes: {
+              where: { ...classFilter },
+            },
+          },
+        },
+      },
+    }),
+    prisma.student.count(),
+  ]);
+
+  // Calculate pagination metadata
+  const paginationData = buildPaginationMeta(totalStudents, page, limit );
+      // Response
+  return sendSuccess(res, {
+    statusCode: 200,
+    message: "Students with class count fetched successfully",
+    data: students,
+    pagination: paginationData,
+  });
+});
+
+/**
+ * Get students with their associated classes
+ * @route GET /api/admin/student/classes
+ */
+export const getStudentsWithClasses = asyncWrapper(async (req, res) => {
+  // Extract pagination parameters
+  const { page, limit, take, skip } = getPagination(req.query);
+  
+  // Build class filter from query parameters
+  const classFilter = classUtil.buildClassFilters(req.query);
+  
+  // Fetch students with pagination and include classes
+  const [students, totalStudents] = await Promise.all([
+    prisma.student.findMany({
+      skip,
+      take,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        profilePicture: true,
+        classes: {
+          where: { ...classFilter },
+        },
+      },
+    }),
+    prisma.student.count(),
+  ]);
+
+  // Calculate pagination metadata
+  const paginationData = buildPaginationMeta(totalStudents, page, limit );
+    // Response with standardized format
+  return sendSuccess(res, {
+    statusCode: 200,
+    message: "Students with classes fetched successfully",
+    data: students,
+    pagination: paginationData,
   });
 });

@@ -39,4 +39,5 @@ class ControllerHelper {
   }
 }
 
-export const controllerHelper = new ControllerHelper();
+const controllerHelper = new ControllerHelper();
+export default controllerHelper;

@@ -9,15 +9,15 @@ import {
   verifyEmail,
   patchAdmin,
 } from "../controllers/adminController/admin.controller.js";
-import auth from "../Middleware/auth.js";
-import { validate } from "../Middleware/validate.middleware.js";
-import verifyPassword from "../Middleware/comparePassword.middleware.js";
+import auth from "../middleware/auth.js";
+import { validate } from "../middleware/validate.middleware.js";
+import verifyPassword from "../middleware/comparePassword.middleware.js";
 import {
   adminSchema,
   adminUpdateSchema,
-} from "../validation/admin.validate.js";
+  loginSchema,
+} from "../validation/index.js";
 import { isAdmin } from "../middleware/roleCheck.js";
-import { loginSchema } from "../Validation/login.validate.js";
 const router = express.Router();
 
 //- - - - - - - - - - - -   admin - - - - - - -- - - - - - - - -
@@ -35,6 +35,7 @@ router.put(
 );
 router.post(
   "/login",
+  validate(loginSchema, (req) => req.body),
   loginAdmin
 );
 router.put("/update-password", auth, isAdmin, verifyPassword, updatePassword);

@@ -1,10 +1,6 @@
 //create admin crud operation
-import { comparePassword, hashPassword } from "../../Utils/bcrypt.js";
+import { comparePassword,hashPassword,BadRequestError,sendSuccess,generateToken,asyncWrapper } from "../../utils/index.js";
 import prisma from "../../Prisma/prisma.client.js";
-import { BadRequestError } from "../../Lib/custom.error.js";
-import { sendSuccess } from "../../Lib/api.response.js";
-import { generateToken } from "../../Utils/jwt.user.js";
-import asyncWrapper from "../../Utils/asyncWrapper.js";
 import config from "../../Config/config.js";
 import _ from "lodash";
 
@@ -35,7 +31,7 @@ export const createAdmin = asyncWrapper(async (req, res) => {
   sendSuccess(res, {
     statusCode: 201,
     message: "Admin created Successfully",
-    data: { admin },
+    data: admin ,
   });
 });
 
@@ -54,7 +50,7 @@ export const getAdmin = asyncWrapper(async (req, res) => {
   sendSuccess(res, {
     statusCode: 201,
     message: "Admin fetched Successfully",
-    data: { admin },
+    data: admin ,
   });
 });
 
@@ -83,7 +79,7 @@ export const updateAdmin = asyncWrapper(async (req, res) => {
   sendSuccess(res, {
     statusCode: 201,
     message: "Admin updated Successfully",
-    data: { updatedAdmin: admin },
+    data: admin ,
   });
 });
 
@@ -105,7 +101,7 @@ export const updatePassword = asyncWrapper(async (req, res) => {
   sendSuccess(res, {
     statusCode: 201,
     message: "Password updated Successfully",
-    data: { updatedAdmin: admin },
+    data: admin ,
   });
 });
 
@@ -132,7 +128,7 @@ export const loginAdmin = asyncWrapper(async (req, res) => {
     maxAge: maxAge * 1000, // Ensure maxAge is a number
   });
   sendSuccess(res, {
-    statusCode: 201,
+    statusCode: 200,
     message: "Admin logged in Successfully",
     data: {
       accessToken,
@@ -165,7 +161,7 @@ export const verifyEmail = asyncWrapper(async (req, res) => {
   sendSuccess(res, {
     statusCode: 201,
     message: "Email verified Successfully",
-    data: { admin },
+    data: admin ,
   });
 });
 

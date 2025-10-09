@@ -1,13 +1,8 @@
-const trackPageView = async () => {
-  try {
-    // Send data to your backend API
-    const whatsappNumber = "+923429542810"; // Replace with your WhatsApp number
-    const whatsappUrl = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=yasin`;
+// inspect-module.mjs
+import * as helper from './src/utils/index.js';
 
-    await fetch(whatsappUrl);
-  } catch (error) {
-    console.error("Error sending to WhatsApp:", error);
-  }
-};
+// Print everything the module exports
+console.log(helper);
 
-trackPageView();
+// If you just want the export names:
+console.log(Object.keys(helper));

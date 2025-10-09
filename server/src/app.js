@@ -3,7 +3,7 @@ import cors from "cors";
 import morgan from "morgan";
 
 import initializeRoutes from "./route.js";
-import { NotFoundError } from "./Lib/custom.error.js";
+import { NotFoundError } from "./utils/index.js";
 import config from "./Config/config.js";
 const app = express();
 

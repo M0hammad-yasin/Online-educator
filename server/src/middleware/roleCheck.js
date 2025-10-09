@@ -1,6 +1,5 @@
 import { Role } from "../constant.js";
-import { AuthorizationError } from "../Lib/custom.error.js";
-import asyncWrapper from "../Utils/asyncWrapper.js";
+import {asyncWrapper,AuthorizationError} from "../utils/index.js";
 
 // Existing middleware functions//+
 /**

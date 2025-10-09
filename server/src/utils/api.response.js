@@ -2,24 +2,39 @@
 
 import config from "../Config/config.js";
 
+/**
+ * Standardized success response handler
+ * @param {Object} res - Express response object
+ * @param {Object} options - Response options
+ * @param {number} options.statusCode - HTTP status code (default: 200)
+ * @param {string} options.message - Success message (default: "Operation successful")
+ * @param {Object|Array} options.data - Response data
+ * @param {Object} options.pagination - Pagination details (optional)
+ * @returns {Object} Express response
+ */
 export const sendSuccess = (res, options = {}) => {
   const {
     statusCode = 200,
     message = "Operation successful",
     data = null,
-    metaData = null,
+    pagination,
   } = options;
 
   const response = {
-    data,
-    error: null,
-    isSuccess: true,
-    metaData: metaData || null,
+    success: true,
+    message,
+    data: Array.isArray(data) ? data : data ?? null,
   };
-
+  if (pagination) response.pagination=pagination;
   return res.status(statusCode).json(response);
 };
 
+/**
+ * Standardized error response handler
+ * @param {Object} res - Express response object
+ * @param {Object} error - Error object
+ * @returns {Object} Express response
+ */
 export const sendError = (res, error) => {
   const statusCode = error.statusCode || 500;
   const isProduction = config.isProduction;
@@ -64,10 +79,10 @@ export const sendError = (res, error) => {
   }
 
   const response = {
+    success: false,
+    message: errorObj.message,
     data: null,
-    error: errorObj,
-    isSuccess: false,
-    metaData: null,
+    error: errorObj
   };
 
   return res.status(statusCode).json(response);

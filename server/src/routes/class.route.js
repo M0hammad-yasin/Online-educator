@@ -1,12 +1,13 @@
 import express, { Router } from "express";
-import { validate } from "../Middleware/validate.middleware.js";
-import auth from "../Middleware/auth.js";
+import { validate } from "../middleware/validate.middleware.js";
+import auth from "../middleware/auth.js";
 import {
   classFilterQuerySchema,
   classSchema,
   updateClassSchema,
-} from "../validation/class.validate.js"; // Your Zod schema for Class
-import { mongoIdSchema } from "../Validation/mongoId.validate.js";
+    mongoIdSchema,
+  paginationSchema,
+} from "../validation/index.js"; // Consolidated validators
 import {
   calendarViewClassData,
   countClassesByGroup,
@@ -24,8 +25,7 @@ import {
 } from "../controllers/classController/class.controller.js";
 import { hasRole, roleBasedController } from "../middleware/roleCheck.js";
 import { Role } from "../constant.js";
-import paginationSchema from "../Validation/pagination.validate.js";
-import asyncWrapper from "../Utils/asyncWrapper.js";
+import {asyncWrapper} from "../utils/index.js";
 
 const router = express.Router();
 

@@ -1,15 +1,11 @@
 // Test file to demonstrate the new error response structure
-import { sendError } from './src/Lib/api.response.js';
-import { 
-  ValidationError, 
+import { sendError,ValidationError, 
   AuthenticationError, 
   AuthorizationError, 
   ConflictError, 
   NotFoundError, 
   BadRequestError, 
-  ServerError 
-} from './src/Lib/custom.error.js';
-
+  ServerError  } from './src/utils/index.js';
 // Mock response object
 const mockRes = {
   status: (code) => ({

@@ -1,8 +1,5 @@
-import { sendSuccess } from "../../Lib/api.response.js";
-import { BadRequestError } from "../../Lib/custom.error.js";
 import prisma from "../../Prisma/prisma.client.js";
-import asyncWrapper from "../../Utils/asyncWrapper.js";
-import pagination from "../../Utils/pagination.js";
+import {getPagination,buildPaginationMeta,sendSuccess,BadRequestError,asyncWrapper} from "../../utils/index.js";
 
 export const modifyAccess = asyncWrapper(async (req, res) => {
   const {
@@ -56,7 +53,7 @@ export const modifyAccess = asyncWrapper(async (req, res) => {
   sendSuccess(res, {
     statusCode: 201,
     message: "User access modified Successfully",
-    data: { updatedUserAccess: updatedUser },
+    data:  updatedUser ,
   });
 });
 
@@ -78,7 +75,7 @@ export const getUsersWithClasses = asyncWrapper(async (req, res) => {
     );
   }
   const userClass = "classes";
-  const { page, limit, take, skip } = pagination(req.query);
+  const { page, limit, take, skip } = getPagination(req.query);
   // Build the class filter from query if provided.
   // We assume the client sends a JSON string in ?filter=
   const classFilter = {};
@@ -124,23 +121,12 @@ export const getUsersWithClasses = asyncWrapper(async (req, res) => {
   //
 
   // Calculate pagination metadata
-  const from = skip + 1;
-  const to = Math.min(skip + users.length, totalUsers);
-
-  const paginationData = {
-    total: totalUsers,
-    range: `${from} to ${to} of ${totalUsers}`,
-    currentPage: page,
-    pageSize: limit,
-  };
+  const paginationData =buildPaginationMeta(totalUsers, page, limit );
 
   return sendSuccess(res, {
     statusCode: 200,
     message: `${user}s fetched successfully!`,
-    data: { [`${user}s`]: users },
-    metadata: {
-      classFilter,
-      paginationData,
-    },
+    data: users,
+    pagination: paginationData,
   });
 });

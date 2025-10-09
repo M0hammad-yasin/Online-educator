@@ -1,14 +1,8 @@
-import { sendSuccess } from "../../Lib/api.response.js";
-import { BadRequestError, NotFoundError } from "../../Lib/custom.error.js";
+
 import prisma from "../../Prisma/prisma.client.js";
-import asyncWrapper from "../../Utils/asyncWrapper.js";
-import { hashPassword, comparePassword } from "../../Utils/bcrypt.js";
-import { generateToken } from "../../Utils/jwt.user.js";
-import { format } from "date-fns";
-import pagination from "../../Utils/pagination.js";
+import {getPagination,buildPaginationMeta,asyncWrapper,controllerHelper,sendSuccess,BadRequestError,NotFoundError,comparePassword,hashPassword,generateToken} from "../../utils/index.js";
 import _ from "lodash";
 import { classUtil } from "../../services/class.services.js";
-import { controllerHelper } from "../../Utils/controller.helper.js";
 import config from "../../Config/config.js";
 import { Role } from "../../constant.js";
 // Register Teacher
@@ -37,7 +31,7 @@ export const registerTeacher = asyncWrapper(async (req, res) => {
   sendSuccess(res, {
     statusCode: 201,
     message: "Teacher created successfully",
-    data: { teacher: _.omit(teacher, ["passwordHash"]) },
+    data:  _.omit(teacher, ["passwordHash"]) ,
   });
 });
 
@@ -119,12 +113,13 @@ export const updateTeacher = asyncWrapper(async (req, res) => {
   sendSuccess(res, {
     statusCode: 200,
     message: "Teacher updated Successfully",
-    data: { updatedTeacher: _.omit(teacher, ["passwordHash"]) },
+    data: _.omit(teacher, ["passwordHash"]) ,
   });
 });
 // Get Teacher Profile
 export const getTeacher = asyncWrapper(async (req, res) => {
   const filter = {};
+  controllerHelper
   if (req?.params.id) {
     filter.id = req.params.id;
   } else {
@@ -140,14 +135,14 @@ export const getTeacher = asyncWrapper(async (req, res) => {
   sendSuccess(res, {
     statusCode: 200,
     message: "Teacher found Successfully",
-    data: { user: _.omit(teacher, ["passwordHash"]) },
+    data:  _.omit(teacher, ["passwordHash"]),
   });
 });
 export const getAllTeacher = asyncWrapper(async (req, res) => {
   const { sortBy = "name", order = "asc" } = req.query;
   const classFilter = classUtil.buildClassFilters(req.query);
   const teacherFilter = controllerHelper.buildFilter(req.user.role, req.query);
-  const { skip, take } = pagination(req.query);
+  const { skip, take,page,limit } = getPagination(req.query);
   const teachers = await prisma.teacher.findMany({
     skip,
     take,
@@ -170,20 +165,22 @@ export const getAllTeacher = asyncWrapper(async (req, res) => {
       qualification: true,
     },
   });
+  const paginationData=buildPaginationMeta(teachers.length,page,limit)
   sendSuccess(res, {
     statusCode: 200,
     message: "Teachers fetched Successfully",
-    data: { teachers },
+    data: teachers,
+    pagination: paginationData,
   });
 });
 
 export const getTeachersForSelection = asyncWrapper(async (req, res) => {
-  const { searchName = "" } = req.query;
-  const { skip, take, page, limit } = pagination(req.query);
+  const { searchName  } = req.query;
+  const { skip, take, page, limit } = getPagination(req.query);
   const filter = {
     ...(searchName && { name: { contains: searchName, mode: "insensitive" } }),
   };
-  const teachers = await prisma.teacher.findMany({
+  const [teachers, totalTeachers] = await  Promise.all([prisma.teacher.findMany({
     skip,
     take,
     orderBy: { ["name"]: "asc" },
@@ -195,26 +192,210 @@ export const getTeachersForSelection = asyncWrapper(async (req, res) => {
       profilePicture: true,
       qualification: true,
     },
-  });
-  const paginationData = {
-    page,
-    totalTeacher: limit,
-  };
+  }),prisma.teacher.count({ where: filter })]);
+  const paginationData = buildPaginationMeta(totalTeachers,page,limit)
   sendSuccess(res, {
     statusCode: 200,
     message: "Teachers fetched Successfully",
-    data: { teachers },
-    metaData: {
-      filter: req.query,
-      paginationData,
-    },
+    data: teachers,
+    pagination: paginationData,
+  });
+});
+//
+export const updateTeacherByAdmin = asyncWrapper(async (req, res) => {
+  const { profilePicture, name, email, qualification, classRate, address } =
+    req.body;
+  const id = req.params.id;
+  const data = {
+    ...(profilePicture && { profilePicture }),
+    ...(name && { name }),
+    ...(email && { email }),
+    ...(qualification && { qualification }),
+    ...(classRate && { classRate }),
+    ...(address && { address }),
+  };
+  if (Object.keys(data).length === 0) {
+    throw new BadRequestError("No data to update");
+  }
+  const check = await prisma.teacher.findUnique({ where: { id } });
+  if (!check) {
+    throw new BadRequestError("teacher not found");
+  }
+  if (email && !(email === check.email)) {
+    const existTeacher = await prisma.teacher.findUnique({ where: { email } });
+    if (existTeacher) {
+      throw new BadRequestError("email already registered");
+    }
+  }
+  const updatedTeacher = await prisma.teacher.update({ where: { id }, data });
+  sendSuccess(res, {
+    statusCode: 200,
+    message: "teacher updated Successfully",
+    data:  _.omit(updatedTeacher, ["passwordHash"]),
   });
 });
 
-// Get class count for first 11 teachers on a specific day
+export const deleteTeacherByAdmin = asyncWrapper(async (req, res) => {
+  const id = String(req.params.id);
+
+  // 1. Find teacher
+  const teacher = await prisma.teacher.findUnique({ where: { id } });
+  if (!teacher) {
+    throw new BadRequestError("Teacher not found");
+  }
+
+  // 2. Check if teacher already soft-deleted
+  if (teacher.isDeleted) {
+    throw new BadRequestError("Teacher already deleted");
+  }
+
+  // 3. Prevent deletion if teacher has ongoing or scheduled classes
+  const hasClasses = await prisma.class.count({
+    where: {
+      teacherId: id,
+      status: { in: ["IN_PROGRESS", "SCHEDULED"] },
+    },
+  });
+
+  if (hasClasses > 0) {
+    throw new BadRequestError("Cannot delete teacher with ongoing or scheduled classes");
+  }
+
+  // 4. Soft delete teacher
+  const updatedTeacher = await prisma.teacher.update({
+    where: { id },
+    data: { isDeleted: true },
+  });
+
+  // 5. Respond with success
+  sendSuccess(res, {
+    statusCode: 200,
+    message: "Teacher deleted successfully",
+    data: _.omit(updatedTeacher, ["passwordHash"]),
+  });
+});
+
+export const patchTeacher = asyncWrapper(async (req, res) => {
+  const id = req.user.userId;
+  const data = req.body;
+  if (Object.keys(data).length !== 1) {
+    throw new BadRequestError("Only one field can be updated at a time.");
+  }
+  if (data.email) {
+    const existTeacher = await prisma.teacher.findUnique({ where: { email: data.email } });
+    if (existTeacher) {
+      throw new BadRequestError("email is already registered");
+    }
+  }
+  const check = await prisma.teacher.findUnique({ where: { id } });
+  if (!check) {
+    throw new NotFoundError("teacher not found");
+  }
+  const teacher = await prisma.teacher.update({
+    where: { id },
+    data,
+  });
+  sendSuccess(res, {
+    statusCode: 200,
+    message: "Teacher field updated successfully",
+    data: _.omit(teacher, ["passwordHash"]),
+  });
+});
+////////////////////////////////////////////////
+//////////////////class////////////////////////
+/////////////////////////////////////////////////
+/**
+ * Get teachers with their class count
+ * @route GET /api/teacher/class-count
+ */
+export const getTeachersWithClassCount = asyncWrapper(async (req, res) => {
+  // Extract pagination parameters
+  const { page, limit, take, skip } = getPagination(req.query);
+  
+  // Build class filter from query parameters
+  const classFilter = classUtil.buildClassFilters(req.query);
+  
+  // Fetch teachers with pagination and include class count
+  const [teachers, totalTeachers] = await Promise.all([
+    prisma.teacher.findMany({
+      skip,
+      take,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        profilePicture: true,
+        _count: {
+          select: {
+            classes: {
+              where: { ...classFilter },
+            },
+          },
+        },
+      },
+    }),
+    prisma.teacher.count(),
+  ]);
+
+  // Calculate pagination metadata
+  const paginationData = buildPaginationMeta(totalTeachers,page,limit)
+
+  // Response
+  return sendSuccess(res, {
+    statusCode: 200,
+    message: "Teachers with class count fetched successfully",
+    data: teachers,
+    pagination: paginationData,
+  });
+});
+
+/**
+ * Get teachers with their associated classes
+ * @route GET /api/teacher/classes
+ */
+export const getTeachersWithClasses = asyncWrapper(async (req, res) => {
+  // Extract pagination parameters
+  const { page, limit, take, skip } = getPagination(req.query);
+  
+  // Build class filter from query parameters
+  const classFilter = classUtil.buildClassFilters(req.query);
+  
+  // Fetch teachers with pagination and include classes
+  const [teachers, totalTeachers] = await Promise.all([
+    prisma.teacher.findMany({
+      skip,
+      take,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        profilePicture: true,
+        classes: {
+          where: { ...classFilter },
+        },
+      },
+    }),
+    prisma.teacher.count(),
+  ]);
+
+  // Calculate pagination metadata
+  const paginationData = buildPaginationMeta(totalTeachers,page,limit)
+
+  // Response
+  return sendSuccess(res, {
+    statusCode: 200,
+    message: "Teachers with classes fetched successfully",
+    data: teachers,
+    pagination: paginationData,
+  });
+});
+/** 
+* Get class count for first 11 teachers on a specific day
+* @route GET /api/teacher/class-day-count
+*/
 export const getTeacherClassCountForDay = asyncWrapper(async (req, res) => {
   const { date } = req.query;
-  const { skip, take, page, limit } = pagination(req.query);
+  const { skip, take, page, limit } = getPagination(req.query);
   if (!date) throw new BadRequestError("Invalid date");
   const targetDate = new Date(date);
   const startOfDay = new Date(targetDate.setHours(0, 0, 0, 0));
@@ -249,97 +430,11 @@ export const getTeacherClassCountForDay = asyncWrapper(async (req, res) => {
     teacherName: teacher.name,
     classCount: teacher._count.classes,
   }));
-  const paginationData = {
-    total: teacherClassCounts.length,
-    range: `${from} to ${to} of ${totalTeachers}`,
-    currentPage: page,
-    pageSize: limit,
-  };
+  const paginationData = buildPaginationMeta(totalTeachers,page,limit)
   sendSuccess(res, {
     statusCode: 200,
     message: "Teacher class count fetched successfully",
-    data: { teacherClassCounts: formattedResult },
-    metadata: {
-      paginationData,
-      filter: {
-        date: format(targetDate, "MMMM d, yyyy"),
-      },
-    },
-  });
-});
-//
-export const updateTeacherByAdmin = asyncWrapper(async (req, res) => {
-  const { profilePicture, name, email, qualification, classRate, address } =
-    req.body;
-  const id = req.params.id;
-  const data = {
-    ...(profilePicture && { profilePicture }),
-    ...(name && { name }),
-    ...(email && { email }),
-    ...(qualification && { qualification }),
-    ...(classRate && { classRate }),
-    ...(address && { address }),
-  };
-  if (Object.keys(data).length === 0) {
-    throw new BadRequestError("No data to update");
-  }
-  const check = await prisma.teacher.findUnique({ where: { id } });
-  if (!check) {
-    throw new BadRequestError("teacher not found");
-  }
-  if (email && !(email === check.email)) {
-    const existTeacher = await prisma.teacher.findUnique({ where: { email } });
-    if (existTeacher) {
-      throw new BadRequestError("email already registered");
-    }
-  }
-  const updatedTeacher = await prisma.teacher.update({ where: { id }, data });
-  sendSuccess(res, {
-    statusCode: 200,
-    message: "teacher updated Successfully",
-    data: { updatedTeacher: _.omit(updatedTeacher, ["passwordHash"]) },
-  });
-});
-
-export const deleteTeacherByAdmin = asyncWrapper(async (req, res) => {
-  const id = String(req.query.id);
-  const teacher = await prisma.teacher.findUnique({ where: { id } });
-  if (!teacher) {
-    throw new BadRequestError("teacher not found");
-  }
-  const deletedTeacher = await prisma.teacher.delete({
-    where: { id },
-  });
-  sendSuccess(res, {
-    statusCode: 201,
-    message: "teacher deleted Successfully",
-    data: { deletedTeacher: _.omit(deletedTeacher, ["passwordHash"]) },
-  });
-});
-
-export const patchTeacher = asyncWrapper(async (req, res) => {
-  const id = req.user.userId;
-  const data = req.body;
-  if (Object.keys(data).length !== 1) {
-    throw new BadRequestError("Only one field can be updated at a time.");
-  }
-  if (data.email) {
-    const existTeacher = await prisma.teacher.findUnique({ where: { email: data.email } });
-    if (existTeacher) {
-      throw new BadRequestError("email is already registered");
-    }
-  }
-  const check = await prisma.teacher.findUnique({ where: { id } });
-  if (!check) {
-    throw new NotFoundError("teacher not found");
-  }
-  const teacher = await prisma.teacher.update({
-    where: { id },
-    data,
-  });
-  sendSuccess(res, {
-    statusCode: 200,
-    message: "Teacher field updated successfully",
-    data: _.omit(teacher, ["passwordHash"]),
+    data: formattedResult,
+    pagination: paginationData,
   });
 });
