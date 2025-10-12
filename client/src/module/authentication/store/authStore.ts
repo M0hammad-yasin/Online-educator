@@ -16,7 +16,7 @@ export interface User {
 
 interface AuthState {
   token: string | null;
-  user: User | null;
+  user: User ;
   isInitialized: boolean;
   setAuth: (data: { token: string; user: User }) => void;
   clearAuth: () => void;
@@ -28,7 +28,7 @@ const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
       token: null,
-      user: null,
+      user: {} as User,
       isInitialized: false,
 
       setAuth: (data) => {
@@ -49,7 +49,7 @@ const useAuthStore = create<AuthState>()(
 
         set({
           token: null,
-          user: null,
+          user: {} as User,
           isInitialized: true,
         });
       },
@@ -70,7 +70,7 @@ const useAuthStore = create<AuthState>()(
         if (!isTokenValid(token)) {
           set({
             token: null,
-            user: null,
+            user: {} as User,
             isInitialized: true,
           });
           localStorage.removeItem('accessToken');
@@ -94,7 +94,7 @@ const useAuthStore = create<AuthState>()(
         } catch (error) {
           set({
             token: null,
-            user: null,
+            user: {} as User,
             isInitialized: true,
           });
           localStorage.removeItem('accessToken');
@@ -140,3 +140,6 @@ function isTokenValid(token: string): boolean {
 }
 
 export default useAuthStore;
+export const useAuthUser=()=>{
+  return useAuthStore(state=>state.user)
+}

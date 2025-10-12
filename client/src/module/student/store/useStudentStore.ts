@@ -2,7 +2,7 @@
 
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-// no shallow equality to match store typing
+import { shallow } from 'zustand/shallow';
 import { StudentFilters } from '../types/student.types';
 
 interface StudentStoreState {
@@ -60,8 +60,6 @@ interface StudentStoreState {
 const initialFilters: StudentFilters = {
   page: 1,
   limit: 10,
-  sortBy: 'name',
-  order: 'asc',
 };
 
 const initialState = {
@@ -174,12 +172,12 @@ export const useStudentModals = () => {
 };
 
 export const useStudentFilters = () => {
-  return useStudentStore((state) => ({
-    filters: state.filters,
-    setFilters: state.setFilters,
-    resetFilters: state.resetFilters,
-    updateFilter: state.updateFilter,
-  }));
+  const filters = useStudentStore((state) => state.filters);
+  const setFilters = useStudentStore((state) => state.setFilters);
+  const resetFilters = useStudentStore((state) => state.resetFilters);
+  const updateFilter = useStudentStore((state) => state.updateFilter);
+  
+  return { filters, setFilters, resetFilters, updateFilter };
 };
 
 export const useStudentView = () => {

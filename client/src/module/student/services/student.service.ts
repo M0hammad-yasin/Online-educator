@@ -2,7 +2,7 @@
 
 import { BaseService } from '../../../services/api/base.service';
 import { ResponseTransformer } from '../../../services/api/response-transformer';
-import { ApiResponse, PaginatedResponse } from '../../../services/api/types';
+import { ApiResponse } from '../../../services/api/types';
 import {
   Student,
   StudentWithClasses,
@@ -20,10 +20,8 @@ class StudentService extends BaseService<Student> {
   }
 
   // Get all students with filtering and pagination
-  async getAllStudents(filters: StudentFilters = {}): Promise<PaginatedResponse<Student>> {
-    const params = this.buildQueryParams(filters);
-    const response = await this.getAll(params);
-    return ResponseTransformer.transformPaginatedResponse(response);
+  async getAllStudents(filters: StudentFilters = {}): Promise<ApiResponse<Student[]>> {
+     return this.getAll(filters);
   }
 
   // Get single student by ID
@@ -46,8 +44,7 @@ class StudentService extends BaseService<Student> {
 
   // Update own profile (Student only)
   async updateOwnProfile(data: UpdateStudentRequest): Promise<ApiResponse<Student>> {
-    const response = await this.customPatch<ApiResponse<Student>>('/me/update', data);
-    return ResponseTransformer.transformApiResponse(response);
+    return this.patch('/me', data);
   }
 
   // Delete student (Admin/Moderator only)
@@ -57,17 +54,17 @@ class StudentService extends BaseService<Student> {
   }
 
   // Get students for selection dropdowns
-  async getStudentsForSelection(filters: StudentFilters = {}): Promise<PaginatedResponse<StudentForSelection>> {
+  async getStudentsForSelection(filters: StudentFilters = {}): Promise<ApiResponse<StudentForSelection[]>> {
     const params = this.buildQueryParams(filters);
-    const response = await this.customGet<PaginatedResponse<StudentForSelection>>('/select', params);
-    return ResponseTransformer.transformPaginatedResponse(response);
+    const response = await this.customGet<StudentForSelection[]>('/select', params);
+    return ResponseTransformer.transformApiResponse(response);
   }
 
   // Get students with their classes
-  async getStudentsWithClasses(filters: StudentFilters = {}): Promise<PaginatedResponse<StudentWithClasses>> {
+  async getStudentsWithClasses(filters: StudentFilters = {}): Promise<ApiResponse<StudentWithClasses[]>> {
     const params = this.buildQueryParams(filters);
-    const response = await this.customGet<PaginatedResponse<StudentWithClasses>>('/classes', params);
-    return ResponseTransformer.transformPaginatedResponse(response);
+    const response = await this.customGet<StudentWithClasses[]>('/classes', params);
+    return ResponseTransformer.transformApiResponse(response);
   }
 
   // Get student statistics

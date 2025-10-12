@@ -11,7 +11,8 @@ import ClassDetail from '../classDetail/ClassDetail';
 import { motion, AnimatePresence } from 'framer-motion';
 import './ClassList.css';
 import { DeleteOutlined,EditOutlined } from '@ant-design/icons';
-import {  useNavigate,useParams} from 'react-router-dom';
+import {  useNavigate} from 'react-router-dom';
+import { HighlightedText } from '../../../../components/widgets/HighlightedText';
 const { Text } = Typography;
 
 // helper to highlight search matches
@@ -50,7 +51,7 @@ const ClassList: React.FC = () => {
   const filters = useClassStoreSelectors.filters();
   const { setFilters } = useClassStore();
 
-  const { data: classesData, isLoading, error } = useClasses(filters);
+  const { data: classesResponse, isLoading, error } = useClasses(filters);
   const [selectedClass, setSelectedClass] = useState<string | null>(null);
 
   const getStatusColor = (status: ClassStatus): string => {
@@ -152,9 +153,7 @@ const ClassList: React.FC = () => {
       dataIndex: 'subject',
       key: 'subject',
       render: (subject: string) => (
-        <Text strong>
-          {highlightMatch(subject, filters.searchData)}
-        </Text>
+           <HighlightedText text={subject} search={filters.searchData} strong />
       ),
     },
     {
@@ -169,7 +168,7 @@ const ClassList: React.FC = () => {
       key: 'teacher',
       render: (teacher: Class['teacher']) => (
         <div>
-          <div>{highlightMatch(teacher?.name, filters.searchData)}</div>
+          <HighlightedText text={teacher?.name} search={filters.searchData} strong />
           <Text type="secondary" style={{ fontSize: '12px' }}>
             {teacher?.qualification}
           </Text>
@@ -188,7 +187,7 @@ const ClassList: React.FC = () => {
       key: 'student',
       render: (student: Class['student']) => (
         <div>
-          <div>{highlightMatch(student?.name, filters.searchData)}</div>
+          <HighlightedText text={student?.name} search={filters.searchData} strong />
           <Text type="secondary" style={{ fontSize: '12px' }}>
             Grade {student?.grade}
           </Text>
@@ -294,15 +293,15 @@ const ClassList: React.FC = () => {
           >
             <Table
               columns={columns}
-              dataSource={classesData?.data || []}
+              dataSource={classesResponse?.data || []}
               rowKey="id"
               loading={isLoading}
               rowClassName={rowClassName}
               className="interactive-table"
               pagination={{
-                current: classesData?.pagination.page,
-                pageSize: classesData?.pagination.limit,
-                total: classesData?.pagination?.total || 0,
+                current: classesResponse?.pagination?.page,
+                pageSize: classesResponse?.pagination?.limit,
+                total: classesResponse?.pagination?.totalItems || 0,
                 showSizeChanger: true,
                 showQuickJumper: true,
                 showTotal: (total, range) =>

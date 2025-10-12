@@ -5,8 +5,7 @@ import { Card, Row, Col, Select, Typography, Space, Button, Divider } from 'antd
 import { FilterOutlined, ClearOutlined } from '@ant-design/icons';
 import { useClassStore, useClassStoreSelectors } from '../../store/useClassStore';
 import { ClassStatus } from '../../types/class.type';
-import SearchBox from './SearchBox'; // ✅ your extracted component
-
+import { SearchBox } from '../../../../components/layout';
 const { Text } = Typography;
 
 const ClassFilters: React.FC = () => {
@@ -57,7 +56,11 @@ const ClassFilters: React.FC = () => {
         {/* Left side: filters grouped */}
         <Col xs={24} md={18}>
           <Space wrap>
-            <SearchBox />
+            <SearchBox
+              placeholder="Search classes by subject, teacher, or student..."
+              onSearch={(val) => setFilters({ searchData: val, page: 1 })}
+              initialValue={filters.searchData}
+            />
             <Select
               placeholder="Status"
               value={statusFilter}

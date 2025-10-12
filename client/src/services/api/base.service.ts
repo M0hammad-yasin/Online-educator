@@ -2,7 +2,7 @@
 
 import { AxiosRequestConfig } from 'axios';
 import { apiClient } from './client';
-import { ApiResponse, PaginatedResponse, QueryParams, BaseEntity } from './types';
+import { ApiResponse, QueryParams, BaseEntity } from './types';
 import { ResponseTransformer } from './response-transformer';
 
 export abstract class BaseService<T extends BaseEntity> {
@@ -33,9 +33,9 @@ export abstract class BaseService<T extends BaseEntity> {
     return queryString ? `${url}?${queryString}` : url;
   }
 
-  async getAll(params?: QueryParams): Promise<PaginatedResponse<T>> {
+  async getAll(params?: QueryParams): Promise<ApiResponse<T[]>> {
     const response = await apiClient.get(this.buildUrl('', params));
-    return ResponseTransformer.transformPaginatedResponse<T>(response.data);
+    return ResponseTransformer.transformApiResponse(response.data);
   }
 
   async getById(id: string): Promise<ApiResponse<T>> {
@@ -57,31 +57,23 @@ export abstract class BaseService<T extends BaseEntity> {
     const response = await apiClient.patch(this.buildUrl(`/${id}`), data);
     return ResponseTransformer.transformApiResponse<T>(response.data);
   }
+  async put(id: string, data: Partial<T>): Promise<ApiResponse<T>> {
+    const response = await apiClient.put(this.buildUrl(`/${id}`), data);
+    return ResponseTransformer.transformApiResponse<T>(response.data);
+  }
 
   async delete(id: string): Promise<ApiResponse<void>> {
     const response = await apiClient.delete(this.buildUrl(`/${id}`));
     return ResponseTransformer.transformApiResponse<void>(response.data);
   }
 
-  // Overloads for customGet based on pagination params
-  protected async customGet<R>(
-    path: string,
-    params: QueryParams
-  ): Promise<PaginatedResponse<R>>;
+  // Method for custom GET requests
   protected async customGet<R>(
     path: string,
     params?: QueryParams
-  ): Promise<ApiResponse<R>>;
-  protected async customGet<R>(
-    path: string,
-    params?: QueryParams
-  ): Promise<ApiResponse<R> | PaginatedResponse<R>> {
+  ): Promise<ApiResponse<R>> {
     const response = await apiClient.get(this.buildUrl(path, params));
-    if (params && (params.page !== undefined || params.limit !== undefined)) {
-      return ResponseTransformer.transformPaginatedResponse<R>(response.data);
-    } else {
-      return ResponseTransformer.transformApiResponse<R>(response.data);
-    }
+    return ResponseTransformer.transformApiResponse<R>(response.data);
   }
 
   protected async customPost<R>(
@@ -99,6 +91,14 @@ export abstract class BaseService<T extends BaseEntity> {
     config?: AxiosRequestConfig
   ): Promise<ApiResponse<R>> {
     const response = await apiClient.patch(this.buildUrl(path), data, config);
+    return ResponseTransformer.transformApiResponse<R>(response.data);
+  }
+  protected async customPut<R>(
+    path: string,
+    data?: any,
+    config?: AxiosRequestConfig
+  ): Promise<ApiResponse<R>> {
+    const response = await apiClient.put(this.buildUrl(path), data, config);
     return ResponseTransformer.transformApiResponse<R>(response.data);
   }
 }

@@ -1,4 +1,4 @@
-import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, { AxiosInstance } from 'axios';
 import { ApiError, ApiErrorResponse } from './types';
 
 class ApiClient {
@@ -40,7 +40,9 @@ class ApiClient {
 
     // Response interceptor
     this.axiosInstance.interceptors.response.use(
-      (response) => response,
+      (response) => {
+        console.log("response : ", response);
+        return response},
       async (error) => {
         const originalRequest = error.config;
         
@@ -49,7 +51,7 @@ class ApiClient {
           
           try {
             const response = await this.axiosInstance.post('/auth/refresh-token');
-            const newToken = response.data.data.accessToken;
+            const newToken = response.data?.data?.accessToken;
             
             if (newToken) {
               localStorage.setItem('accessToken', newToken);

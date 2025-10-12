@@ -1,3 +1,5 @@
+import { widgetConfig } from "../../../pages/Students/StudentsPage";
+
 export interface Student {
   id: string;
   name: string;
@@ -45,13 +47,20 @@ export interface UpdateStudentRequest {
   region?: string;
   profilePicture?: string;
 }
-
+export type StudentOrderBy = Array<
+  Partial<
+    Record<string,
+      "asc" | "desc"
+    >
+  >
+>;
 export interface StudentFilters {
   page?: number;
   limit?: number;
   grade?: number;
   region?: string;
   search?: string;
+  orderBy?: StudentOrderBy;
   sortBy?: 'name' | 'email' | 'grade' | 'createdAt';
   order?: 'asc' | 'desc';
 }
@@ -90,4 +99,8 @@ export interface StudentAuthData {
   grade: number;
   parentEmail?: string;
   region?: string;
+}
+export interface StudentWidget {
+  widgetType: keyof typeof widgetConfig;
+  widgetName: string | null;
 }

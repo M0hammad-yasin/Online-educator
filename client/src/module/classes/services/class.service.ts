@@ -11,7 +11,7 @@ import {
   GroupedClass, 
   CalendarClass 
 } from '../types/class.type';
-import { ApiResponse, PaginatedResponse } from '../../../services/api/types';
+import { ApiResponse } from '../../../services/api/types';
 
 class ClassService extends BaseService<Class> {
   constructor() {
@@ -22,12 +22,12 @@ class ClassService extends BaseService<Class> {
     return this.customPost('/create', data);
   }
 
-  async getAllClasses(filters?: ClassFilters): Promise<PaginatedResponse<Class>> {
+  async getAllClasses(filters?: ClassFilters): Promise<ApiResponse<Class[]>> {
     return this.getAll(filters);
   }
 
-  async getClassesForSelection(filters: ClassFilters): Promise<PaginatedResponse<ClassSelection>> {
-    return this.customGet<ClassSelection>('/select',filters);
+  async getClassesForSelection(filters: ClassFilters): Promise<ApiResponse<ClassSelection[]>> {
+    return this.customGet<ClassSelection[]>('/select',filters);
   }
 
   async getClassesCountByGroup(filters: ClassFilters): Promise<ApiResponse<any>> {
