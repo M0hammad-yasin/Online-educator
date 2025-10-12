@@ -164,8 +164,8 @@ GET /teacher/
 **Required Roles:** ADMIN, MODERATOR
 
 **Query Parameters:**
-- `page`: Page number (> 1)
-- `limit`: Items per page (> 1)
+- `page`: Page number (> 0)
+- `limit`: Items per page (> 4)
 
 ### Get Teacher Profile
 ```http

@@ -13,6 +13,10 @@ class ControllerHelper {
     if (query.createdAt) {
       filter.createdAt = query.createdAt;
     }
+    if(query.search){
+      filter.OR=[{ name: { contains: query.search, mode: "insensitive" } },
+      ];
+    }
 
     // Role specific filters
     switch (role) {
