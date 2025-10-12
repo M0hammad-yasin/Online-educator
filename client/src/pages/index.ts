@@ -6,6 +6,7 @@ import Dashboard from './Dashboard/Dashboard';
 import ClassUpdatePage from './class/ClassUpdatePage';
 import ClassCreatePage from './class/ClassUpdatePage';
 import StudentsPage from './Students/StudentsPage';
+import TeachersPage from './Teachers/TeachersPage';
 export {
   Login,
   ClassUpdatePage , ClassCreatePage,
@@ -14,4 +15,5 @@ export {
   Profile,
    Dashboard,
    StudentsPage,
+   TeachersPage,
 };
