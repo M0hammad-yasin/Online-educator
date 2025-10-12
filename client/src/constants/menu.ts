@@ -144,6 +144,78 @@ const SIDEBAR_MENU = {
       icon: "LogoutOutlined",
     },
   ],
+  [Role.MODERATOR]: [
+    {
+      key: 1,
+      label: "Dashboard",
+      path: "/dashboard",
+      icon: "DashboardOutlined",
+    },
+    {
+      key: 2,
+      label: "Manage Teachers",
+      path: "/teachers",
+      icon: "UserOutlined",
+    },
+    {
+      key: 3,
+      label: "Manage Students",
+      path: "/students",
+      icon: "UserOutlined",
+    },
+    {
+      key: 4,
+      label: "Classes",
+      icon: "CalendarOutlined",
+      children: [
+        {
+          key: "4-1",
+          label: "Overview",
+          path: "/classes/overview",
+        },
+        {
+          key: "4-2",
+          label: "Class List",
+          path: "/classes/list",
+        },
+        {
+          key: "4-3",
+          label: "Create Class",
+          path: "/classes/create",
+        },
+      ],
+    },
+    {
+      key: 5,
+      label: "Manage Subjects",
+      path: "/subjects",
+      icon: "BookOutlined",
+    },
+    {
+      key: 6,
+      label: "Calendar",
+      path: "/calendar",
+      icon: "CalendarOutlined",
+    },
+    {
+      key: 7,
+      label: "Settings",
+      path: "/settings",
+      icon: "SettingOutlined",
+    },
+    {
+      key: 8,
+      label: "My Profile",
+      path: "/profile",
+      icon: "UserOutlined",
+    },
+    {
+      key: 9,
+      label: "Logout",
+      path: "/logout",
+      icon: "LogoutOutlined",
+    },
+  ],
   [Role.STUDENT]: [
     {
       key: 1,

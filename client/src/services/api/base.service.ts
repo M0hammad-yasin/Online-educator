@@ -101,4 +101,13 @@ export abstract class BaseService<T extends BaseEntity> {
     const response = await apiClient.patch(this.buildUrl(path), data, config);
     return ResponseTransformer.transformApiResponse<R>(response.data);
   }
+
+  protected async customPut<R>(
+    path: string,
+    data?: any,
+    config?: AxiosRequestConfig
+  ): Promise<ApiResponse<R>> {
+    const response = await apiClient.put(this.buildUrl(path), data, config);
+    return ResponseTransformer.transformApiResponse<R>(response.data);
+  }
 }
