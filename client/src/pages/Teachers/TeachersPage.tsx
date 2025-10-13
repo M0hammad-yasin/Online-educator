@@ -30,6 +30,8 @@ const TeachersPage: React.FC = () => {
 
   return (
     <div style={{ padding: token.paddingLG }}>
+      <div>Students Page</div>
+
       {/* Top Section - Summary Cards and Filters */}
       <Row gutter={[token.size, token.sizeLG]}>
         {widgets.top.map((w) => {
@@ -60,7 +62,7 @@ const TeachersPage: React.FC = () => {
             <Col key={w.key} xs={24} sm={24} md={24} lg={24}>
               <Card
                 style={glassCardStyle}
-                bordered={false}
+                variant={'borderless'}
                 styles={{ body: { padding: token.paddingLG } }}
               >
                 <Comp />
