@@ -2,7 +2,8 @@ import express from "express";
 import {
   teacherSchema,
   teacherUpdateSchema,
-  accessControlSchema,
+  accessControlSchemaBody,
+  accessControlSchemaQuery,
   mongoIdSchema,
   loginSchema,
   classFilterQuerySchema,
@@ -23,19 +24,15 @@ import {
   patchTeacher,
   getTeachersWithClasses,
   getTeachersWithClassCount,
+  modifyTeacherAccess,
 } from "../controllers/TeacherController/teacher.controller.js";
 import auth from "../middleware/auth.js";
 import {
   validate,
-  validateBody,
 } from "../middleware/validate.middleware.js";
-import {
-  modifyAccess
-} from "../controllers/adminController/common.admin.controlller.js";
 import {
   isAdmin,
   hasRole,
-  roleBasedController
 } from "../middleware/roleCheck.js";
 import { Role } from "../constant.js";
 const router = express.Router();
@@ -69,8 +66,8 @@ router.post(
 //   roleBasedController(["ADMIN", "MODERATOR"], registerTeacher)
 // );
 
-router.post("/register", validateBody(teacherSchema), registerTeacher);
-router.post("/login",validateBody(loginSchema, (req) => req.body), loginTeacher);
+router.post("/register", validate(teacherSchema,(req) => req.body), registerTeacher);
+router.post("/login",validate(loginSchema, (req) => req.body), loginTeacher);
 router.post("/logout", auth, logoutTeacher);
 
 router.get("/me", auth,hasRole(Role.TEACHER), getTeacher);
@@ -83,7 +80,7 @@ router.put(
 );
 router.patch(
   "/me",
-  validateBody(teacherUpdateSchema),
+  validate(teacherUpdateSchema,(req) => req.body),
   auth,
   hasRole(Role.TEACHER),
   patchTeacher
@@ -130,10 +127,11 @@ router.get(
 router.put(
   "/:id/access-control",
   validate(mongoIdSchema, (req) => req.params),
-  validate(accessControlSchema, (req) => req.query),
+  validate(accessControlSchemaQuery, (req) => req.query),
+  validate(accessControlSchemaBody, (req) => req.body),
   auth,
   isAdmin,
-  modifyAccess
+  modifyTeacherAccess
 );
 router.put(
   "/:id",

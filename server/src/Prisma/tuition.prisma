@@ -6,6 +6,7 @@ datasource db {
   provider = "mongodb" // or "postgresql" if using PostgreSQL
   url      = env("MONGO_URI")
 }
+
 model Admin {
    id              String        @id @default(auto()) @map("_id") @db.ObjectId
   name            String
@@ -17,6 +18,21 @@ model Admin {
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
 }
+
+model Moderator{
+  id              String        @id @default(auto()) @map("_id") @db.ObjectId
+  name            String
+  email           String        @unique
+  passwordHash    String
+  address         String?
+  moderatorAccessControl   ModeratorAccessControl?
+  role            Role          @default(MODERATOR)
+  profilePicture  String?       // Cloudinary URL
+  isEmailVerified Boolean       @default(false)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
 model Teacher {
   id              String        @id @default(auto()) @map("_id") @db.ObjectId
   profilePicture  String?       // Cloudinary URL
@@ -28,7 +44,7 @@ model Teacher {
   role            Role        @default(TEACHER)  // ADMIN, TEACHER, or STUDENT
   passwordHash    String
   address         String?
-  accessControl   AccessControl?
+  teacherAccessControl   TeacherAccessControl?
   isEmailVerified Boolean       @default(false)
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
@@ -68,48 +84,53 @@ model Class {
   updatedAt       DateTime      @updatedAt
   classLink       String?
   duration        Int 
-  
   status          ClassStatus   @default(SCHEDULED)
 }
-model Moderator{
-  id              String        @id @default(auto()) @map("_id") @db.ObjectId
-  name            String
-  email           String        @unique
-  passwordHash    String
-  address         String?
-  accessControl   AccessControl?
-  role            Role          @default(MODERATOR)
-  profilePicture  String?       // Cloudinary URL
-  isEmailVerified Boolean       @default(false)
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
-}
-model AccessControl {
-  id              String        @id @default(auto()) @map("_id") @db.ObjectId
-  moderator       Moderator     @relation(fields: [moderatorId], references: [id])
-  moderatorId     String        @db.ObjectId @unique
-  teacherId   String  @db.ObjectId @unique
-  teacher         Teacher   @relation(fields: [teacherId], references: [id])
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
-  canSeeClass     Boolean       @default(false)
-  canAddClass     Boolean       @default(false)
-  canUpdateClass  Boolean       @default(false)
-  canDeleteClass  Boolean       @default(false)
-  canSeeUser      Boolean       @default(false)
-  canAddUser      Boolean       @default(false)
-  canDeleteUser   Boolean       @default(false)
-  canUpdateUser   Boolean       @default(false)
-  canSeeTeacher   Boolean       @default(false)
-  canAddTeacher   Boolean       @default(false)
-  canDeleteTeacher   Boolean       @default(false)
-  canUpdateTeacher   Boolean       @default(false)
-  canSeeStudent   Boolean       @default(false)
-  canAddStudent   Boolean       @default(false)
-  canDeleteStudent   Boolean       @default(false)
-  canUpdateStudent   Boolean       @default(false)
+model TeacherAccessControl {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  teacher        Teacher?  @relation(fields: [teacherId], references: [id])
+  teacherId      String   @unique @db.ObjectId
+
+  // Permissions for class and student management
+  canSeeClass     Boolean  @default(true)
+  canAddClass     Boolean  @default(true)
+  canUpdateClass  Boolean  @default(true)
+  canDeleteClass  Boolean  @default(false)
+
+  canSeeStudent   Boolean  @default(true)
+  canAddStudent   Boolean  @default(false)
+  canUpdateStudent Boolean @default(false)
+  canDeleteStudent Boolean @default(false)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
+model ModeratorAccessControl {
+  id              String     @id @default(auto()) @map("_id") @db.ObjectId
+  moderator    Moderator?  @relation(fields: [moderatorId], references: [id])
+  moderatorId     String     @unique @db.ObjectId
+
+  // Permissions for teachers, students, and classes
+
+  canSeeTeacher   Boolean    @default(true)
+  canAddTeacher   Boolean    @default(false)
+  canUpdateTeacher Boolean   @default(true)
+  canDeleteTeacher Boolean   @default(false)
+
+  canSeeStudent   Boolean    @default(true)
+  canAddStudent   Boolean    @default(false)
+  canUpdateStudent Boolean   @default(true)
+  canDeleteStudent Boolean   @default(false)
+
+  canSeeClass     Boolean    @default(true)
+  canAddClass     Boolean    @default(true)
+  canUpdateClass  Boolean    @default(true)
+  canDeleteClass  Boolean    @default(false)
+
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+}
 
 enum Role {
   ADMIN
@@ -117,6 +138,7 @@ enum Role {
   STUDENT
   MODERATOR
   }
+  
 enum ClassStatus { 
   SCHEDULED
   COMPLETED

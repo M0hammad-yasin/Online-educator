@@ -8,5 +8,5 @@ export { teacherSchema, teacherUpdateSchema } from "./teacher.validate.js";
 export { studentSchema, studentUpdateSchema } from "./student.validate.js";
 export { classSchema, updateClassSchema, classFilterQuerySchema } from "./class.validate.js";
 export { moderatorSchema, moderatorUpdateSchema } from "./moderator.validate.js";
-export { accessControlSchema } from "./access.validate.js";
+export { accessControlSchemaBody, accessControlSchemaQuery } from "./access.validate.js";
 
