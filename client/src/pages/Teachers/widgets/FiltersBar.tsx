@@ -1,10 +1,15 @@
 import React from 'react';
-import { Input, Select, Flex, theme as antdTheme, Button } from 'antd';
+import { Input, Select, Flex, theme as antdTheme, Button, Typography } from 'antd';
+import { SearchOutlined, FilterOutlined, SortAscendingOutlined, ReloadOutlined } from '@ant-design/icons';
 import { useTeacherFilters } from '../../../module/teacher/store/useTeacherStore';
 import { useDebounce } from '../../../hooks/useDebounce';
+import useThemeStore from '../../../store/themeStore';
+
+const { Text } = Typography;
 
 const FiltersBar: React.FC = () => {
   const { token } = antdTheme.useToken();
+  const { mode } = useThemeStore();
   const { filters, setFilters, resetFilters } = useTeacherFilters();
   const [search, setSearch] = React.useState(filters.search || '');
   const debouncedSearch = useDebounce(search, 300);
@@ -49,34 +54,58 @@ const FiltersBar: React.FC = () => {
     ? `${filters.sortBy}_${filters.order}` 
     : undefined;
 
+  const inputStyle: React.CSSProperties = {
+    borderRadius: 8,
+    border: `1px solid ${mode === 'dark' ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.15)'}`,
+    background: mode === 'dark' 
+      ? 'rgba(255, 255, 255, 0.05)' 
+      : 'rgba(255, 255, 255, 0.9)',
+  };
+
   return (
-    <Flex gap={token.size} wrap="wrap" align="center" justify="space-between">
-      <Flex gap={token.size} wrap="wrap">
-        <Input
-          allowClear
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search by name or email"
-          style={{ width: 260 }}
-        />
-        <Select
-          allowClear
-          placeholder="Qualification"
-          value={filters.qualification}
-          onChange={(val) => setFilters({ qualification: val ?? undefined, page: 1 })}
-          options={qualifications}
-          style={{ width: 160 }}
-        />
-        <Select
-          allowClear
-          placeholder="Sort By"
-          value={currentSort}
-          onChange={handleSortChange}
-          options={sortOptions}
-          style={{ width: 180 }}
-        />
+    <Flex vertical gap={token.size}>
+      <Text strong style={{ fontSize: token.fontSizeLG }}>
+        🔍 Filter & Search
+      </Text>
+      <Flex gap={token.size} wrap="wrap" align="center" justify="space-between">
+        <Flex gap={token.size} wrap="wrap" align="center">
+          <Input
+            allowClear
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search by name or email..."
+            prefix={<SearchOutlined style={{ color: token.colorTextSecondary }} />}
+            style={{ width: 280, ...inputStyle }}
+          />
+          <Select
+            allowClear
+            placeholder="Filter by Qualification"
+            value={filters.qualification}
+            onChange={(val) => setFilters({ qualification: val ?? undefined, page: 1 })}
+            options={qualifications}
+            suffixIcon={<FilterOutlined style={{ color: token.colorTextSecondary }} />}
+            style={{ width: 200 }}
+            popupMatchSelectWidth={false}
+          />
+          <Select
+            allowClear
+            placeholder="Sort by..."
+            value={currentSort}
+            onChange={handleSortChange}
+            options={sortOptions}
+            suffixIcon={<SortAscendingOutlined style={{ color: token.colorTextSecondary }} />}
+            style={{ width: 180 }}
+            popupMatchSelectWidth={false}
+          />
+        </Flex>
+        <Button 
+          icon={<ReloadOutlined />}
+          onClick={resetFilters}
+          style={{ borderRadius: 8 }}
+        >
+          Reset
+        </Button>
       </Flex>
-      <Button onClick={resetFilters}>Reset Filters</Button>
     </Flex>
   );
 };
