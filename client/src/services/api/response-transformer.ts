@@ -32,7 +32,7 @@ export class ResponseTransformer {
    * Transform paginated server response to client format
    */
   static transformPaginatedResponse<T>(serverResponse: any): PaginatedResponse<T> {
-    const { data, isSuccess, metaData } = serverResponse;
+    const { data, isSuccess } = serverResponse;
     
     let transformedData: T[] = [];
     
@@ -50,10 +50,12 @@ export class ResponseTransformer {
     return {
       data: transformedData,
       pagination: {
-        page: metaData?.paginationData?.currentPage || 1,
-        limit: metaData?.paginationData?.pageSize || 20,
-        total: metaData?.paginationData?.total || 0,
-        totalPages: Math.ceil((metaData?.paginationData?.total || 0) / (metaData?.paginationData?.pageSize || 20))
+        page: serverResponse?.pagination?.page || 1,
+        limit: serverResponse?.pagination?.limit || 20,
+        totalItems: serverResponse?.pagination?.totalItems || 0,
+        totalPages:serverResponse?.totalPages||0,
+      hasNextPage: serverResponse?.pagination?.hasNextPage || false,
+      hasPrevPage: serverResponse?.pagination?.hasPrevPage || false,
       },
       isSuccess
     };

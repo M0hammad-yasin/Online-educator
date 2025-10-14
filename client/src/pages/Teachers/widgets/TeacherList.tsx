@@ -44,7 +44,7 @@ const TeacherList: React.FC = () => {
   
   const items = data?.data || [];
   const pagination = data?.pagination;
-  const total = pagination?.total || 0;
+  const total = pagination?.totalItems || 0;
 
   const isAdmin = role === Role.ADMIN;
   const isAdminOrMod = role === Role.ADMIN || role === Role.MODERATOR;

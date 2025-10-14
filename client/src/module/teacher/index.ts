@@ -29,6 +29,4 @@ export {
   useTeacherSelection,
   useTeacherModals,
   useTeacherFilters,
-  useTeacherView,
-  useTeacherUI,
 } from './store/useTeacherStore';

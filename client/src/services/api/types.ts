@@ -13,8 +13,10 @@ export interface PaginatedResponse<T = any> {
   pagination: {
     page: number;
     limit: number;
-    total: number;
+    totalItems: number;
     totalPages: number;
+    hasNextPage: boolean;
+    hasPrevPage: boolean;
   };
   isSuccess: boolean;
 }

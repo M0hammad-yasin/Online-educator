@@ -172,14 +172,13 @@ export const useStudentModals = () => {
     closeAllModals: state.closeAllModals,
   }));
 };
-
 export const useStudentFilters = () => {
-  return useStudentStore((state) => ({
-    filters: state.filters,
-    setFilters: state.setFilters,
-    resetFilters: state.resetFilters,
-    updateFilter: state.updateFilter,
-  }));
+  const filters = useStudentStore((state) => state.filters);
+  const setFilters = useStudentStore((state) => state.setFilters);
+  const resetFilters = useStudentStore((state) => state.resetFilters);
+  const updateFilter = useStudentStore((state) => state.updateFilter);
+  
+  return { filters, setFilters, resetFilters, updateFilter };
 };
 
 export const useStudentView = () => {

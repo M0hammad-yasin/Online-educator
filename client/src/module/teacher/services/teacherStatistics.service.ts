@@ -2,6 +2,7 @@
 
 import { BaseService } from '../../../services/api/base.service';
 import { ApiResponse, PaginatedResponse } from '../../../services/api/types';
+import { Teacher } from '../types';
 import { TeacherFilters } from '../types/teacher.types';
 
 interface TeacherWithClassCount {
@@ -27,7 +28,7 @@ interface TeacherSummary {
   pendingVerifications: number;
 }
 
-class TeacherStatisticsService extends BaseService<any> {
+class TeacherStatisticsService extends BaseService<Teacher> {
   constructor() {
     super('/teacher');
   }
@@ -52,12 +53,12 @@ class TeacherStatisticsService extends BaseService<any> {
         this.getAll(filters),
         this.customGet<TeacherWithClassCount>('/class-count', filters),
       ]);
-
-      const totalTeachers = teachersRes.pagination?.total || 0;
+console.log(teachersRes);
+      const totalTeachers = teachersRes.pagination?.totalItems || 0;
       const teachers = classCountRes.data || [];
       const totalClasses = teachers.reduce((sum, t) => sum + (t._count?.classes || 0), 0);
       const activeTeachers = teachers.filter(t => (t._count?.classes || 0) > 0).length;
-
+      const pendingVerifications=teachersRes.data.reduce((sum, t) => sum + (t.isEmailVerified ? 0 : 1), 0);
       return {
         isSuccess: true,
         message: 'Summary fetched',
@@ -66,7 +67,7 @@ class TeacherStatisticsService extends BaseService<any> {
           activeTeachers,
           totalClasses,
           avgClassesPerDay: totalTeachers > 0 ? totalClasses / totalTeachers : 0,
-          pendingVerifications: 0, // This would need a separate endpoint
+          pendingVerifications,
         },
       };
     } catch (error) {

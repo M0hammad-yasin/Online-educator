@@ -147,57 +147,54 @@ export const useTeacherStore = create<TeacherStoreState>()(
   )
 );
 
-// Selector hooks for convenience
-export const useTeacherSelection = () => {
-  return useTeacherStore(state => ({
-    selectedTeacherId: state.selectedTeacherId,
-    selectedTeachers: state.selectedTeachers,
-    setSelectedTeacherId: state.setSelectedTeacherId,
-    setSelectedTeachers: state.setSelectedTeachers,
-    addSelectedTeacher: state.addSelectedTeacher,
-    removeSelectedTeacher: state.removeSelectedTeacher,
-    clearSelectedTeachers: state.clearSelectedTeachers,
-  }));
+export const useTeacherSelection = () => { 
+  const selectedTeacherId = useTeacherStore((state) => state.selectedTeacherId);
+  const selectedTeachers = useTeacherStore((state) => state.selectedTeachers);
+  const setSelectedTeacherId = useTeacherStore((state) => state.setSelectedTeacherId);
+  const setSelectedTeachers = useTeacherStore((state) => state.setSelectedTeachers);
+  const addSelectedTeacher = useTeacherStore((state) => state.addSelectedTeacher);
+  const removeSelectedTeacher = useTeacherStore((state) => state.removeSelectedTeacher);
+  const clearSelectedTeachers = useTeacherStore((state) => state.clearSelectedTeachers);
+
+  return { 
+    selectedTeacherId, 
+    selectedTeachers, 
+    setSelectedTeacherId, 
+    setSelectedTeachers, 
+    addSelectedTeacher, 
+    removeSelectedTeacher, 
+    clearSelectedTeachers 
+  };
 };
 
-export const useTeacherModals = () => {
-  return useTeacherStore(state => ({
-    isCreateModalOpen: state.isCreateModalOpen,
-    isEditModalOpen: state.isEditModalOpen,
-    isDeleteModalOpen: state.isDeleteModalOpen,
-    isViewModalOpen: state.isViewModalOpen,
-    setCreateModalOpen: state.setCreateModalOpen,
-    setEditModalOpen: state.setEditModalOpen,
-    setDeleteModalOpen: state.setDeleteModalOpen,
-    setViewModalOpen: state.setViewModalOpen,
-    closeAllModals: state.closeAllModals,
-  }));
+export const useTeacherModals = () => { 
+  const isCreateModalOpen = useTeacherStore((state) => state.isCreateModalOpen);
+  const isEditModalOpen = useTeacherStore((state) => state.isEditModalOpen);
+  const isDeleteModalOpen = useTeacherStore((state) => state.isDeleteModalOpen);
+  const isViewModalOpen = useTeacherStore((state) => state.isViewModalOpen);
+  const setCreateModalOpen = useTeacherStore((state) => state.setCreateModalOpen);
+  const setEditModalOpen = useTeacherStore((state) => state.setEditModalOpen);
+  const setDeleteModalOpen = useTeacherStore((state) => state.setDeleteModalOpen);
+  const setViewModalOpen = useTeacherStore((state) => state.setViewModalOpen);
+  const closeAllModals = useTeacherStore((state) => state.closeAllModals);
+
+  return {
+    isCreateModalOpen,
+    isEditModalOpen,
+    isDeleteModalOpen,
+    isViewModalOpen,
+    setCreateModalOpen,
+    setEditModalOpen,
+    setDeleteModalOpen,
+    setViewModalOpen,
+    closeAllModals,
+  };
 };
 
 export const useTeacherFilters = () => {
-  return useTeacherStore(state => ({
-    filters: state.filters,
-    setFilters: state.setFilters,
-    resetFilters: state.resetFilters,
-    updateFilter: state.updateFilter,
-  }));
-};
-
-export const useTeacherView = () => {
-  return useTeacherStore(state => ({
-    currentView: state.currentView,
-    searchQuery: state.searchQuery,
-    setCurrentView: state.setCurrentView,
-    setSearchQuery: state.setSearchQuery,
-  }));
-};
-
-export const useTeacherUI = () => {
-  return useTeacherStore(state => ({
-    isLoading: state.isLoading,
-    error: state.error,
-    setLoading: state.setLoading,
-    setError: state.setError,
-    clearError: state.clearError,
-  }));
+    const filters = useTeacherStore((state) => state.filters);
+    const setFilters = useTeacherStore((state) => state.setFilters);
+    const resetFilters = useTeacherStore((state) => state.resetFilters);
+    const updateFilter = useTeacherStore((state) => state.updateFilter);
+    return { filters, setFilters, resetFilters, updateFilter };
 };

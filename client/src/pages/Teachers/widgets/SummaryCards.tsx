@@ -1,23 +1,13 @@
 import React from 'react';
 import { Card, Col, Row, Statistic, theme as antdTheme } from 'antd';
 import { UserOutlined, CheckCircleOutlined, BookOutlined, BarChartOutlined } from '@ant-design/icons';
-import { useTeachers } from '../../../module/teacher/hooks/useTeachers';
-import { useTeachersWithClassCount } from '../../../module/teacher/hooks/useTeacherStatistics';
+import { useTeacherSummary } from '../../../module/teacher/hooks/useTeacherStatistics';
 
 const SummaryCards: React.FC = () => {
   const { token } = antdTheme.useToken();
-  const { data: teachersData, isLoading: teachersLoading } = useTeachers({});
-  const { data: classCountData, isLoading: classCountLoading } = useTeachersWithClassCount({});
-
-  const isLoading = teachersLoading || classCountLoading;
+  const { data: summaryData, isLoading: summaryLoading } = useTeacherSummary({});
 
   // Calculate statistics
-  const totalTeachers = teachersData?.pagination?.total || 0;
-  const teachers = classCountData?.data || [];
-  const totalClasses = teachers.reduce((sum, t) => sum + (t._count?.classes || 0), 0);
-  const activeTeachers = teachers.filter(t => (t._count?.classes || 0) > 0).length;
-  const avgClassesPerTeacher = totalTeachers > 0 ? (totalClasses / totalTeachers).toFixed(1) : '0';
-
   const cardStyle = {
     height: '100%',
     borderRadius: token.borderRadiusLG,
@@ -29,8 +19,8 @@ const SummaryCards: React.FC = () => {
         <Card bordered={false} style={cardStyle}>
           <Statistic
             title="Total Teachers"
-            value={totalTeachers}
-            loading={isLoading}
+            value={summaryData?.data.totalTeachers}
+            loading={summaryLoading}
             prefix={<UserOutlined style={{ color: token.colorPrimary }} />}
             valueStyle={{ color: token.colorText }}
           />
@@ -41,8 +31,8 @@ const SummaryCards: React.FC = () => {
         <Card bordered={false} style={cardStyle}>
           <Statistic
             title="Active Teachers"
-            value={activeTeachers}
-            loading={isLoading}
+            value={summaryData?.data.activeTeachers}
+            loading={summaryLoading}
             prefix={<CheckCircleOutlined style={{ color: token.colorSuccess }} />}
             valueStyle={{ color: token.colorSuccess }}
           />
@@ -53,8 +43,8 @@ const SummaryCards: React.FC = () => {
         <Card bordered={false} style={cardStyle}>
           <Statistic
             title="Total Classes Taught"
-            value={totalClasses}
-            loading={isLoading}
+            value={summaryData?.data.totalClasses}
+            loading={summaryLoading}
             prefix={<BookOutlined style={{ color: token.colorInfo }} />}
             valueStyle={{ color: token.colorText }}
           />
@@ -65,8 +55,8 @@ const SummaryCards: React.FC = () => {
         <Card bordered={false} style={cardStyle}>
           <Statistic
             title="Avg Classes / Teacher"
-            value={avgClassesPerTeacher}
-            loading={isLoading}
+            value={summaryData?.data.avgClassesPerDay}
+            loading={summaryLoading}
             prefix={<BarChartOutlined style={{ color: token.colorWarning }} />}
             valueStyle={{ color: token.colorText }}
           />
