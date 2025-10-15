@@ -3,14 +3,18 @@ import {
   Avatar,
   Button,
   Flex,
-  List,
+  Card,
+  Row,
+  Col,
   Pagination,
-  Space,
   Tag,
   Tooltip,
   theme as antdTheme,
   Popconfirm,
   message,
+  Typography,
+  Empty,
+  Skeleton,
 } from 'antd';
 import {
   EditOutlined,
@@ -19,6 +23,7 @@ import {
   UserOutlined,
   MailOutlined,
   BookOutlined,
+  DollarOutlined,
 } from '@ant-design/icons';
 import { useTeachers, useDeleteTeacher } from '../../../module/teacher/hooks/useTeachers';
 import { useTeacherFilters, useTeacherSelection } from '../../../module/teacher/store/useTeacherStore';
@@ -27,14 +32,18 @@ import useAuthStore from '../../../module/authentication/store/authStore';
 import TeacherDetailDrawer from './TeacherDetailDrawer';
 import TeacherEditModal from './TeacherEditModal';
 import { Teacher } from '../../../module/teacher/types/teacher.types';
+import useThemeStore from '../../../store/themeStore';
+
+const { Text } = Typography;
 
 const TeacherList: React.FC = () => {
   const { token } = antdTheme.useToken();
+  const { mode } = useThemeStore();
   const { filters, setFilters } = useTeacherFilters();
   const { setSelectedTeacherId } = useTeacherSelection();
   const user = useAuthStore((s) => s.user);
   const role = user?.role;
-
+  const [isHovered, setIsHovered] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedTeacher, setSelectedTeacher] = useState<Teacher | null>(null);
@@ -72,111 +81,167 @@ const TeacherList: React.FC = () => {
 
   const getStatusTag = (teacher: Teacher) => {
     if (teacher.isEmailVerified) {
-      return <Tag color="success">Active</Tag>;
+      return <Tag color="success" style={{ borderRadius: 6 }}>Verified</Tag>;
     }
-    return <Tag color="warning">Pending Verification</Tag>;
+    return <Tag color="warning" style={{ borderRadius: 6 }}>Pending</Tag>;
   };
+
+  const teacherCardStyle = (isHovered: boolean): React.CSSProperties => ({
+    height: '100%',
+    borderRadius: token.borderRadiusLG,
+    background: mode === 'dark'
+      ? 'linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%)'
+      : 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%)',
+    backdropFilter: 'blur(10px)',
+    border: `1px solid ${mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.06)'}`,
+    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+    cursor: 'pointer',
+    transform: isHovered ? 'translateY(-4px)' : 'translateY(0)',
+    boxShadow: isHovered ? '0 12px 24px rgba(0, 0, 0, 0.15)' : '0 2px 8px rgba(0, 0, 0, 0.08)',
+  });
+
+  if (isLoading) {
+    return (
+      <Row gutter={[token.size, token.size]}>
+        {[1, 2, 3, 4].map((i) => (
+          <Col xs={24} sm={12} md={12} lg={6} key={i}>
+            <Card>
+              <Skeleton active avatar paragraph={{ rows: 3 }} />
+            </Card>
+          </Col>
+        ))}
+      </Row>
+    );
+  }
+
+  if (items.length === 0) {
+    return <Empty description="No teachers found" />;
+  }
 
   return (
     <>
-      <List
-        loading={isLoading}
-        dataSource={items}
-        renderItem={(teacher: Teacher) => (
-          <List.Item
-            actions={[
-              <Tooltip key="view" title="View Details">
-                <Button
-                  size="small"
-                  icon={<EyeOutlined />}
-                  onClick={() => handleViewDetails(teacher)}
-                >
-                  View
-                </Button>
-              </Tooltip>,
-              ...(isAdminOrMod
-                ? [
-                    <Tooltip key="edit" title="Edit Teacher">
+      <Row gutter={[token.size, token.size]}>
+        {items.map((teacher: Teacher) => {
+          return (
+            <Col xs={24} sm={12} md={12} lg={6} key={teacher.id}>
+              <Card
+                bordered={false}
+                style={teacherCardStyle(isHovered)}
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+                styles={{ body: { padding: token.paddingLG } }}
+              >
+                {/* Header with Avatar */}
+                <Flex vertical align="center" gap={token.size}>
+                  <Avatar
+                    size={80}
+                    src={teacher.profilePicture}
+                    icon={<UserOutlined />}
+                    style={{
+                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                      border: `3px solid ${token.colorBgContainer}`,
+                      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                    }}
+                  />
+                  
+                  <Flex vertical align="center" gap={4}>
+                    <Text
+                      strong
+                      style={{
+                        fontSize: token.fontSizeLG,
+                        textAlign: 'center',
+                        color: token.colorText,
+                      }}
+                    >
+                      {teacher.name}
+                    </Text>
+                    {getStatusTag(teacher)}
+                  </Flex>
+                </Flex>
+
+                {/* Details */}
+                <Flex vertical gap={8} style={{ marginTop: token.marginMD }}>
+                  <Flex align="center" gap={8}>
+                    <MailOutlined style={{ color: token.colorTextSecondary, fontSize: 14 }} />
+                    <Text
+                      ellipsis
+                      style={{ 
+                        fontSize: token.fontSizeSM, 
+                        color: token.colorTextSecondary,
+                        flex: 1,
+                      }}
+                    >
+                      {teacher.email}
+                    </Text>
+                  </Flex>
+
+                  {teacher.qualification && (
+                    <Flex align="center" gap={8}>
+                      <BookOutlined style={{ color: token.colorTextSecondary, fontSize: 14 }} />
+                      <Text style={{ fontSize: token.fontSizeSM, color: token.colorTextSecondary }}>
+                        {teacher.qualification}
+                      </Text>
+                    </Flex>
+                  )}
+
+                  {teacher.classRate && (
+                    <Flex align="center" gap={8}>
+                      <DollarOutlined style={{ color: '#10b981', fontSize: 14 }} />
+                      <Text style={{ fontSize: token.fontSizeSM, color: '#10b981', fontWeight: 600 }}>
+                        ${teacher.classRate}/hr
+                      </Text>
+                    </Flex>
+                  )}
+                </Flex>
+
+                {/* Actions */}
+                <Flex gap={8} style={{ marginTop: token.marginMD }}>
+                  <Tooltip title="View Details">
+                    <Button
+                      type="primary"
+                      ghost
+                      icon={<EyeOutlined />}
+                      onClick={() => handleViewDetails(teacher)}
+                      style={{ flex: 1, borderRadius: 8 }}
+                    />
+                  </Tooltip>
+
+                  {isAdminOrMod && (
+                    <Tooltip title="Edit">
                       <Button
-                        size="small"
                         icon={<EditOutlined />}
                         onClick={() => handleEdit(teacher)}
-                      >
-                        Edit
-                      </Button>
-                    </Tooltip>,
-                  ]
-                : []),
-              ...(isAdmin
-                ? [
+                        style={{ borderRadius: 8 }}
+                      />
+                    </Tooltip>
+                  )}
+
+                  {isAdmin && (
                     <Popconfirm
-                      key="delete"
                       title="Delete Teacher"
-                      description="Are you sure you want to delete this teacher?"
+                      description="Are you sure?"
                       onConfirm={() => handleDelete(teacher.id)}
                       okText="Yes"
                       cancelText="No"
                     >
-                      <Tooltip title="Delete Teacher">
+                      <Tooltip title="Delete">
                         <Button
-                          size="small"
                           danger
                           icon={<DeleteOutlined />}
                           loading={deleteTeacherMutation.isPending}
-                        >
-                          Delete
-                        </Button>
+                          style={{ borderRadius: 8 }}
+                        />
                       </Tooltip>
-                    </Popconfirm>,
-                  ]
-                : []),
-            ]}
-          >
-            <List.Item.Meta
-              avatar={
-                <Avatar
-                  shape="square"
-                  size={56}
-                  src={teacher.profilePicture}
-                  icon={<UserOutlined />}
-                  style={{ background: token.colorPrimary }}
-                />
-              }
-              title={
-                <Space size={token.sizeSM}>
-                  <span style={{ fontWeight: 600, fontSize: token.fontSizeLG }}>
-                    {teacher.name}
-                  </span>
-                  {getStatusTag(teacher)}
-                </Space>
-              }
-              description={
-                <Flex vertical gap={6}>
-                  <Space size={token.sizeXS}>
-                    <MailOutlined style={{ color: token.colorTextSecondary }} />
-                    <span style={{ color: token.colorTextSecondary }}>{teacher.email}</span>
-                  </Space>
-                  {teacher.qualification && (
-                    <Space size={token.sizeXS}>
-                      <BookOutlined style={{ color: token.colorTextTertiary }} />
-                      <span style={{ color: token.colorTextTertiary }}>
-                        {teacher.qualification}
-                      </span>
-                    </Space>
-                  )}
-                  {teacher.classRate && (
-                    <Tag color="blue" style={{ width: 'fit-content' }}>
-                      Rate: ${teacher.classRate}/hr
-                    </Tag>
+                    </Popconfirm>
                   )}
                 </Flex>
-              }
-            />
-          </List.Item>
-        )}
-      />
+              </Card>
+            </Col>
+          );
+        })}
+      </Row>
       
-      <Flex justify="end" style={{ marginTop: token.margin }}>
+      <Flex justify="end" style={{ marginTop: token.marginLG }}>
         <Pagination
           current={filters.page || 1}
           pageSize={filters.limit || 10}
