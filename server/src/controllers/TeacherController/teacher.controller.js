@@ -14,9 +14,11 @@ export const registerTeacher = asyncWrapper(async (req, res) => {
   if (teacher) {
     throw new BadRequestError("Email is already registered");
   }
-  // Hash Password
+
+  // Hash password
   const hashedPassword = await hashPassword(req.body.password);
 
+  // Create teacher
   teacher = await prisma.teacher.create({
     data: {
       name: req.body.name,
@@ -28,10 +30,27 @@ export const registerTeacher = asyncWrapper(async (req, res) => {
       role: Role.TEACHER,
     },
   });
+
+  // ✅ Create default access control linked to the teacher
+  await prisma.teacherAccessControl.create({
+    data: {
+      teacherId: teacher.id,
+      canSeeClass: true,
+      canAddClass: true,
+      canUpdateClass: true,
+      canDeleteClass: false,
+      canSeeStudent: true,
+      canAddStudent: false,
+      canUpdateStudent: false,
+      canDeleteStudent: false,
+    },
+  });
+
+  // ✅ Send response
   sendSuccess(res, {
     statusCode: 201,
-    message: "Teacher created successfully",
-    data:  _.omit(teacher, ["passwordHash"]) ,
+    message: "Teacher created successfully with default access control",
+    data: _.omit(teacher, ["passwordHash"]),
   });
 });
 
@@ -119,11 +138,12 @@ export const updateTeacher = asyncWrapper(async (req, res) => {
 // Get Teacher Profile
 export const getTeacher = asyncWrapper(async (req, res) => {
   const filter = {};
-  controllerHelper
+  let omit=['passwordHash'];
   if (req?.params.id) {
     filter.id = req.params.id;
   } else {
     filter.id = req.user.userId;
+    omit.push('teacherAccessControl');
   }
   const teacher = await prisma.teacher.findUnique({
     where: filter,
@@ -135,37 +155,31 @@ export const getTeacher = asyncWrapper(async (req, res) => {
   sendSuccess(res, {
     statusCode: 200,
     message: "Teacher found Successfully",
-    data:  _.omit(teacher, ["passwordHash"]),
+    data:  _.omit(teacher, omit),
   });
 });
 export const getAllTeacher = asyncWrapper(async (req, res) => {
   const { sortBy = "name", order = "asc" } = req.query;
-  const classFilter = classUtil.buildClassFilters(req.query);
   const teacherFilter = controllerHelper.buildFilter(req.user.role, req.query);
   const { skip, take,page,limit } = getPagination(req.query);
-  const teachers = await prisma.teacher.findMany({
+  const [teachers,totalTeachers] = await Promise.all([prisma.teacher.findMany({
     skip,
     take,
     orderBy: { [sortBy]: order },
-    where: {
-      AND: [
-        teacherFilter,
-        {
-          classes: {
-            some: classFilter,
-          },
-        },
-      ],
-    },
+    where: teacherFilter,
     select: {
       id: true,
       name: true,
       email: true,
       profilePicture: true,
       qualification: true,
+      isEmailVerified: true,
     },
-  });
-  const paginationData=buildPaginationMeta(teachers.length,page,limit)
+  }),prisma.teacher.count({
+    where: teacherFilter,
+  })]);
+  const paginationData=buildPaginationMeta(totalTeachers,page,limit)
+  console.log(paginationData)
   sendSuccess(res, {
     statusCode: 200,
     message: "Teachers fetched Successfully",
@@ -436,5 +450,76 @@ export const getTeacherClassCountForDay = asyncWrapper(async (req, res) => {
     message: "Teacher class count fetched successfully",
     data: formattedResult,
     pagination: paginationData,
+  });
+});
+////////////////////////////////////////////////
+//////////////////access control////////////////////////
+/////////////////////////////////////////////////
+export const modifyTeacherAccess = asyncWrapper(async (req, res) => {
+  const id = req.params.id;
+
+  // 1️⃣ Find teacher
+  const teacher = await prisma.teacher.findUnique({ where: { id } });
+  if (!teacher) {
+    throw new BadRequestError("Teacher not found");
+  }
+
+  // 2️⃣ Extract permission fields (teacher relevant)
+  const {
+    canSeeClass,
+    canAddClass,
+    canUpdateClass,
+    canDeleteClass,
+    canSeeStudent,
+    canAddStudent,
+    canUpdateStudent,
+    canDeleteStudent,
+  } = req.body;
+
+  // 3️⃣ Build update object (ignore undefined)
+  const updatedAccess = {
+    ...(canSeeClass !== undefined && { canSeeClass }),
+    ...(canAddClass !== undefined && { canAddClass }),
+    ...(canUpdateClass !== undefined && { canUpdateClass }),
+    ...(canDeleteClass !== undefined && { canDeleteClass }),
+    ...(canSeeStudent !== undefined && { canSeeStudent }),
+    ...(canAddStudent !== undefined && { canAddStudent }),
+    ...(canUpdateStudent !== undefined && { canUpdateStudent }),
+    ...(canDeleteStudent !== undefined && { canDeleteStudent }),
+  };
+
+  // 4️⃣ Ensure access control record exists
+  let access = await prisma.teacherAccessControl.findUnique({
+    where: { teacherId: id },
+  });
+
+  if (!access) {
+    access = await prisma.teacherAccessControl.create({
+      data: { teacherId: id, ...updatedAccess },
+    });
+  } else {
+    access = await prisma.teacherAccessControl.update({
+      where: { id: access.id },
+      data: updatedAccess,
+    });
+  }
+
+  // 5️⃣ Return updated teacher with access
+  const updatedTeacher = await prisma.teacher.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      profilePicture: true,
+      qualification: true,
+      teacherAccessControl: true,
+    },
+  });
+
+  sendSuccess(res, {
+    statusCode: 200,
+    message: "Teacher access modified successfully",
+    data: _.omit(updatedTeacher, ["passwordHash"]),
   });
 });

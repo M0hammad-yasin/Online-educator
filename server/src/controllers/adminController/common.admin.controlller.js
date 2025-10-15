@@ -1,61 +1,84 @@
 import prisma from "../../Prisma/prisma.client.js";
 import {getPagination,buildPaginationMeta,sendSuccess,BadRequestError,asyncWrapper} from "../../utils/index.js";
 
-export const modifyAccess = asyncWrapper(async (req, res) => {
+export const modifyModeratorAccess = asyncWrapper(async (req, res) => {
+  const id = req.params.id;
+
+  // 1️⃣ Find moderator
+  const moderator = await prisma.moderator.findUnique({ where: { id } });
+  if (!moderator) {
+    throw new BadRequestError("Moderator not found");
+  }
+
+  // 2️⃣ Extract permissions (moderator relevant)
   const {
     canSeeUser,
     canAddUser,
-    canDeleteUser,
     canUpdateUser,
+    canDeleteUser,
     canSeeTeacher,
     canAddTeacher,
-    canDeleteTeacher,
     canUpdateTeacher,
+    canDeleteTeacher,
     canSeeStudent,
     canAddStudent,
-    canDeleteStudent,
     canUpdateStudent,
+    canDeleteStudent,
     canSeeClass,
     canAddClass,
-    canDeleteClass,
     canUpdateClass,
-    model,
-  } = req.query;
-  const id = req.params.id;
-  const user = await prisma[model].findUnique({ where: { id } });
-  if (!user) {
-    throw new BadRequestError(`${model} not found`);
-  }
-  const updatedUserAccess = {
-    ...(canSeeUser && { canSeeUser }),
-    ...(canAddUser && { canAddUser }),
-    ...(canDeleteUser && { canDeleteUser }),
-    ...(canUpdateUser && { canUpdateUser }),
-    ...(canSeeTeacher && { canSeeTeacher }),
-    ...(canAddTeacher && { canAddTeacher }),
-    ...(canDeleteTeacher && { canDeleteTeacher }),
-    ...(canUpdateTeacher && { canUpdateTeacher }),
-    ...(canSeeStudent && { canSeeStudent }),
-    ...(canAddStudent && { canAddStudent }),
-    ...(canDeleteStudent && { canDeleteStudent }),
-    ...(canUpdateStudent && { canUpdateStudent }),
-    ...(canSeeClass && { canSeeClass }),
-    ...(canAddClass && { canAddClass }),
-    ...(canDeleteClass && { canDeleteClass }),
-    ...(canUpdateClass && { canUpdateClass }),
+    canDeleteClass,
+  } = req.body;
+
+  // 3️⃣ Build update object (ignore undefined)
+  const updatedAccess = {
+    ...(canSeeUser !== undefined && { canSeeUser }),
+    ...(canAddUser !== undefined && { canAddUser }),
+    ...(canUpdateUser !== undefined && { canUpdateUser }),
+    ...(canDeleteUser !== undefined && { canDeleteUser }),
+    ...(canSeeTeacher !== undefined && { canSeeTeacher }),
+    ...(canAddTeacher !== undefined && { canAddTeacher }),
+    ...(canUpdateTeacher !== undefined && { canUpdateTeacher }),
+    ...(canDeleteTeacher !== undefined && { canDeleteTeacher }),
+    ...(canSeeStudent !== undefined && { canSeeStudent }),
+    ...(canAddStudent !== undefined && { canAddStudent }),
+    ...(canUpdateStudent !== undefined && { canUpdateStudent }),
+    ...(canDeleteStudent !== undefined && { canDeleteStudent }),
+    ...(canSeeClass !== undefined && { canSeeClass }),
+    ...(canAddClass !== undefined && { canAddClass }),
+    ...(canUpdateClass !== undefined && { canUpdateClass }),
+    ...(canDeleteClass !== undefined && { canDeleteClass }),
   };
-  const updatedUser = await prisma[model].update({
-    where: { id },
-    data: {
-      [model]: updatedUserAccess,
-    },
+
+  // 4️⃣ Ensure access control record exists
+  let access = await prisma.moderatorAccessControl.findUnique({
+    where: { moderatorId: id },
   });
+
+  if (!access) {
+    access = await prisma.moderatorAccessControl.create({
+      data: { moderatorId: id, ...updatedAccess },
+    });
+  } else {
+    access = await prisma.moderatorAccessControl.update({
+      where: { id: access.id },
+      data: updatedAccess,
+    });
+  }
+
+  // 5️⃣ Return updated moderator with access
+  const updatedModerator = await prisma.moderator.findUnique({
+    where: { id },
+    include: { moderatorAccessControl: true },
+  });
+
   sendSuccess(res, {
-    statusCode: 201,
-    message: "User access modified Successfully",
-    data:  updatedUser ,
+    statusCode: 200,
+    message: "Moderator access modified successfully",
+    data: updatedModerator,
   });
 });
+
 
 //get all teachers or students with their classes
 export const getUsersWithClasses = asyncWrapper(async (req, res) => {
