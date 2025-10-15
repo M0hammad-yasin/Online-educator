@@ -7,7 +7,6 @@ import {
   Row,
   Col,
   Pagination,
-  Space,
   Tag,
   Tooltip,
   theme as antdTheme,
@@ -44,7 +43,7 @@ const TeacherList: React.FC = () => {
   const { setSelectedTeacherId } = useTeacherSelection();
   const user = useAuthStore((s) => s.user);
   const role = user?.role;
-
+  const [isHovered, setIsHovered] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedTeacher, setSelectedTeacher] = useState<Teacher | null>(null);
@@ -123,8 +122,6 @@ const TeacherList: React.FC = () => {
     <>
       <Row gutter={[token.size, token.size]}>
         {items.map((teacher: Teacher) => {
-          const [isHovered, setIsHovered] = useState(false);
-          
           return (
             <Col xs={24} sm={12} md={12} lg={6} key={teacher.id}>
               <Card
