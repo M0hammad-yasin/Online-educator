@@ -2,7 +2,6 @@
 
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import { shallow } from 'zustand/shallow';
 import { StudentFilters } from '../types/student.types';
 
 interface StudentStoreState {
@@ -158,17 +157,16 @@ export const useStudentSelection = () => {
 };
 
 export const useStudentModals = () => {
-  return useStudentStore((state) => ({
-    isCreateModalOpen: state.isCreateModalOpen,
-    isEditModalOpen: state.isEditModalOpen,
-    isDeleteModalOpen: state.isDeleteModalOpen,
-    isViewModalOpen: state.isViewModalOpen,
-    setCreateModalOpen: state.setCreateModalOpen,
-    setEditModalOpen: state.setEditModalOpen,
-    setDeleteModalOpen: state.setDeleteModalOpen,
-    setViewModalOpen: state.setViewModalOpen,
-    closeAllModals: state.closeAllModals,
-  }));
+    const isCreateModalOpen= useStudentStore((state)=> state.isCreateModalOpen);
+    const isEditModalOpen= useStudentStore((state)=> state.isEditModalOpen);
+    const isDeleteModalOpen= useStudentStore((state)=> state.isDeleteModalOpen);
+    const isViewModalOpen= useStudentStore((state)=> state.isViewModalOpen);
+    const setCreateModalOpen= useStudentStore((state)=> state.setCreateModalOpen);
+    const setEditModalOpen= useStudentStore((state)=> state.setEditModalOpen);
+    const setDeleteModalOpen= useStudentStore((state)=> state.setDeleteModalOpen);
+    const setViewModalOpen= useStudentStore((state)=> state.setViewModalOpen);
+    const closeAllModals= useStudentStore((state)=> state.closeAllModals);
+    return {isCreateModalOpen,isEditModalOpen,isDeleteModalOpen,isViewModalOpen,setCreateModalOpen,setEditModalOpen,setDeleteModalOpen,setViewModalOpen,closeAllModals};
 };
 
 export const useStudentFilters = () => {

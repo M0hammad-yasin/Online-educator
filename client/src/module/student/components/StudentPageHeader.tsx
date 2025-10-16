@@ -1,20 +1,13 @@
 import React from 'react';
 import { Button, Space } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
-import { UserRole } from '../../../module/authentication/store/authStore';
 import { Role } from '../../../constants/role';
-import { StudentWidget } from '../types/student.types';
-interface StudentPageHeaderProps {
-  currentRole: UserRole;
-  hasAccess: (widgetType: StudentWidget['widgetType'], widgetName?: StudentWidget['widgetName']) => boolean;
-  onAddStudent: () => void;
-}
+import { StudentWidget ,useStudentModals,hasAccess} from '../';
+import {useRole} from '../../../hooks';
 
-const StudentPageHeader: React.FC<StudentPageHeaderProps> = ({
-  currentRole,
-  hasAccess,
-  onAddStudent,
-}) => {
+const StudentPageHeader: React.FC = () => {
+  const currentRole=useRole();
+  const {setCreateModalOpen}=useStudentModals();
   return (
     <div style={{ 
       marginBottom: '32px',
@@ -45,11 +38,11 @@ const StudentPageHeader: React.FC<StudentPageHeaderProps> = ({
       </div>
       
       <Space wrap>
-        {hasAccess('quickActions') && (
+        {hasAccess(currentRole,'quickActions') && (
           <Button 
             type="primary" 
             icon={<PlusOutlined />}
-            onClick={onAddStudent}
+            onClick={()=>{setCreateModalOpen(true)}}
             style={{
               borderRadius: '8px',
               background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',

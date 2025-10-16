@@ -1,33 +1,5 @@
 import { BaseService,ApiResponse } from '../../../services';
-import {User, UserRole} from '../store/authStore';
-import type {Student} from '../../student';
-import type { Teacher } from '../../teacher/types';
-import type { Moderator } from '../../moderator/types';
-import type { Admin } from '../../admin/types';
-
-export type AllUserProps = {
-  [K in keyof Student | keyof Teacher | keyof Admin | keyof Moderator]?:
-    K extends keyof Student ? Student[K] :
-    K extends keyof Teacher ? Teacher[K] :
-    K extends keyof Admin ? Admin[K] :
-    K extends keyof Moderator ? Moderator[K] :
-    never;
-};
-export interface LoginCredentials {
-  email: string;
-  password: string;
-}
-
-export interface RegisterData {
-  name: string;
-  email: string;
-  password: string;
-  role: UserRole;
-}
-export interface AuthResponse {
-  user: User;
-  accessToken: string;
-}
+import {User, UserRole,AllUserProps, LoginCredentials, RegisterData, AuthResponse } from '..';
 
 class AuthService extends BaseService<any> {
   constructor() {

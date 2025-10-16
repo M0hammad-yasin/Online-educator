@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Card, Row, Col, Statistic } from 'antd';
 import {
   UserOutlined,
@@ -6,28 +6,26 @@ import {
   RiseOutlined,
   TrophyOutlined,
 } from '@ant-design/icons';
-import { UserRole } from '../../../module/authentication/store/authStore';
 import { Role } from '../../../constants/role';
-import { StudentWidget } from '../types/student.types';
+import {useRole} from '../../../hooks';
+import { hasAccess, useStudentFilters, useStudents } from '..';
 
-interface StudentStats {
-  total: number;
-  active: number;
-  avgAttendance: number;
-  topPerformers: number;
-}
+const StudentStatsCards: React.FC = () => {
+  const currentRole=useRole();
+  const { filters} = useStudentFilters();
 
-interface StudentStatsCardsProps {
-  stats: StudentStats;
-  currentRole: UserRole;
-  hasAccess: (widgetType: StudentWidget['widgetType'], widgetName?: StudentWidget['widgetName']) => boolean;
-}
-
-const StudentStatsCards: React.FC<StudentStatsCardsProps> = ({
-  stats,
-  currentRole,
-  hasAccess,
-}) => {
+  const { data: studentsResponse } = useStudents(filters);
+  const students = studentsResponse?.data;
+    // Calculate statistics
+    const stats = useMemo(() => {
+      const total = students?.length || 0;
+      const active = 20;
+      const avgAttendance = Math.round(85 / total);
+      const topPerformers = 8;
+      
+      return { total, active, avgAttendance, topPerformers };
+    }, [students]);
+  
   // Stat cards configuration
   const statCards = [
     {
@@ -61,14 +59,14 @@ const StudentStatsCards: React.FC<StudentStatsCardsProps> = ({
     },
   ];
 
-  if (!hasAccess('stats')) {
+  if (!hasAccess(currentRole,'stats')) {
     return null;
   }
 
   return (
     <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
       {statCards
-        .filter(card => hasAccess('stats', card.key))
+        .filter(card => hasAccess(currentRole,'stats', card.key))
         .map((card) => (
           <Col xs={24} sm={12} lg={6} key={card.key}>
             <Card

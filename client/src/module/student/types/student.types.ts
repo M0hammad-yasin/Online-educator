@@ -1,4 +1,4 @@
-import { widgetConfig } from "../../../pages/Students/StudentsPage";
+import { widgetConfig } from "../../../module/student";
 
 export interface Student {
   id: string;

@@ -5,7 +5,8 @@ export * from './types/student.types';
 export { default as studentService } from './services/student.service';
 // Hooks
 export * from './hooks/useStudents';
-
+//components
+export * from './components';
 // Store
 export * from './store/useStudentStore';
 
@@ -20,7 +21,9 @@ export {
   useDeleteStudent,
   useStudentOperations,
 } from './hooks/useStudents';
-
+export {
+  hasAccess,widgetConfig
+} from "./config/config";
 export {
   useStudentStore,
   useStudentSelection,

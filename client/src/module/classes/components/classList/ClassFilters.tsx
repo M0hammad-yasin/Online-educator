@@ -5,7 +5,7 @@ import { Card, Row, Col, Select, Typography, Space, Button, Divider } from 'antd
 import { FilterOutlined, ClearOutlined } from '@ant-design/icons';
 import { useClassStore, useClassStoreSelectors } from '../../store/useClassStore';
 import { ClassStatus } from '../../types/class.type';
-import { SearchBox } from '../../../../components/layout';
+import { SearchBox } from '../../../../components/widgets';
 const { Text } = Typography;
 
 const ClassFilters: React.FC = () => {

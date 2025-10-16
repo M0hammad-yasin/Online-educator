@@ -1,10 +1,9 @@
-import React, { useRef } from 'react';
-import { Form, Input, Button, Typography, Select, Card, Flex, message, InputNumber } from 'antd';
+import React from 'react';
+import { Form, Input, Button, Typography, Select, Card, message, InputNumber } from 'antd';
 import { UserOutlined, LockOutlined, MailOutlined, LoginOutlined } from '@ant-design/icons';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useRegister } from '../hooks/useAuth';
 import styles from './Login.module.css';
-import { ApiError } from '../../../services/api/types';
 import { UserRole } from '../store/authStore';
 import { authService } from '../services/auth.service';
 

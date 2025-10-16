@@ -11,17 +11,6 @@ export interface ApiResponse<T = any> {
   pagination?: PaginationDetails;
   error?: ApiErrorResponse;
 }
-// export interface PaginatedResponse<T = any> {
-//   data: T[];
-//   error?:ApiErrorResponse|string;
-//   pagination: {
-//     page: number;
-//     limit: number;
-//     total: number;
-//     totalPages: number;
-//   };
-//   isSuccess: boolean;
-// }
 /**
  * Pagination details interface
  */
@@ -33,6 +22,12 @@ export interface PaginationDetails {
   hasNextPage: boolean;
   hasPrevPage: boolean;
   filter?: Record<string, any>;
+}
+export interface PaginatedResponse<T = any> {
+  data: T[];
+  error?:ApiErrorResponse|string;
+  pagination: PaginationDetails,
+  isSuccess: boolean;
 }
 
 /**

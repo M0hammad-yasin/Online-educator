@@ -1,13 +1,15 @@
 // Teacher management feature module for online education platform
 
 // Types
-export * from './types/teacher.types';
+export * from './types';
 
 // Services
 export { default as teacherService } from './services/teacher.service';
+export {teacherStatisticsService  } from './services/teacherStatistics.service';
 
 // Hooks
 export * from './hooks/useTeachers';
+export * from './hooks/useTeacherStatistics';
 
 // Store
 export * from './store/useTeacherStore';
@@ -29,6 +31,4 @@ export {
   useTeacherSelection,
   useTeacherModals,
   useTeacherFilters,
-  useTeacherView,
-  useTeacherUI,
 } from './store/useTeacherStore';

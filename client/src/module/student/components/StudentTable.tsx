@@ -20,36 +20,19 @@ import {
   MailOutlined,
   CalendarOutlined,
 } from '@ant-design/icons';
-import { UserRole } from '../../../module/authentication/store/authStore';
+import { UserRole } from '../../../module/authentication';
 import { Role } from '../../../constants/role';
-import { Student, StudentFilters, StudentWidget } from '../types/student.types';
-import { SearchBox } from '../../../components/layout';
-import { HighlightedText } from '../../../components/widgets/HighlightedText';
+import { Student,useStudents ,useStudentFilters, hasAccess} from '../';
+import { HighlightedText, } from '../../../components/widgets';
+import {useRole} from '../../../hooks';
 
-interface StudentTableProps {
-  students: Student[] | undefined;
-  isLoading: boolean;
-  pagination: {
-    page?: number;
-    limit?: number;
-    totalItems?: number;
-  } | undefined;
-  filters: StudentFilters;
-  currentRole: UserRole;
-  hasAccess: (widgetType: StudentWidget['widgetType'], widgetName?: StudentWidget['widgetName']) => boolean;
-  onFiltersChange: (filters: Partial<StudentFilters>) => void;
-}
-
-const StudentTable: React.FC<StudentTableProps> = ({
-  students,
-  isLoading,
-  pagination,
-  filters,
-  currentRole,
-  hasAccess,
-  onFiltersChange,
-}) => {
+const StudentTable: React.FC = () => {
   // Color palette
+  const currentRole=useRole();
+  const { filters, setFilters } = useStudentFilters();
+  const { data: studentsResponse, isLoading } = useStudents(filters);
+  const students = studentsResponse?.data;
+  const pagination = studentsResponse?.pagination;
   const COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
 
   // Get role-specific columns
@@ -229,70 +212,70 @@ const StudentTable: React.FC<StudentTableProps> = ({
     return roleColumns.map(key => allColumns[key as keyof typeof allColumns]).filter(Boolean);
   };
 
-  if (!hasAccess('table')) {
+  if (!hasAccess(currentRole,'table')) {
     return null;
   }
 
   return (
     <Card
-      bordered={false}
+      variant="borderless"
       style={{ borderRadius: '16px' }}
-      title={
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          gap: '16px',
-        }}>
-          <span style={{ fontSize: '18px', fontWeight: 600 }}>
-            {currentRole === Role.TEACHER ? 'My Students List' : 'All Students'}
-          </span>
-          <Space wrap>
-            <SearchBox
-              placeholder="Search students by name, email..."
-              initialValue={filters.search}
-              onSearch={(val) => onFiltersChange({ search: val, page: 1 })}
-            />
-            <Select
-              placeholder="Filter by Grade"
-              value={filters.grade}
-              onChange={(val) => onFiltersChange({ grade: val, page: 1 })}
-              style={{ width: 140 }}
-              allowClear
-              options={[
-                { label: 'Grade 1', value: 1 },
-                { label: 'Grade 2', value: 2 },
-                { label: 'Grade 3', value: 3 },
-                { label: 'Grade 4', value: 4 },
-                { label: 'Grade 5', value: 5 },
-                { label: 'Grade 6', value: 6 },
-                { label: 'Grade 7', value: 7 },
-                { label: 'Grade 8', value: 8 },
-                { label: 'Grade 9', value: 9 },
-                { label: 'Grade 10', value: 10 },
-                { label: 'Grade 11', value: 11 },
-                { label: 'Grade 12', value: 12 },
-              ]}
-            />
-            {currentRole !== Role.TEACHER && (
-              <Select
-                placeholder="Filter by Region"
-                value={filters.region}
-                onChange={(val) => onFiltersChange({ region: val, page: 1 })}
-                style={{ width: 140 }}
-                allowClear
-                options={[
-                  { label: 'Canada', value: 'canada' },
-                  { label: 'USA', value: 'USA' },
-                  { label: 'England', value: 'England' },
-                  { label: 'West', value: 'West' },
-                ]}
-              />
-            )}
-          </Space>
-        </div>
-      }
+      // title={
+      //   <div style={{ 
+      //     display: 'flex', 
+      //     justifyContent: 'space-between', 
+      //     alignItems: 'center',
+      //     flexWrap: 'wrap',
+      //     gap: '16px',
+      //   }}>
+      //     <span style={{ fontSize: '18px', fontWeight: 600 }}>
+      //       {currentRole === Role.TEACHER ? 'My Students List' : 'All Students'}
+      //     </span>
+      //     <Space wrap>
+      //       <SearchBox
+      //         placeholder="Search students by name, email..."
+      //         initialValue={filters.search}
+      //         onSearch={(val) => setFilters({ search: val, page: 1 })}
+      //       />
+      //       <Select
+      //         placeholder="Filter by Grade"
+      //         value={filters.grade}
+      //         onChange={(val) => setFilters({ grade: val, page: 1 })}
+      //         style={{ width: 140 }}
+      //         allowClear
+      //         options={[
+      //           { label: 'Grade 1', value: 1 },
+      //           { label: 'Grade 2', value: 2 },
+      //           { label: 'Grade 3', value: 3 },
+      //           { label: 'Grade 4', value: 4 },
+      //           { label: 'Grade 5', value: 5 },
+      //           { label: 'Grade 6', value: 6 },
+      //           { label: 'Grade 7', value: 7 },
+      //           { label: 'Grade 8', value: 8 },
+      //           { label: 'Grade 9', value: 9 },
+      //           { label: 'Grade 10', value: 10 },
+      //           { label: 'Grade 11', value: 11 },
+      //           { label: 'Grade 12', value: 12 },
+      //         ]}
+      //       />
+      //       {currentRole !== Role.TEACHER && (
+      //         <Select
+      //           placeholder="Filter by Region"
+      //           value={filters.region}
+      //           onChange={(val) => setFilters({ region: val, page: 1 })}
+      //           style={{ width: 140 }}
+      //           allowClear
+      //           options={[
+      //             { label: 'Canada', value: 'canada' },
+      //             { label: 'USA', value: 'USA' },
+      //             { label: 'England', value: 'England' },
+      //             { label: 'West', value: 'West' },
+      //           ]}
+      //         />
+      //       )}
+      //     </Space>
+      //   </div>
+      // }
     >
       <Table
         dataSource={students}
@@ -307,7 +290,7 @@ const StudentTable: React.FC<StudentTableProps> = ({
           showQuickJumper: true,
           showTotal: (total, range) =>
             `${range[0]}-${range[1]} of ${total} students`,
-          onChange: (page, pageSize) => onFiltersChange({ page, limit: pageSize }),
+          onChange: (page, pageSize) => setFilters({ page, limit: pageSize }),
         }}
         scroll={{ x: 1200 }}
       />

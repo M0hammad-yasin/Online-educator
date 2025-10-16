@@ -4,10 +4,10 @@ import { Navigate } from 'react-router-dom';
 
 
 // Page Components (these would be imported from their actual locations)
-import {Dashboard, Profile,ClassPage,ClassUpdatePage, StudentsPage} from '../pages';
+import {Dashboard, Profile,ClassPage,ClassUpdatePage, StudentsPage, TeacherPage} from '../pages';
 
 // Placeholder components (replace with actual components)
-const TeachersManagement = () => <div>Manage Teachers</div>;
+const TeachersManagement =TeacherPage;
 const StudentsManagement = StudentsPage;
 const SubjectsManagement = () => <div>Manage Subjects</div>;
 const AssignmentsManagement = () => <div>Manage Assignments</div>;

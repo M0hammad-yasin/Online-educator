@@ -1,18 +1,8 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Role } from '../../../constants/role';
 import { authService } from '../services/auth.service';
 import { mountStoreDevtool } from 'simple-zustand-devtools';
-
-export type UserRole = (typeof Role)[keyof typeof Role];
-
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: UserRole;
-  profilePicture: string;
-}
+import { User } from '..';
 
 interface AuthState {
   token: string | null;

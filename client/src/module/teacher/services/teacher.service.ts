@@ -1,7 +1,7 @@
 // src/module/teacher/services/teacher.service.ts
 
 import { BaseService } from '../../../services/api/base.service';
-import { ApiResponse } from '../../../services/api/types';
+import { ApiResponse, PaginatedResponse } from '../../../services/api/types';
 import {
   Teacher,
   TeacherWithClasses,
@@ -19,7 +19,7 @@ class TeacherService extends BaseService<Teacher> {
   }
 
   // Get all teachers with filtering and pagination
-  async getAllTeachers(filters: TeacherFilters = {}): Promise<ApiResponse<Teacher[]>> {
+  async getAllTeachers(filters: TeacherFilters = {}): Promise<PaginatedResponse<Teacher>> {
     return this.getAll(filters);  
   }
 
@@ -49,13 +49,13 @@ class TeacherService extends BaseService<Teacher> {
   }
 
   // Get teachers for selection dropdowns
-  async getTeachersForSelection(filters: TeacherFilters = {}): Promise<ApiResponse<TeacherForSelection[]>> {
-    return this.customGet<TeacherForSelection[]>('/select', filters);
+  async getTeachersForSelection(filters: TeacherFilters = {}): Promise<PaginatedResponse<TeacherForSelection>> {
+    return this.customGet<TeacherForSelection>('/select', filters);
   }
 
   // Get teachers with their classes
-  async getTeachersWithClasses(filters: TeacherFilters = {}): Promise<ApiResponse<TeacherWithClasses[]>> {
-    return this.customGet<TeacherWithClasses[]>('/classes', filters);
+  async getTeachersWithClasses(filters: TeacherFilters = {}): Promise<PaginatedResponse<TeacherWithClasses>> {
+    return this.customGet<TeacherWithClasses>('/classes', filters);
   }
 
   // // Get teacher statistics

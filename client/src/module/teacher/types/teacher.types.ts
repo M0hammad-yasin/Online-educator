@@ -1,3 +1,5 @@
+import { Class } from "../../classes";
+
 export interface Teacher {
   id: string;
   profilePicture?: string;
@@ -5,7 +7,7 @@ export interface Teacher {
   email: string;
   qualification?: string;
   classRate?: number;
-  classes?: any[]; // Replace with actual Class type if available
+  classes?: Class[]; // Replace with actual Class type if available
   role: 'TEACHER';
   password?: string;
   address?: string;

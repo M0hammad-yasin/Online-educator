@@ -1,8 +1,8 @@
-import React from 'react';
-import { Card, Row, Col, Progress } from 'antd';
+import React, { useMemo } from 'react';
+import { Card, Row, Col, Progress, Skeleton } from 'antd';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
-import { UserRole } from '../../../module/authentication/store/authStore';
-import { StudentWidget } from '../types/student.types';
+import { hasAccess, useStudentFilters, useStudents } from '../';
+import { useRole } from '../../../hooks';
 
 interface ChartData {
   gradeDistribution: Array<{ grade: string; count: number }>;
@@ -10,32 +10,66 @@ interface ChartData {
   attendanceTrend: Array<{ month: string; attendance: number }>;
   avgAttendance: number;
 }
-
-interface StudentChartsProps {
-  chartData: ChartData;
-  currentRole: UserRole;
-  hasAccess: (widgetType: StudentWidget['widgetType'], widgetName?: StudentWidget['widgetName']) => boolean;
-}
-
-const StudentCharts: React.FC<StudentChartsProps> = ({
-  chartData,
-  currentRole,
-  hasAccess,
-}) => {
+const StudentCharts: React.FC = () => {
+  const currentRole=useRole();
+  const { filters } = useStudentFilters();
+  const { data: studentsResponse, isLoading } = useStudents(filters);
+  const students = studentsResponse?.data;
   // Color palette
   const COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
+  // Chart data
+  const chartData = useMemo(() => {
+    const gradeDistribution = (() => {
+      const distribution: Record<number, number> = {};
+      students?.forEach(s => {
+        distribution[s.grade] = (distribution[s.grade] || 0) + 1;
+      });
+      return Object.entries(distribution).map(([grade, count]) => ({
+        grade: `Grade ${grade}`,
+        count: count as number,
+      }));
+    })();
 
-  if (!hasAccess('charts')) {
+    const regionDistribution = (() => {
+      const distribution = students?.reduce<Record<string, number>>((acc, student) => {
+        const key = student.region ?? "Unknown";
+        acc[key] = (acc[key] ?? 0) + 1;
+        return acc;
+      }, {});
+      if (!distribution) return [{ region: "Unknown", value: 0 }];
+      return Object.entries(distribution).map(([region, value]) => ({
+        region,
+        value,
+      }));
+    })();
+
+    const attendanceTrend = [
+      { month: 'Jan', attendance: 85 },
+      { month: 'Feb', attendance: 88 },
+      { month: 'Mar', attendance: 82 },
+      { month: 'Apr', attendance: 90 },
+      { month: 'May', attendance: 87 },
+      { month: 'Jun', attendance: 80 },
+    ];
+
+    return {
+      gradeDistribution,
+      regionDistribution,
+      attendanceTrend,
+      avgAttendance: Math.round(85/(students?.length||)),
+    };
+  }, [students]);
+
+  if (!hasAccess(currentRole,'charts')) {
     return null;
   }
-
   return (
     <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
-      {hasAccess('charts', 'gradeDistribution') && (
+      {hasAccess(currentRole,'charts', 'gradeDistribution') && (
         <Col xs={24} lg={12}>
           <Card
             title="Grade Distribution"
-            bordered={false}
+            variant='borderless'
             style={{ 
               borderRadius: '16px',
               height: '400px',
@@ -70,7 +104,7 @@ const StudentCharts: React.FC<StudentChartsProps> = ({
         </Col>
       )}
 
-      {hasAccess('charts', 'attendanceTrend') && (
+      {hasAccess(currentRole,'charts', 'attendanceTrend') && (
         <Col xs={24} lg={12}>
           <Card
             title="Attendance Trend"
@@ -106,7 +140,7 @@ const StudentCharts: React.FC<StudentChartsProps> = ({
         </Col>
       )}
 
-      {hasAccess('charts', 'regionDistribution') && (
+      {hasAccess(currentRole,'charts', 'regionDistribution') && (
         <Col xs={24} lg={12}>
           <Card
             title="Region Distribution"
@@ -145,7 +179,7 @@ const StudentCharts: React.FC<StudentChartsProps> = ({
         </Col>
       )}
 
-      {hasAccess('charts', 'performanceAnalysis') && (
+      {hasAccess(currentRole,'charts', 'performanceAnalysis') && (
         <Col xs={24} lg={12}>
           <Card
             title="Performance Analysis"

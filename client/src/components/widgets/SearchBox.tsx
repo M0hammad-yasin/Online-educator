@@ -1,7 +1,7 @@
 import { Input } from "antd";
 import React from "react";
 import { SearchOutlined } from "@ant-design/icons";
-import { useDebounce } from "../../hooks/useDebounce";
+import { useDebounce } from "../../hooks/";
 
 interface SearchBox {
   placeholder?: string;

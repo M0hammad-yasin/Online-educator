@@ -20,6 +20,7 @@ export const studentSchema = z.object({
     .number({ invalid_type_error: "Grade must be a number" })
     .min(1, { message: "Grade should not be empty" })
     .lte(12, { message: "Grade must be at most 12" }),
+    region: z.string().min(2,{message:"region must be at least 2 characters long"})
 });
 export const studentUpdateSchema = studentSchema.partial();
 
