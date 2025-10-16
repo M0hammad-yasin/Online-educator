@@ -118,7 +118,7 @@ const TeacherPage: React.FC = () => {
                   key={widget.key}
                   bordered={false}
                   style={glassCardStyle}
-                  styles={{ body: { padding: token.paddingLG } }}
+                  styles={{ body: { padding: token.paddingSM } }}
                   className="dashboard-card"
                 >
                   <WidgetComponent />

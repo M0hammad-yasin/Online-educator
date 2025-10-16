@@ -59,12 +59,12 @@ export const DashboardConfig: DashboardSection[] = [
     id: 'management',
     label: 'Teacher Management',
     widgets: [
-      {
-        key: 'FiltersBar',
-        roles: [Role.ADMIN, Role.MODERATOR],
-        gridSpan: { xs: 24, sm: 24, md: 24, lg: 24, xl: 24 },
-        order: 3,
-      },
+      // {
+      //   key: 'FiltersBar',
+      //   roles: [Role.ADMIN, Role.MODERATOR],
+      //   gridSpan: { xs: 24, sm: 24, md: 24, lg: 24, xl: 24 },
+      //   order: 3,
+      // },
       {
         key: 'TeacherList',
         roles: [Role.ADMIN, Role.MODERATOR],

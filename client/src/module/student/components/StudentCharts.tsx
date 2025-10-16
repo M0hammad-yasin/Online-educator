@@ -1,19 +1,13 @@
 import React, { useMemo } from 'react';
-import { Card, Row, Col, Progress, Skeleton } from 'antd';
+import { Card, Row, Col, Progress } from 'antd';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
 import { hasAccess, useStudentFilters, useStudents } from '../';
 import { useRole } from '../../../hooks';
 
-interface ChartData {
-  gradeDistribution: Array<{ grade: string; count: number }>;
-  regionDistribution: Array<{ region: string; value: number }>;
-  attendanceTrend: Array<{ month: string; attendance: number }>;
-  avgAttendance: number;
-}
 const StudentCharts: React.FC = () => {
   const currentRole=useRole();
   const { filters } = useStudentFilters();
-  const { data: studentsResponse, isLoading } = useStudents(filters);
+  const { data: studentsResponse } = useStudents(filters);
   const students = studentsResponse?.data;
   // Color palette
   const COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
@@ -56,7 +50,7 @@ const StudentCharts: React.FC = () => {
       gradeDistribution,
       regionDistribution,
       attendanceTrend,
-      avgAttendance: Math.round(85/(students?.length||)),
+      avgAttendance: Math.round(85/(students?.length||0)),
     };
   }, [students]);
 
@@ -108,7 +102,7 @@ const StudentCharts: React.FC = () => {
         <Col xs={24} lg={12}>
           <Card
             title="Attendance Trend"
-            bordered={false}
+            variant='borderless'
             style={{ 
               borderRadius: '16px',
               height: '400px',
@@ -144,7 +138,7 @@ const StudentCharts: React.FC = () => {
         <Col xs={24} lg={12}>
           <Card
             title="Region Distribution"
-            bordered={false}
+            variant='borderless'
             style={{ 
               borderRadius: '16px',
               height: '400px',
@@ -183,7 +177,7 @@ const StudentCharts: React.FC = () => {
         <Col xs={24} lg={12}>
           <Card
             title="Performance Analysis"
-            bordered={false}
+            variant='borderless'
             style={{ 
               borderRadius: '16px',
               height: '400px',
