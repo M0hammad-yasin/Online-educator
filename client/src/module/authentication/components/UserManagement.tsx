@@ -2,14 +2,13 @@ import React from "react";
 import { Avatar, Button, Dropdown, MenuProps, Typography, Flex, message, Drawer, Descriptions, Space, Spin } from "antd";
 import { UserOutlined, SettingOutlined, LogoutOutlined, DownOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-import useAuthStore from "../store/authStore";
-import { useLogout } from "../hooks/useAuth";
+import  { useAuthUser,useLogout } from "..";
 
 const { Text } = Typography;
 
 const UserManagement: React.FC = () => {
   const navigate = useNavigate();
-  const { user } = useAuthStore();
+  const user = useAuthUser();
   const { mutate: logout, isPending } = useLogout();
   const [drawerOpen, setDrawerOpen] = React.useState(false);
 
@@ -22,6 +21,7 @@ const UserManagement: React.FC = () => {
       logout(undefined, {
         onSuccess: () => {
           navigate("/login");
+          message.success('you\'re logged out successfuly');
         },
       });
     }
@@ -61,7 +61,7 @@ const UserManagement: React.FC = () => {
         </Flex>
         <Dropdown
           menu={{ items: menuItems, onClick: handleMenuClick, style: { borderRadius: 6 } }}
-          trigger={["click"]}
+          trigger={['hover']}
           dropdownRender={(menu) => (
             <div style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.15)", borderRadius: 6 }}>{menu}</div>
           )}

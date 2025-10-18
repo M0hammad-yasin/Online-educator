@@ -1,27 +1,17 @@
 import {
-  Avatar,
   Badge,
   Button,
   Input,
   Layout,
-  Space,
   Switch,
   theme,
   Tooltip,
-  Dropdown,
-  MenuProps,
-  Flex,
-  Typography,
 } from "antd";
 import {
   BellOutlined,
   SearchOutlined,
-  UserOutlined,
   SunOutlined,
   MoonOutlined,
-  DownOutlined,
-  SettingOutlined,
-  LogoutOutlined,
 } from "@ant-design/icons";
 import useThemeStore from "../../../store/themeStore";
 import "../../../style/header.css";
@@ -39,8 +29,6 @@ const AppHeader: React.FC<HeaderProps> = ({ collapsed, setCollapsed }) => {
   const {
     token: {
       colorBgContainer,
-      colorPrimary,
-      colorTextSecondary,
       colorBorderSecondary,
       borderRadius,
     },
@@ -107,7 +95,6 @@ const AppHeader: React.FC<HeaderProps> = ({ collapsed, setCollapsed }) => {
             onChange={toggleTheme}
           />
         </Tooltip>
-        {/* Replace old user profile and dropdown with UserManagement */}
         <UserManagement />
       </div>
     </Header>

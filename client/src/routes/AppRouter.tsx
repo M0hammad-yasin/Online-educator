@@ -1,10 +1,8 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { Layout } from 'antd';
-import { Login, ForgotPassword } from '../module/authentication/components';
-import Register from '../module/authentication/components/Register';
 import { AppHeader, MainContent, Sidebar } from '../components/layout';
-import useAuthStore, { UserRole } from '../module/authentication/store/authStore';
+import {useAuthStore, Register, UserRole,Login, ForgotPassword } from '../module/authentication';
 import { protectedRoutes, RouteConfig } from './routeConfig';
 // Components
 const NotFound = () => <div>Page Not Found</div>;

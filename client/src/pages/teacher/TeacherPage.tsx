@@ -5,10 +5,9 @@
 import React, { useMemo } from 'react';
 import { Card, Space, Typography, theme as antdTheme, Flex } from 'antd';
 import { TeamOutlined } from '@ant-design/icons';
-import {useAuthUser} from '../../module/authentication';
-import { Role } from '../../constants/role';
 import useThemeStore from '../../store/themeStore';
 import { SummaryCards,PerformanceCharts,FiltersBar,TeacherList, getVisibleWidgets, } from '../../module/teacher';
+import { useRole } from '../../hooks';
 const { Title, Text } = Typography;
 
 // Widget registry - maps widget keys to their React components
@@ -20,12 +19,11 @@ const widgetRenderer: Record<string, React.FC> = {
 };
 
 const TeacherPage: React.FC = () => {
-  const user = useAuthUser();
   const { token } = antdTheme.useToken();
   const { mode } = useThemeStore();
 
-  const role = user?.role ?? Role.TEACHER;
-  const dashboardSections = useMemo(() => getVisibleWidgets(role), [role]);
+  const currentRole = useRole();
+  const dashboardSections = useMemo(() => getVisibleWidgets(currentRole), [currentRole]);
 
   // Glass-morphism card style with theme awareness
   const glassCardStyle: React.CSSProperties = {
@@ -34,7 +32,6 @@ const TeacherPage: React.FC = () => {
       : 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%)',
     backdropFilter: 'saturate(180%) blur(20px)',
     borderRadius: token.borderRadiusLG,
-    border: `1px solid ${mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.06)'}`,
     boxShadow: mode === 'dark'
       ? '0 8px 32px rgba(0, 0, 0, 0.3)'
       : '0 8px 32px rgba(0, 0, 0, 0.08)',
