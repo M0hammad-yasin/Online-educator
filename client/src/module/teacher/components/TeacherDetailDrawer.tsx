@@ -27,10 +27,8 @@ import {
   CheckCircleOutlined,
   CloseCircleOutlined,
 } from '@ant-design/icons';
-import { Teacher } from '../../../module/teacher/types/teacher.types';
-import { useTeachersWithClasses } from '../../../module/teacher/hooks/useTeachers';
-import AccessControlPanel from './AccessControlPanel';
-import useAuthStore from '../../../module/authentication/store/authStore';
+import { useTeachersWithClasses,AccessControlPanel,Teacher } from '..';
+import {useAuthUser} from '../../authentication';
 import { Role } from '../../../constants/role';
 import useThemeStore from '../../../store/themeStore';
 
@@ -45,7 +43,7 @@ interface TeacherDetailDrawerProps {
 const TeacherDetailDrawer: React.FC<TeacherDetailDrawerProps> = ({ open, onClose, teacher }) => {
   const { token } = antdTheme.useToken();
   const { mode } = useThemeStore();
-  const user = useAuthStore((s) => s.user);
+  const user = useAuthUser();
   const isAdmin = user?.role === Role.ADMIN;
 
   // Fetch teacher with classes

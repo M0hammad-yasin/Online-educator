@@ -25,13 +25,13 @@ import {
   BookOutlined,
   DollarOutlined,
 } from '@ant-design/icons';
-import { useTeachers, useDeleteTeacher } from '../../../module/teacher/hooks/useTeachers';
-import { useTeacherFilters, useTeacherSelection } from '../../../module/teacher/store/useTeacherStore';
+import { useTeachers, useDeleteTeacher } from '../hooks/useTeachers';
+import { useTeacherFilters, useTeacherSelection } from '../store/useTeacherStore';
 import { Role } from '../../../constants/role';
-import useAuthStore from '../../../module/authentication/store/authStore';
+import useAuthStore from '../../authentication/store/authStore';
 import TeacherDetailDrawer from './TeacherDetailDrawer';
 import TeacherEditModal from './TeacherEditModal';
-import { Teacher } from '../../../module/teacher/types/teacher.types';
+import { Teacher } from '../types/teacher.types';
 import useThemeStore from '../../../store/themeStore';
 import FiltersBar from './FiltersBar';
 

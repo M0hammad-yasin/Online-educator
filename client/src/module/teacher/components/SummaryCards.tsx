@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, Col, Row, Statistic, theme as antdTheme, Skeleton } from 'antd';
 import { UserOutlined, CheckCircleOutlined, BookOutlined, BarChartOutlined } from '@ant-design/icons';
-import { useTeacherSummary } from '../../../module/teacher/hooks/useTeacherStatistics';
+import { useTeacherSummary } from '..';
 import useThemeStore from '../../../store/themeStore';
 
 interface StatCardProps {
@@ -58,7 +58,7 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, loading, icon, gradie
 
   return (
     <Card
-      bordered={false}
+      variant='borderless'
       style={cardStyle}
       styles={{ body: { padding: token.paddingLG, position: 'relative', zIndex: 1 } }}
       className="stat-card"

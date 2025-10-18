@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
-import { Modal, Form, Input, InputNumber, message, Select } from 'antd';
-import { Teacher } from '../../../module/teacher/types/teacher.types';
-import { useUpdateTeacher } from '../../../module/teacher/hooks/useTeachers';
+import { Modal, Form, Input, InputNumber, message, Select, Skeleton } from 'antd';
+import { Teacher,useTeacher,useUpdateTeacher  } from '..';
 
 interface TeacherEditModalProps {
   open: boolean;
@@ -12,24 +11,26 @@ interface TeacherEditModalProps {
 const TeacherEditModal: React.FC<TeacherEditModalProps> = ({ open, onClose, teacher }) => {
   const [form] = Form.useForm();
   const updateTeacherMutation = useUpdateTeacher();
-
+const {data,isLoading,error,}=useTeacher(teacher?.id!);
+const teacherData=data?.data;
   useEffect(() => {
-    if (teacher && open) {
+    if (teacherData && open) {
       form.setFieldsValue({
-        name: teacher.name,
-        email: teacher.email,
-        qualification: teacher.qualification,
-        classRate: teacher.classRate,
-        address: teacher.address,
+        name: teacherData.name,
+        email: teacherData.email,
+        qualification: teacherData.qualification,
+        classRate: teacherData.classRate,
+        address: teacherData.address,
       });
     }
   }, [teacher, open, form]);
-
+if(error){
+  message.error(error.message||'teacher fetch unsuccessful',4);
+}
   const handleSubmit = async () => {
     try {
       const values = await form.validateFields();
       if (!teacher) return;
-
       await updateTeacherMutation.mutateAsync({
         id: teacher.id,
         data: values,
@@ -59,7 +60,10 @@ const TeacherEditModal: React.FC<TeacherEditModalProps> = ({ open, onClose, teac
     { label: 'M.A', value: 'M.A' },
     { label: 'Other', value: 'Other' },
   ];
-
+if(isLoading){
+  return (
+    <Skeleton loading/> )
+}
   return (
     <Modal
       title="Edit Teacher"

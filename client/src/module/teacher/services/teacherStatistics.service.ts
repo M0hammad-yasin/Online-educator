@@ -1,7 +1,7 @@
 // src/module/teacher/services/teacherStatistics.service.ts
 
 import { BaseService } from '../../../services/api/base.service';
-import { ApiResponse, PaginatedResponse } from '../../../services/api/types';
+import { ApiResponse } from '../../../services/api/types';
 import { Teacher } from '../types';
 import { TeacherFilters } from '../types/teacher.types';
 
@@ -34,8 +34,8 @@ class TeacherStatisticsService extends BaseService<Teacher> {
   }
 
   // Get teachers with their class count
-  async getTeachersWithClassCount(filters: TeacherFilters = {}): Promise<ApiResponse<TeacherWithClassCount>> {
-    return this.customGet<TeacherWithClassCount>('/class-count', filters);
+  async getTeachersWithClassCount(filters: TeacherFilters = {}): Promise<ApiResponse<TeacherWithClassCount[]>> {
+    return this.customGet<TeacherWithClassCount[]>('/class-count', filters);
   }
 
   // Get teacher class count for a specific day

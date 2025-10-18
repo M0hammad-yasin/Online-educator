@@ -1,8 +1,8 @@
 import React from 'react';
 import { Input, Select, Flex, theme as antdTheme, Button, Typography } from 'antd';
 import { SearchOutlined, FilterOutlined, SortAscendingOutlined, ReloadOutlined } from '@ant-design/icons';
-import { useTeacherFilters } from '../../../module/teacher/store/useTeacherStore';
-import { useDebounce } from '../../../hooks/useDebounce';
+import { useTeacherFilters } from '..';
+import { useDebounce } from '../../../hooks';
 import useThemeStore from '../../../store/themeStore';
 
 const { Text } = Typography;

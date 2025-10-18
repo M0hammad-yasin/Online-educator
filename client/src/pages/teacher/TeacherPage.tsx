@@ -5,14 +5,10 @@
 import React, { useMemo } from 'react';
 import { Card, Space, Typography, theme as antdTheme, Flex } from 'antd';
 import { TeamOutlined } from '@ant-design/icons';
-import useAuthStore from '../../module/authentication/store/authStore';
+import {useAuthUser} from '../../module/authentication';
 import { Role } from '../../constants/role';
 import useThemeStore from '../../store/themeStore';
-import SummaryCards from './widgets/SummaryCards';
-import PerformanceCharts from './widgets/PerformanceCharts';
-import FiltersBar from './widgets/FiltersBar';
-import TeacherList from './widgets/TeacherList';
-import { getVisibleWidgets } from './widgets/teacherDashboard.config';
+import { SummaryCards,PerformanceCharts,FiltersBar,TeacherList, getVisibleWidgets, } from '../../module/teacher';
 const { Title, Text } = Typography;
 
 // Widget registry - maps widget keys to their React components
@@ -24,7 +20,7 @@ const widgetRenderer: Record<string, React.FC> = {
 };
 
 const TeacherPage: React.FC = () => {
-  const user = useAuthStore((s) => s.user);
+  const user = useAuthUser();
   const { token } = antdTheme.useToken();
   const { mode } = useThemeStore();
 
@@ -116,7 +112,7 @@ const TeacherPage: React.FC = () => {
               return (
                 <Card
                   key={widget.key}
-                  bordered={false}
+                  variant='borderless'
                   style={glassCardStyle}
                   styles={{ body: { padding: token.paddingSM } }}
                   className="dashboard-card"

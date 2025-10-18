@@ -1,5 +1,6 @@
 // Teacher management feature module for online education platform
-
+//components
+export * from './components';
 // Types
 export * from './types';
 
@@ -13,6 +14,9 @@ export * from './hooks/useTeacherStatistics';
 
 // Store
 export * from './store/useTeacherStore';
+
+//config
+export * from './config/teacher.config'
 
 // Re-export commonly used items for convenience
 export {

@@ -18,7 +18,7 @@ import {
   EditOutlined,
   DeleteOutlined,
 } from '@ant-design/icons';
-import { accessControlService } from '../../../module/admin/services/access-control.service';
+import { accessControlService } from '../../admin';
 
 const { Text } = Typography;
 
@@ -52,7 +52,7 @@ const AccessControlPanel: React.FC<AccessControlPanelProps> = ({ teacherId }) =>
     setLoading(true);
     try {
       const response = await accessControlService.getAccessControl(teacherId);
-      if (response.isSuccess && response.data) {
+      if (response.success && response.data) {
         setAccessControl({
           canSeeClass: response.data.canSeeClass ?? false,
           canAddClass: response.data.canAddClass ?? false,

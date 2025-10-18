@@ -4,7 +4,7 @@
 import React from 'react';
 import { Card, Row, Col, theme as antdTheme, Empty, Spin } from 'antd';
 import { BarChart, Bar, PieChart, Pie, Cell, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, CartesianGrid } from 'recharts';
-import { useTeachersWithClassCount } from '../../../module/teacher/hooks/useTeacherStatistics';
+import { useTeachersWithClassCount } from '..';
 import useThemeStore from '../../../store/themeStore';
 
 const PerformanceCharts: React.FC = () => {
@@ -13,7 +13,6 @@ const PerformanceCharts: React.FC = () => {
   const { data, isLoading } = useTeachersWithClassCount({ limit: 50 });
 
   const teachers = data?.data || [];
-
   // Prepare data for charts
   const topTeachersData = teachers
     .sort((a, b) => (b._count?.classes || 0) - (a._count?.classes || 0))
@@ -29,11 +28,6 @@ const PerformanceCharts: React.FC = () => {
     const qual = teacher.email ? 'Qualified' : 'Not Qualified'; // Simplified - adjust as needed
     qualificationMap.set(qual, (qualificationMap.get(qual) || 0) + 1);
   });
-
-  const qualificationData = Array.from(qualificationMap.entries()).map(([name, value]) => ({
-    name,
-    value,
-  }));
 
   // Colors based on theme
   const COLORS = mode === 'dark' 
@@ -159,7 +153,7 @@ const PerformanceCharts: React.FC = () => {
                 fill="#8884d8"
                 dataKey="value"
               >
-                {[0, 1].map((entry, index) => (
+                {[0, 1].map((_, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
