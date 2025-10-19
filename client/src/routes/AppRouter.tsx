@@ -4,6 +4,8 @@ import { Layout } from 'antd';
 import { AppHeader, MainContent, Sidebar } from '../components/layout';
 import {useAuthStore, Register, UserRole,Login, ForgotPassword } from '../module/authentication';
 import { protectedRoutes, RouteConfig } from './routeConfig';
+import AppSkeleton from '../components/AppSkeleton';
+import PublicNotFound from '../components/PublicNotFound';
 // Components
 const NotFound = () => <div>Page Not Found</div>;
 
@@ -13,7 +15,7 @@ const AuthGuard = ({ allowedRoles }: { allowedRoles?: UserRole | UserRole[] }) =
   const user = useAuthStore((state) => state.user);
   const isInitialized = useAuthStore((state) => state.isInitialized);
   if (!isInitialized) {
-    return <div>Loading...</div>;
+    return <AppSkeleton/>;
   }
 
   if (!isAuthenticated) {
@@ -53,7 +55,7 @@ const RootRedirect = () => {
   const isInitialized = useAuthStore((state) => state.isInitialized);
 
   if (!isInitialized) {
-    return <div>Loading...</div>;
+    return <AppSkeleton/>;
   }
 
   return isAuthenticated ? <Navigate to="/dashboard" replace /> : <Navigate to="/login" replace />;
@@ -131,7 +133,7 @@ const AppRouter: React.FC = () => {
           </Route>
 
           {/* 404 Catch All */}
-          <Route path="*" element={<NotFound />} />
+          <Route path="*" element={<PublicNotFound />} />
         </Routes>
       </AuthInitializer>
     </BrowserRouter>

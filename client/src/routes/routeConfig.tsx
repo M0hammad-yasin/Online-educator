@@ -1,10 +1,11 @@
-import { UserRole } from '../module/authentication/store/authStore';
+import { UserRole } from '../module/authentication';
 import { Role } from '../constants/role';
 import { Navigate } from 'react-router-dom';
 
 
 // Page Components (these would be imported from their actual locations)
 import {Dashboard, Profile,ClassPage,ClassUpdatePage, StudentsPage, TeacherPage} from '../pages';
+import AuthenticatedNotFound from '../components/AuthenticatedNotFound';
 
 // Placeholder components (replace with actual components)
 const TeachersManagement =TeacherPage;
@@ -41,6 +42,10 @@ export const protectedRoutes: RouteConfig[] = [
     path: '/profile',
     component: Profile,
     title: 'Profile'
+  },
+  {
+    path:'*',
+    component:AuthenticatedNotFound,
   },
   
   // Admin only routes
