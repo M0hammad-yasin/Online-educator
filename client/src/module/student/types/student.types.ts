@@ -27,7 +27,14 @@ export interface StudentWithClasses extends Student {
     };
   }>;
 }
-
+export interface StudentSearchResult {
+  id: string;
+  name: string;
+  email: string;
+  profilePicture?: string;
+  grade: number;
+  parentEmail?: string;
+}
 export interface CreateStudentRequest {
   name: string;
   email: string;

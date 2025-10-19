@@ -6,11 +6,11 @@ import {
   CreateClassRequest, 
   UpdateClassRequest, 
   ClassFilters, 
-  ClassCountByGroup, 
   ClassSelection, 
   GroupedClass, 
-  CalendarClass 
-} from '../types/class.type';
+  CalendarClass, 
+  ClassSearchResult
+} from '..';
 import { ApiResponse } from '../../../services/api/types';
 
 class ClassService extends BaseService<Class> {
@@ -58,6 +58,9 @@ class ClassService extends BaseService<Class> {
 
   async deleteClass(id: string): Promise<ApiResponse<void>> {
     return this.delete(id);
+  }
+  async searchClasses(filters: ClassFilters): Promise<ApiResponse<ClassSearchResult[]>> {
+    return this.customGet<ClassSearchResult[]>('/search', filters);
   }
 }
 

@@ -109,7 +109,7 @@ export const useClassStoreSelectors = {
         filters.studentId ||
         filters.teacherId ||
         (filters.status && filters.status !== 'all-classes') ||
-        filters.searchData ||
+        filters.search ||
         filters.grade ||
         (filters.orderBy && filters.orderBy.length > 0) 
       );

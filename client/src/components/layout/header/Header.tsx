@@ -4,7 +4,6 @@ import {
   Flex,
   Input,
   Layout,
-  Space,
   Switch,
   theme,
   Tooltip,
@@ -17,16 +16,15 @@ import {
 } from "@ant-design/icons";
 import useThemeStore from "../../../store/themeStore";
 import "../../../style/header.css";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import UserManagement from '../../../module/authentication/components/UserManagement';
 import NavigationKeeper from "./NavigationKeeper";
+import { SearchUI } from "../../widgets";
 const { Header } = Layout;
 
 const AppHeader: React.FC = () => {
   const { toggleTheme } = useThemeStore();
   const {
     token: {
-      colorBgContainer,
       colorBorderSecondary,
       borderRadius,
     },
@@ -45,11 +43,7 @@ const AppHeader: React.FC = () => {
       }}
     >
         <NavigationKeeper/>
-        <Input
-          prefix={<SearchOutlined />}
-          placeholder="Search for something"
-          style={{ width: 250 }}
-        />
+        <SearchUI/>
       <Flex style={{  alignItems: "center", gap: 16 }}>
         <Tooltip title="Notifications">
           <Badge count={1} size="small">

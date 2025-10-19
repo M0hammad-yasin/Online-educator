@@ -8,12 +8,12 @@ const SearchBox: React.FC = () => {
   const filters = useClassStoreSelectors.filters();
   const setFilters = useClassStore((state) => state.setFilters);
 
-  const [searchValue, setSearchValue] = React.useState<string>(filters.searchData || '');
+  const [searchValue, setSearchValue] = React.useState<string>(filters.search || '');
   const debouncedSearch = useDebounce(searchValue, 400); // wait 400ms
 
   // Run filter update only when debounced value changes
   React.useEffect(() => {
-    setFilters({ searchData: debouncedSearch || undefined, page: 1 });
+    setFilters({ search: debouncedSearch || undefined, page: 1 });
   }, [debouncedSearch, setFilters]);
 
   const handleSearchChange = (value: string) => {

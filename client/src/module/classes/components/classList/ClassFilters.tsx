@@ -28,7 +28,7 @@ const ClassFilters: React.FC = () => {
     value: i + 1,
   }));
 
-  const hasActiveFilters = Boolean(filters.searchData) || statusFilter !== 'all-classes' || Boolean(gradeFilter);
+  const hasActiveFilters = Boolean(filters.search) || statusFilter !== 'all-classes' || Boolean(gradeFilter);
 
   const handleStatusChange = (value: string) => {
     setStatusFilter(value);
@@ -43,7 +43,7 @@ const ClassFilters: React.FC = () => {
   const handleClearFilters = () => {
     setStatusFilter('all-classes');
     setGradeFilter(undefined);
-    setFilters({ status: undefined, searchData: undefined, grade: undefined, page: 1 });
+    setFilters({ status: undefined, search: undefined, grade: undefined, page: 1 });
   };
 
   return (
@@ -58,8 +58,8 @@ const ClassFilters: React.FC = () => {
           <Space wrap>
             <SearchBox
               placeholder="Search classes by subject, teacher, or student..."
-              onSearch={(val) => setFilters({ searchData: val, page: 1 })}
-              initialValue={filters.searchData}
+              onSearch={(val) => setFilters({ search: val, page: 1 })}
+              initialValue={filters.search}
             />
             <Select
               placeholder="Status"

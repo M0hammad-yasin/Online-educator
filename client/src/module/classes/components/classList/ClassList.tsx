@@ -153,7 +153,7 @@ const ClassList: React.FC = () => {
       dataIndex: 'subject',
       key: 'subject',
       render: (subject: string) => (
-           <HighlightedText text={subject} search={filters.searchData} strong />
+           <HighlightedText text={subject} search={filters.search} strong />
       ),
     },
     {
@@ -168,7 +168,7 @@ const ClassList: React.FC = () => {
       key: 'teacher',
       render: (teacher: Class['teacher']) => (
         <div>
-          <HighlightedText text={teacher?.name} search={filters.searchData} strong />
+          <HighlightedText text={teacher?.name} search={filters.search} strong />
           <Text type="secondary" style={{ fontSize: '12px' }}>
             {teacher?.qualification}
           </Text>
@@ -187,7 +187,7 @@ const ClassList: React.FC = () => {
       key: 'student',
       render: (student: Class['student']) => (
         <div>
-          <HighlightedText text={student?.name} search={filters.searchData} strong />
+          <HighlightedText text={student?.name} search={filters.search} strong />
           <Text type="secondary" style={{ fontSize: '12px' }}>
             Grade {student?.grade}
           </Text>

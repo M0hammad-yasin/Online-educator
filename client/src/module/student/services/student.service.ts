@@ -1,7 +1,6 @@
 // src/module/student/services/student.service.ts
 
 import { BaseService } from '../../../services/api/base.service';
-import { ResponseTransformer } from '../../../services/api/response-transformer';
 import { ApiResponse } from '../../../services/api/types';
 import {
   Student,
@@ -12,7 +11,8 @@ import {
   StudentForSelection,
   StudentCount,
   GroupedStudent,
-} from '../types/student.types';
+  StudentSearchResult,
+} from '..';
 
 class StudentService extends BaseService<Student> {
   constructor() {
@@ -26,20 +26,17 @@ class StudentService extends BaseService<Student> {
 
   // Get single student by ID
   async getStudentById(id: string): Promise<ApiResponse<Student>> {
-    const response = await this.getById(`/${id}`);
-    return ResponseTransformer.transformApiResponse(response);
+    return this.getById(`/${id}`);
   }
 
   // Create new student (Admin/Moderator only)
   async createStudent(data: CreateStudentRequest): Promise<ApiResponse<Student>> {
-    const response = await this.customPost<ApiResponse<Student>>('/register', data);
-    return ResponseTransformer.transformApiResponse(response);
+    return this.create(data);
   }
 
   // Update student (Admin/Moderator/Teacher or self)
   async updateStudent(id: string, data: UpdateStudentRequest): Promise<ApiResponse<Student>> {
-    const response = await this.customPatch<ApiResponse<Student>>(`/${id}`, data);
-    return ResponseTransformer.transformApiResponse(response);
+    return this.put(`/${id}`, data);
   }
 
   // Update own profile (Student only)
@@ -49,56 +46,37 @@ class StudentService extends BaseService<Student> {
 
   // Delete student (Admin/Moderator only)
   async deleteStudent(id: string): Promise<ApiResponse<void>> {
-    const response = await this.delete(`/${id}`);
-    return ResponseTransformer.transformApiResponse(response);
+    return this.delete(`/${id}`);
   }
 
   // Get students for selection dropdowns
   async getStudentsForSelection(filters: StudentFilters = {}): Promise<ApiResponse<StudentForSelection[]>> {
-    const params = this.buildQueryParams(filters);
-    const response = await this.customGet<StudentForSelection[]>('/select', params);
-    return ResponseTransformer.transformApiResponse(response);
+    return this.customGet<StudentForSelection[]>('/select', filters);
   }
 
   // Get students with their classes
   async getStudentsWithClasses(filters: StudentFilters = {}): Promise<ApiResponse<StudentWithClasses[]>> {
-    const params = this.buildQueryParams(filters);
-    const response = await this.customGet<StudentWithClasses[]>('/classes', params);
-    return ResponseTransformer.transformApiResponse(response);
+    return this.customGet<StudentWithClasses[]>('/classes', filters);
   }
 
   // Get student statistics
   async getStudentCount(filters: StudentFilters = {}): Promise<ApiResponse<StudentCount>> {
-    const params = this.buildQueryParams(filters);
-    const response = await this.customGet<ApiResponse<StudentCount>>('/count', params);
-    return ResponseTransformer.transformApiResponse(response);
+    return this.customGet<StudentCount>('/count', filters);
   }
 
   // Get grouped students
   async getGroupedStudents(filters: StudentFilters = {}): Promise<ApiResponse<GroupedStudent>> {
-    const params = this.buildQueryParams(filters);
-    const response = await this.customGet<ApiResponse<GroupedStudent>>('/group', params);
-    return ResponseTransformer.transformApiResponse(response);
+    return this.customGet<GroupedStudent>('/group', filters);
   }
 
   // Get current student profile (for authenticated student)
   async getCurrentStudentProfile(): Promise<ApiResponse<Student>> {
-    const response = await this.customGet<ApiResponse<Student>>('/me');
-    return ResponseTransformer.transformApiResponse(response);
+    return this.customGet<Student>('/me');
+  }
+  async searchStudents(filters:StudentFilters): Promise<ApiResponse<StudentSearchResult[]>> {
+    return this.customGet<StudentSearchResult[]>('/search', filters);
   }
 
-  // Helper method to build query parameters
-  private buildQueryParams(filters: StudentFilters): Record<string, any> {
-    const params: Record<string, any> = {};
-    
-    Object.entries(filters).forEach(([key, value]) => {
-      if (value !== undefined && value !== null && value !== '') {
-        params[key] = value;
-      }
-    });
-
-    return params;
-  }
 }
 
 // Export singleton instance

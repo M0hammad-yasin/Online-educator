@@ -28,7 +28,24 @@ export interface Class {
   createdAt: string;
   updatedAt: string;
 }
-
+export interface ClassSearchResult {
+  id: string;
+  subject: string;
+  title?: string;
+  scheduledAt: string;
+  startTime: string;
+  status: string;
+  teacher: {
+    id: string;
+    name: string;
+    profilePicture?: string;
+  };
+  student: {
+    id: string;
+    name: string;
+    profilePicture?: string;
+  };
+}
 export interface CreateClassRequest {
   subject: string;
   scheduledAt: string;
@@ -74,7 +91,7 @@ export interface ClassFilters {
   studentId?: string;
   teacherId?: string;
   status?: ClassStatus | 'all-classes';
-  searchData?: string;
+  search?: string;
   grade?: number;
   page?: number;
   groupBy?:'teacher' | 'student' | 'status' | 'subject' | 'startTime' | 'day' | 'hour' | 'month' | 'grade' ;

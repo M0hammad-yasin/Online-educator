@@ -16,7 +16,14 @@ export interface Teacher {
   createdAt: string;
   updatedAt: string;
 }
-
+export interface TeacherSearchResult {
+  id: string;
+  name: string;
+  email: string;
+  profilePicture?: string;
+  qualification?: string;
+  classRate?: number;
+}
 export interface TeacherWithClasses extends Teacher {
   scheduledClasses?: Array<{
     id: string;

@@ -19,24 +19,38 @@ Directory structure:
     │       ├── assets/
     │       │   └── auth-illustrations.tsx
     │       ├── components/
-    │       │   └── layout/
+    │       │   ├── AppSkeleton.tsx
+    │       │   ├── AuthenticatedNotFound.tsx
+    │       │   ├── PublicNotFound.tsx
+    │       │   ├── layout/
+    │       │   │   ├── index.ts
+    │       │   │   ├── MainContent.tsx
+    │       │   │   ├── header/
+    │       │   │   │   └── Header.tsx
+    │       │   │   └── sideBar/
+    │       │   │       └── Sidebar.tsx
+    │       │   └── widgets/
+    │       │       ├── ErrorBoundary.tsx
+    │       │       ├── HighlightedText.tsx
     │       │       ├── index.ts
-    │       │       ├── MainContent.tsx
-    │       │       ├── header/
-    │       │       │   └── Header.tsx
-    │       │       └── sideBar/
-    │       │           └── Sidebar.tsx
+    │       │       └── SearchBox.tsx
     │       ├── constants/
     │       │   ├── classStatus.ts
     │       │   ├── menu.ts
     │       │   ├── role.ts
     │       │   └── statCardOptions.ts
     │       ├── hooks/
-    │       │   └── useDebounce.ts
+    │       │   ├── index.ts
+    │       │   ├── useDebounce.ts
+    │       │   ├── useHighlightMatch.tsx
+    │       │   └── useRole.ts
     │       ├── module/
     │       │   ├── admin/
     │       │   │   ├── index.ts
+    │       │   │   ├── services/
+    │       │   │   │   └── access-control.service.ts
     │       │   │   └── types/
+    │       │   │       ├── admin.types.ts
     │       │   │       └── index.ts
     │       │   ├── authentication/
     │       │   │   ├── index.ts
@@ -55,9 +69,11 @@ Directory structure:
     │       │   │   ├── services/
     │       │   │   │   ├── auth.service.ts
     │       │   │   │   └── index.ts
-    │       │   │   └── store/
-    │       │   │       ├── authStore.ts
-    │       │   │       └── index.ts
+    │       │   │   ├── store/
+    │       │   │   │   ├── authStore.ts
+    │       │   │   │   └── index.ts
+    │       │   │   └── types/
+    │       │   │       └── authentication.types.ts
     │       │   ├── classes/
     │       │   │   ├── index.ts
     │       │   │   ├── components/
@@ -72,14 +88,20 @@ Directory structure:
     │       │   │   │   ├── index.ts
     │       │   │   │   ├── cards/
     │       │   │   │   │   └── StatTile.tsx
+    │       │   │   │   ├── classDetail/
+    │       │   │   │   │   ├── ClassDetail.css
+    │       │   │   │   │   └── ClassDetail.tsx
     │       │   │   │   ├── ClassGraph/
     │       │   │   │   │   ├── ClassChartFilter.tsx
     │       │   │   │   │   └── ClassPerDayChart.tsx
-    │       │   │   │   └── classList/
-    │       │   │   │       ├── ClassFilters.tsx
-    │       │   │   │       ├── ClassList.tsx
-    │       │   │   │       ├── SearchBox.tsx
-    │       │   │   │       └── SortableHeader.tsx
+    │       │   │   │   ├── classList/
+    │       │   │   │   │   ├── ClassFilters.tsx
+    │       │   │   │   │   ├── ClassList.css
+    │       │   │   │   │   ├── ClassList.tsx
+    │       │   │   │   │   ├── SearchBox.tsx
+    │       │   │   │   │   └── SortableHeader.tsx
+    │       │   │   │   └── updateClass/
+    │       │   │   │       └── UpdateClass.tsx
     │       │   │   ├── hooks/
     │       │   │   │   └── useClasses.ts
     │       │   │   ├── services/
@@ -93,6 +115,16 @@ Directory structure:
     │       │   │       └── index.ts
     │       │   ├── student/
     │       │   │   ├── index.ts
+    │       │   │   ├── components/
+    │       │   │   │   ├── AddStudentModal.tsx
+    │       │   │   │   ├── index.ts
+    │       │   │   │   ├── StudentCharts.tsx
+    │       │   │   │   ├── StudentFilterBar.tsx
+    │       │   │   │   ├── StudentPageHeader.tsx
+    │       │   │   │   ├── StudentStatsCards.tsx
+    │       │   │   │   └── StudentTable.tsx
+    │       │   │   ├── config/
+    │       │   │   │   └── config.ts
     │       │   │   ├── hooks/
     │       │   │   │   └── useStudents.ts
     │       │   │   ├── services/
@@ -103,10 +135,23 @@ Directory structure:
     │       │   │       └── student.types.ts
     │       │   ├── teacher/
     │       │   │   ├── index.ts
+    │       │   │   ├── components/
+    │       │   │   │   ├── AccessControlPanel.tsx
+    │       │   │   │   ├── FiltersBar.tsx
+    │       │   │   │   ├── index.ts
+    │       │   │   │   ├── PerformanceCharts.tsx
+    │       │   │   │   ├── SummaryCards.tsx
+    │       │   │   │   ├── TeacherDetailDrawer.tsx
+    │       │   │   │   ├── TeacherEditModal.tsx
+    │       │   │   │   └── TeacherList.tsx
+    │       │   │   ├── config/
+    │       │   │   │   └── teacher.config.ts
     │       │   │   ├── hooks/
-    │       │   │   │   └── useTeachers.ts
+    │       │   │   │   ├── useTeachers.ts
+    │       │   │   │   └── useTeacherStatistics.ts
     │       │   │   ├── services/
-    │       │   │   │   └── teacher.service.ts
+    │       │   │   │   ├── teacher.service.ts
+    │       │   │   │   └── teacherStatistics.service.ts
     │       │   │   ├── store/
     │       │   │   │   └── useTeacherStore.ts
     │       │   │   └── types/
@@ -115,14 +160,17 @@ Directory structure:
     │       │   └── users/
     │       │       └── index.ts
     │       ├── pages/
-    │       │   ├── README.md
     │       │   ├── index.ts
     │       │   ├── class/
-    │       │   │   └── ClassPage.tsx
+    │       │   │   ├── ClassCreatePage.tsx
+    │       │   │   ├── ClassListPage.tsx
+    │       │   │   ├── ClassOverviewPage.tsx
+    │       │   │   ├── ClassPage.tsx
+    │       │   │   └── ClassUpdatePage.tsx
     │       │   ├── dashboard/
     │       │   │   ├── Dashboard.module.css
     │       │   │   ├── Dashboard.tsx
-    │       │   │   ├── DashboardCopy.tsx
+    │       │   │   ├── DashboardCopy1.tsx
     │       │   │   ├── ItemList.module.css
     │       │   │   ├── ItemList.tsx
     │       │   │   ├── RecentActivities.module.css
@@ -140,9 +188,13 @@ Directory structure:
     │       │   │   ├── index.ts
     │       │   │   ├── Login.module.css
     │       │   │   └── Login.tsx
-    │       │   └── Profile/
-    │       │       ├── index.ts
-    │       │       └── Profile.tsx
+    │       │   ├── Profile/
+    │       │   │   ├── index.ts
+    │       │   │   └── Profile.tsx
+    │       │   ├── Students/
+    │       │   │   └── StudentsPage.tsx
+    │       │   └── teacher/
+    │       │       └── TeacherPage.tsx
     │       ├── routes/
     │       │   ├── AdminRoutes.tsx
     │       │   ├── AppRouter.tsx
@@ -157,7 +209,6 @@ Directory structure:
     │       │       ├── client.ts
     │       │       ├── index.ts
     │       │       ├── response-transformer.ts
-    │       │       ├── type.ts
     │       │       └── types.ts
     │       ├── store/
     │       │   ├── authStore.ts
@@ -170,6 +221,7 @@ Directory structure:
     │           ├── themeConfig.ts
     │           └── ThemeProvider.tsx
     ├── documentations/
+    │   ├── api_contract.md
     │   ├── api_docs.md
     │   └── folder_structure.md
     └── server/
@@ -193,13 +245,9 @@ Directory structure:
             │   ├── classController/
             │   │   └── class.controller.js
             │   ├── StudentController/
-            │   │   ├── class.student.controller.js
             │   │   └── student.controller.js
             │   └── TeacherController/
             │       └── teacher.controller.js
-            ├── lib/
-            │   ├── api.response.js
-            │   └── custom.error.js
             ├── middleware/
             │   ├── auth.js
             │   ├── comparePassword.middleware.js
@@ -208,6 +256,7 @@ Directory structure:
             │   └── validate.middleware.js
             ├── Prisma/
             │   ├── prisma.client.js
+            │   ├── seed.js
             │   └── tuition.prisma
             ├── routes/
             │   ├── admin.route.js
@@ -217,9 +266,12 @@ Directory structure:
             ├── Services/
             │   └── class.services.js
             ├── utils/
+            │   ├── api.response.js
             │   ├── asyncWrapper.js
             │   ├── bcrypt.js
             │   ├── controller.helper.js
+            │   ├── custom.error.js
+            │   ├── index.js
             │   ├── jwt.user.js
             │   ├── pagination.js
             │   └── parseOrderBy.js
@@ -228,6 +280,7 @@ Directory structure:
                 ├── admin.validate.js
                 ├── class.validate.js
                 ├── general.validate.js
+                ├── index.js
                 ├── login.validate.js
                 ├── moderator.validate.js
                 ├── mongoId.validate.js

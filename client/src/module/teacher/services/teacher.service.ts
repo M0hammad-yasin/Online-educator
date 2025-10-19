@@ -11,7 +11,8 @@ import {
   TeacherForSelection,
   TeacherCount,
   GroupedTeacher,
-} from '../types/teacher.types';
+  TeacherSearchResult
+} from '..';
 
 class TeacherService extends BaseService<Teacher> {
   constructor() {
@@ -19,7 +20,7 @@ class TeacherService extends BaseService<Teacher> {
   }
 
   // Get all teachers with filtering and pagination
-  async getAllTeachers(filters: TeacherFilters = {}): Promise<PaginatedResponse<Teacher>> {
+  async getAllTeachers(filters: TeacherFilters = {}): Promise<ApiResponse<Teacher[]>> {
     return this.getAll(filters);  
   }
 
@@ -49,30 +50,34 @@ class TeacherService extends BaseService<Teacher> {
   }
 
   // Get teachers for selection dropdowns
-  async getTeachersForSelection(filters: TeacherFilters = {}): Promise<PaginatedResponse<TeacherForSelection>> {
-    return this.customGet<TeacherForSelection>('/select', filters);
+  async getTeachersForSelection(filters: TeacherFilters = {}): Promise<ApiResponse<TeacherForSelection[]>> {
+    return this.customGet<TeacherForSelection[]>('/select', filters);
   }
 
   // Get teachers with their classes
-  async getTeachersWithClasses(filters: TeacherFilters = {}): Promise<PaginatedResponse<TeacherWithClasses>> {
-    return this.customGet<TeacherWithClasses>('/classes', filters);
+  async getTeachersWithClasses(filters: TeacherFilters = {}): Promise<ApiResponse<TeacherWithClasses[]>> {
+    return this.customGet<TeacherWithClasses[]>('/classes', filters);
   }
 
-  // // Get teacher statistics
-  // async getTeacherCount(filters: TeacherFilters = {}): Promise<ApiResponse<TeacherCount>> {
-  //   return this.customGet<TeacherCount>('/count', filters);
-  // }
+  // Get teacher statistics
+  async getTeacherCount(filters: TeacherFilters = {}): Promise<ApiResponse<TeacherCount>> {
+    return this.customGet<TeacherCount>('/count', filters);
+  }
 
-  // // Get grouped teachers
-  // async getGroupedTeachers(filters: TeacherFilters = {}): Promise<ApiResponse<GroupedTeacher>> {
-  //   return this.customGet<GroupedTeacher>('/group', filters);
-  // }
+  // Get grouped teachers
+  async getGroupedTeachers(filters: TeacherFilters = {}): Promise<ApiResponse<GroupedTeacher[]>> {
+    return this.customGet<GroupedTeacher[]>('/group', filters);
+  }
 
   // Get current teacher profile (for authenticated teacher)
   async getCurrentTeacherProfile(): Promise<ApiResponse<Teacher>> {
     return this.customGet('/me');
   }
+  async searchTeachers(params: TeacherFilters): Promise<ApiResponse<TeacherSearchResult[]>> {
+    return this.customGet<TeacherSearchResult[]>('/search', params);
+  }
 }
+
 
 const teacherService = new TeacherService();
 export default teacherService;
