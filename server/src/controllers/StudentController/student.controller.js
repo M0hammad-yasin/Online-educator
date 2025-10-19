@@ -3,7 +3,7 @@ import prisma from "../../Prisma/prisma.client.js";
 import _ from "lodash";
 import { Role } from "../../constant.js";
 import config from "../../Config/config.js";
-import { classUtil } from "../../services/class.services.js";
+import { classUtil } from "../../Services/class.services.js";
 // Register Student
 export const registerStudent = asyncWrapper(async (req, res) => {
   // Hash Password
@@ -303,6 +303,37 @@ export const patchStudent = asyncWrapper(async (req, res) => {
     statusCode: 200,
     message: "Student field updated successfully",
     data: _.omit(student, ["passwordHash"]),
+  });
+});
+
+// Search Students
+export const searchStudents = asyncWrapper(async (req, res) => {
+  const { search, limit = 10 } = req.query;
+  const filter = {
+        OR: [
+          { name: { contains: search, mode: "insensitive" } },
+          { email: { contains: search, mode: "insensitive" } },
+          { parentEmail: { contains: search, mode: "insensitive" } },
+        ],
+      };
+  const students = await prisma.student.findMany({
+    where: filter,
+    take: parseInt(limit),
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      profilePicture: true,
+      grade: true,
+      parentEmail: true,
+    },
+    orderBy: { name: "asc" },
+  });
+
+  sendSuccess(res, {
+    statusCode: 200,
+    message: "Students search results",
+    data: students,
   });
 });
 /////////////////////////////////////////////////////////

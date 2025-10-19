@@ -1,5 +1,5 @@
 import { sendSuccess,asyncWrapper } from "../../utils/index.js";
-import { classService, classUtil } from "../../services/class.services.js";
+import { classService, classUtil } from "../../Services/class.services.js";
 import { Role } from "../../constant.js";
 
 export const createClass = asyncWrapper(async (req, res) => {
@@ -183,5 +183,22 @@ export const countClassesByGroup = asyncWrapper(async (req, res) => {
     message: "grouped Classes count fetched successfully",
     data: groupedClassesCount,
     pagination: paginationData,
+  });
+});
+
+
+
+// Search Classes
+export const searchClasses = asyncWrapper(async (req, res) => {
+  const { classes, paginationData } = [Role.TEACHER, Role.STUDENT].includes(
+    req.user.role
+  )
+    ? await classService.getAllClasses(req.query, req.user)
+    : await classService.getAllClassesForAdmin(req.query);
+  sendSuccess(res, {
+    statusCode: 200,
+    message: "Classes search results",
+    data: classes,
+    pagination:paginationData,
   });
 });

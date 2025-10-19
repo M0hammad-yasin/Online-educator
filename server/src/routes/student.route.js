@@ -18,7 +18,8 @@ import {
   getAllStudent,
   patchStudent,
   getStudentsWithClassCount,
-  getStudentsWithClasses
+  getStudentsWithClasses,
+  searchStudents
 } from "../controllers/StudentController/student.controller.js";
 import auth from "../middleware/auth.js";
 import { validate, validateBody } from "../middleware/validate.middleware.js";
@@ -52,7 +53,7 @@ router.get(
   getStudentsWithClassCount
 );
 
-router.post("/register", validateBody(studentSchema), registerStudent);
+router.post("/", validateBody(studentSchema), registerStudent);
 router.put(
   "/me",
   validate(studentUpdateSchema, (req) => req.query),
@@ -70,6 +71,7 @@ router.patch(
 router.post("/login", loginStudent);
 router.post("/logout", auth, hasRole(Role.STUDENT), logoutStudent);
 router.get("/me", auth, isStudent, getStudent);
+router.get('/search',auth,hasRole([Role.ADMIN,Role.MODERATOR,Role.TEACHER]),searchStudents)
 router.get(
   "/select",
   auth,

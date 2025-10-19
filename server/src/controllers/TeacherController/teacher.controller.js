@@ -2,7 +2,7 @@
 import prisma from "../../Prisma/prisma.client.js";
 import {getPagination,buildPaginationMeta,asyncWrapper,controllerHelper,sendSuccess,BadRequestError,NotFoundError,comparePassword,hashPassword,generateToken} from "../../utils/index.js";
 import _ from "lodash";
-import { classUtil } from "../../services/class.services.js";
+import { classUtil } from "../../Services/class.services.js";
 import config from "../../Config/config.js";
 import { Role } from "../../constant.js";
 // Register Teacher
@@ -521,5 +521,36 @@ export const modifyTeacherAccess = asyncWrapper(async (req, res) => {
     statusCode: 200,
     message: "Teacher access modified successfully",
     data: _.omit(updatedTeacher, ["passwordHash"]),
+  });
+});
+// Search Teachers
+export const searchTeachers = asyncWrapper(async (req, res) => {
+  const { search, limit = 10,page=1 } = req.query;
+
+  const filter = {
+        OR: [
+          { name: { contains: search, mode: "insensitive" } },
+          { email: { contains: search, mode: "insensitive" } },
+          { qualification: { contains: search, mode: "insensitive" } },
+        ],
+      };
+  const teachers = await prisma.teacher.findMany({
+    where: filter,
+    take: parseInt(limit),
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      profilePicture: true,
+      qualification: true,
+      classRate: true,
+    },
+    orderBy: { name: "asc" },
+  });
+
+  sendSuccess(res, {
+    statusCode: 200,
+    message: "Teachers search results",
+    data: teachers,
   });
 });

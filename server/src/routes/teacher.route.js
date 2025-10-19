@@ -25,6 +25,7 @@ import {
   getTeachersWithClasses,
   getTeachersWithClassCount,
   modifyTeacherAccess,
+  searchTeachers,
 } from "../controllers/TeacherController/teacher.controller.js";
 import auth from "../middleware/auth.js";
 import {
@@ -44,6 +45,7 @@ router.get(
   hasRole([Role.ADMIN, Role.MODERATOR]),
   getAllTeacher
 );
+router.get('/search',auth,hasRole([Role.ADMIN,Role.MODERATOR]),searchTeachers)
 router.get(
   "/select",
   validate(paginationSchema, (req) => req.query),

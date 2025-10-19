@@ -22,6 +22,7 @@ import {
   getClassesForSelectionByAdmin,
   getGroupedClasses,
   updateClass,
+  searchClasses
 } from "../controllers/classController/class.controller.js";
 import { hasRole, roleBasedController } from "../middleware/roleCheck.js";
 import { Role } from "../constant.js";
@@ -52,6 +53,7 @@ router.get(
     [Role.TEACHER]: asyncWrapper(getAllClasses),
   })
 );
+router.get('/search',auth,hasRole([Role.ADMIN,Role.MODERATOR,Role.TEACHER]),searchClasses)
 // ----------------- GET ClASSES FOR QUICK SELECTION --------------
 router.get(
   "/select",

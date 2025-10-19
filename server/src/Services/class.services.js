@@ -20,7 +20,7 @@ class ClassUtilities {
  * @returns {Object} Prisma-compatible filter object
  */
 buildClassFilters(query, user = null) {
-  let { teacherId, studentId, subject, status, grade, startDate, endDate, searchData, hour ,groupBy} = query;
+  let { teacherId, studentId, subject, status, grade, startDate, endDate, search, hour ,groupBy} = query;
 
   if (status === "all-classes") status = null;
 
@@ -71,11 +71,11 @@ buildClassFilters(query, user = null) {
   });
 
   // Search filter across subject, teacher name, and student name
-  if (searchData) {
+  if (search) {
     filter.OR = [
-      { subject: { contains: searchData, mode: "insensitive" } },
-      { teacher: { name: { contains: searchData, mode: "insensitive" } } },
-      { student: { name: { contains: searchData, mode: "insensitive" } } },
+      { subject: { contains: search, mode: "insensitive" } },
+      { teacher: { name: { contains: search, mode: "insensitive" } } },
+      { student: { name: { contains: search, mode: "insensitive" } } },
     ];
   }
 
@@ -437,15 +437,15 @@ class ClassService {
     };
   }
   async getClassesForSelection(query, user = null) {
-    const { searchData = "" } = query;
+    const { search = "" } = query;
     const { skip, take, page, limit } = this.#cu.getPaginationParams(query);
 
     const filter = {
-      ...(searchData && {
+      ...(search && {
         OR: [
-          { subject: { contains: searchData, mode: "insensitive" } },
-          { teacher: { name: { contains: searchData, mode: "insensitive" } } },
-          { student: { name: { contains: searchData, mode: "insensitive" } } },
+          { subject: { contains: search, mode: "insensitive" } },
+          { teacher: { name: { contains: search, mode: "insensitive" } } },
+          { student: { name: { contains: search, mode: "insensitive" } } },
         ],
       }),
     };
