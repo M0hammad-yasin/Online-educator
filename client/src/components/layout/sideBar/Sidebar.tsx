@@ -1,4 +1,4 @@
-import { Layout, Menu, theme } from "antd";
+import { Button, Flex, Layout, Menu, Space, theme } from "antd";
 import {
   DashboardOutlined,
   UserOutlined,
@@ -11,13 +11,11 @@ import {
 import { useNavigate, useLocation } from "react-router-dom";
 import SIDEBAR_MENU from "../../../constants/menu";
 import { Role } from "../../../constants/role";
-import useAuthStore from "../../../module/authentication/store/authStore";
-import { useAuthState, useLogout } from "../../../module/authentication/hooks/useAuth";
+import { useLogout } from "../../../module/authentication";
+import { FaChevronLeft, FaChevronRight,FaBookOpen } from "react-icons/fa";
+import React from "react";
+import { useRole } from "../../../hooks";
 const { Sider } = Layout;
-
-interface SidebarProps {
-  collapsed: boolean;
-}
 
 interface MenuItem {
   key: number | string;
@@ -27,19 +25,18 @@ interface MenuItem {
   children?: MenuItem[];
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
+const Sidebar: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user,  } = useAuthStore();
   const {mutate : logout }= useLogout();
+  const [collapsed, setCollapsed] = React.useState(false);
+
   
-  const {
-    token: {  borderRadiusLG, Layout, colorBorder },
-  } = theme.useToken();
+  const {token} = theme.useToken();
 
   // Get menu items based on user role
-  const userRole = user?.role || Role.STUDENT;
-  const menuItems = SIDEBAR_MENU[userRole as keyof typeof SIDEBAR_MENU] || SIDEBAR_MENU[Role.STUDENT];
+  const currenRole =useRole();
+  const menuItems = SIDEBAR_MENU[currenRole as keyof typeof SIDEBAR_MENU] || SIDEBAR_MENU[Role.STUDENT];
 
   // Handle menu item click
   const handleMenuClick = async (item: { key: string }) => {
@@ -125,23 +122,50 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
   return (
     <Sider
       style={{
-        background: Layout?.siderBg,
-        borderRightColor: colorBorder,
+        background: token.colorBgLayout,
+        borderRightColor: token.colorBorder,
         borderRightWidth: 1,
       }}
       trigger={null}
       collapsible
       collapsed={collapsed}
     >
-      <div
+      <Flex
+       justify='space-between'
+       align='center'
+       gap={4}
         className="demo-logo-vertical"
         style={{
-          height: 32,
-          margin: 14,
+          margin:6,
+          paddingBlock:20,
+          paddingInline: 8,
           background: "rgba(24, 144, 255, 0.2)",
-          borderRadius: borderRadiusLG,
+          borderRadius: token.borderRadiusLG,
         }}
-      />
+      >
+      <Button
+          type="text"
+          icon={collapsed ? <FaChevronRight /> : <FaChevronLeft />}
+          onClick={() => setCollapsed(!collapsed)}
+          style={{
+            borderRadius: "50%",
+            width: 25,
+            height: 25,
+            background: token.colorBgContainer,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 0,
+            border: `1.4px solid ${token.colorBorderSecondary}`,
+          }}
+        />
+    <Flex justify='space-around' vertical>
+      
+    {collapsed?<Space style={{background:token.colorBgElevated,borderRadius:"100%",  alignContent:'center',padding:token.sizeXS, alignItems:'center',transition:'ease-in'}}><FaBookOpen/></Space>: <Space style={{ fontSize: "18px", fontWeight: "bold", alignContent:'center', alignItems:'center',transition:'ease-in'}}>
+          Online Educator
+        </Space>}
+    </Flex>
+        </Flex>
       <Menu
         mode="inline"
         selectedKeys={getSelectedKeys()}

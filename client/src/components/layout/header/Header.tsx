@@ -1,8 +1,10 @@
 import {
   Badge,
   Button,
+  Flex,
   Input,
   Layout,
+  Space,
   Switch,
   theme,
   Tooltip,
@@ -17,14 +19,10 @@ import useThemeStore from "../../../store/themeStore";
 import "../../../style/header.css";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import UserManagement from '../../../module/authentication/components/UserManagement';
+import NavigationKeeper from "./NavigationKeeper";
 const { Header } = Layout;
 
-interface HeaderProps {
-  collapsed: boolean;
-  setCollapsed: (collapsed: boolean) => void;
-}
-
-const AppHeader: React.FC<HeaderProps> = ({ collapsed, setCollapsed }) => {
+const AppHeader: React.FC = () => {
   const { toggleTheme } = useThemeStore();
   const {
     token: {
@@ -46,38 +44,13 @@ const AppHeader: React.FC<HeaderProps> = ({ collapsed, setCollapsed }) => {
         border: `1.4px solid ${colorBorderSecondary}`,
       }}
     >
-      <div
-        style={{ display: "flex", alignItems: "center", position: "relative" }}
-      >
-        <Button
-          type="text"
-          icon={collapsed ? <FaChevronRight /> : <FaChevronLeft />}
-          onClick={() => setCollapsed(!collapsed)}
-          style={{
-            position: "absolute",
-            left: "-5%", // Use position and left to move left
-            borderRadius: "50%",
-            width: 25,
-            height: 25,
-            background: colorBgContainer,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: 0,
-            border: `1.4px solid ${colorBorderSecondary}`,
-          }}
-        />
-        <span style={{ fontSize: "18px", fontWeight: "bold", marginRight: 24 }}>
-          Online Educator Platform
-        </span>
+        <NavigationKeeper/>
         <Input
           prefix={<SearchOutlined />}
           placeholder="Search for something"
           style={{ width: 250 }}
         />
-      </div>
-
-      <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+      <Flex style={{  alignItems: "center", gap: 16 }}>
         <Tooltip title="Notifications">
           <Badge count={1} size="small">
             <Button
@@ -96,7 +69,7 @@ const AppHeader: React.FC<HeaderProps> = ({ collapsed, setCollapsed }) => {
           />
         </Tooltip>
         <UserManagement />
-      </div>
+      </Flex>
     </Header>
   );
 };

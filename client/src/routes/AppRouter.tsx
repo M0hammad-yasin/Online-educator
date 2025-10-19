@@ -34,13 +34,11 @@ const AuthGuard = ({ allowedRoles }: { allowedRoles?: UserRole | UserRole[] }) =
 
 // App Layout Component
 const AppLayout = () => {
-  const [collapsed, setCollapsed] = React.useState(false);
-  
   return (
     <Layout style={{ minHeight: "100vh" }}>
-      <Sidebar collapsed={collapsed} />
+      <Sidebar />
       <Layout>
-        <AppHeader collapsed={collapsed} setCollapsed={setCollapsed} />
+        <AppHeader/>
         <MainContent>
           <Outlet />
         </MainContent>
@@ -97,6 +95,7 @@ const groupRoutesByPermissions = (routes: RouteConfig[]) => {
 
 const AppRouter: React.FC = () => {
   const routeGroups = groupRoutesByPermissions(protectedRoutes);
+  
 
   return (
     <BrowserRouter>
