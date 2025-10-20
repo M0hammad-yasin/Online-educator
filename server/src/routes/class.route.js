@@ -7,6 +7,7 @@ import {
   updateClassSchema,
     mongoIdSchema,
   paginationSchema,
+  searchQuerySchema,
 } from "../validation/index.js"; // Consolidated validators
 import {
   calendarViewClassData,
@@ -53,7 +54,12 @@ router.get(
     [Role.TEACHER]: asyncWrapper(getAllClasses),
   })
 );
-router.get('/search',auth,hasRole([Role.ADMIN,Role.MODERATOR,Role.TEACHER]),searchClasses)
+router.get('/search',
+  validate(searchQuerySchema,(req)=>req.query),
+  auth,
+  hasRole([Role.ADMIN,Role.MODERATOR,Role.TEACHER]),
+  searchClasses
+);
 // ----------------- GET ClASSES FOR QUICK SELECTION --------------
 router.get(
   "/select",

@@ -1,6 +1,7 @@
 export { emailSchema, passwordSchema } from "./general.validate.js";
 export { default as paginationSchema } from "./pagination.validate.js";
 export { mongoIdSchema } from "./mongoId.validate.js";
+export { searchQuerySchema } from "./search.validate.js";
 export { loginSchema } from "./login.validate.js";
 export { userSchema, userUpdateSchema } from "./user.validate.js";
 export { adminSchema, adminUpdateSchema } from "./admin.validate.js";

@@ -5,6 +5,7 @@ import {
   classFilterQuerySchema,
   paginationSchema,
   mongoIdSchema,
+  searchQuerySchema
 } from "../validation/index.js";
 import {
   registerStudent,
@@ -71,7 +72,12 @@ router.patch(
 router.post("/login", loginStudent);
 router.post("/logout", auth, hasRole(Role.STUDENT), logoutStudent);
 router.get("/me", auth, isStudent, getStudent);
-router.get('/search',auth,hasRole([Role.ADMIN,Role.MODERATOR,Role.TEACHER]),searchStudents)
+router.get('/search',
+  validate(searchQuerySchema,(req)=>req.query),
+  auth,
+  hasRole([Role.ADMIN,Role.MODERATOR,Role.TEACHER]),
+  searchStudents
+)
 router.get(
   "/select",
   auth,

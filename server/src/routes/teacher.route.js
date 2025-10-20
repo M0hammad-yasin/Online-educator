@@ -8,6 +8,7 @@ import {
   loginSchema,
   classFilterQuerySchema,
   paginationSchema,
+  searchQuerySchema,
 } from "../validation/index.js";
 
 import {
@@ -45,7 +46,12 @@ router.get(
   hasRole([Role.ADMIN, Role.MODERATOR]),
   getAllTeacher
 );
-router.get('/search',auth,hasRole([Role.ADMIN,Role.MODERATOR]),searchTeachers)
+router.get('/search',
+  validate(searchQuerySchema,(req)=>req.query),
+  auth,
+  hasRole([Role.ADMIN,Role.MODERATOR]),
+  searchTeachers
+);
 router.get(
   "/select",
   validate(paginationSchema, (req) => req.query),
