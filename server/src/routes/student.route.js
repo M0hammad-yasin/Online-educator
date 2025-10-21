@@ -5,7 +5,9 @@ import {
   classFilterQuerySchema,
   paginationSchema,
   mongoIdSchema,
-  searchQuerySchema
+  searchQuerySchema,
+  emailSchema,
+  loginSchema
 } from "../validation/index.js";
 import {
   registerStudent,
@@ -20,7 +22,8 @@ import {
   patchStudent,
   getStudentsWithClassCount,
   getStudentsWithClasses,
-  searchStudents
+  searchStudents,
+  forgotPassword
 } from "../controllers/StudentController/student.controller.js";
 import auth from "../middleware/auth.js";
 import { validate, validateBody } from "../middleware/validate.middleware.js";
@@ -35,23 +38,6 @@ router.get(
   auth,
   hasRole([Role.ADMIN, Role.MODERATOR, Role.TEACHER]),
   getAllStudent
-);
-
-router.get(
-  "/classes",
-  validate(paginationSchema, (req) => req.query),
-  validate(classFilterQuerySchema, (req) => req.query),
-  auth,
-  hasRole([Role.ADMIN, Role.MODERATOR]),
-  getStudentsWithClasses
-);
-router.get(
-  "/class-count",
-  validate(paginationSchema, (req) => req.query),
-  validate(classFilterQuerySchema, (req) => req.query),
-  auth,
-  hasRole([Role.ADMIN, Role.MODERATOR]),
-  getStudentsWithClassCount
 );
 
 router.post("/", validateBody(studentSchema), registerStudent);
@@ -69,8 +55,10 @@ router.patch(
   hasRole(Role.STUDENT),
   patchStudent
 );
-router.post("/login", loginStudent);
+router.post("/login",validate(loginSchema,req=>req.body) ,loginStudent);
 router.post("/logout", auth, hasRole(Role.STUDENT), logoutStudent);
+router.post("/forgot-password",validate(emailSchema,(req)=>req.body), auth, hasRole(Role.STUDENT),forgotPassword);
+
 router.get("/me", auth, isStudent, getStudent);
 router.get('/search',
   validate(searchQuerySchema,(req)=>req.query),
@@ -85,6 +73,24 @@ router.get(
   auth,
   hasRole([Role.ADMIN, Role.MODERATOR, Role.TEACHER]),
   getStudentsForSelection
+);
+
+
+router.get(
+  "/classes",
+  validate(paginationSchema, (req) => req.query),
+  validate(classFilterQuerySchema, (req) => req.query),
+  auth,
+  hasRole([Role.ADMIN, Role.MODERATOR]),
+  getStudentsWithClasses
+);
+router.get(
+  "/class-count",
+  validate(paginationSchema, (req) => req.query),
+  validate(classFilterQuerySchema, (req) => req.query),
+  auth,
+  hasRole([Role.ADMIN, Role.MODERATOR]),
+  getStudentsWithClassCount
 );
 router.get(
   "/:id",

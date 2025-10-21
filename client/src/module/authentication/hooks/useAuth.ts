@@ -8,7 +8,6 @@ export const useLogin = () => {
   return useMutation({
     mutationFn: (credentials: LoginCredentials) => authService.login(credentials),
     onSuccess: (response) => {
-      console.log("respose : ", response);
       if (response.data?.accessToken && response.data?.user) {
         setAuth({
           token: response.data.accessToken,
@@ -58,6 +57,7 @@ export const useForgotPassword = () => {
     mutationFn: (email: string) => authService.forgotPassword(email),
     onError: (error) => {
       console.error('Forgot password failed:', error);
+      throw new Error(error.message||"forgot password failed");
     },
   });
 };

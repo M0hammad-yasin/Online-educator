@@ -6,9 +6,6 @@ import {useAuthStore, Register, UserRole,Login, ForgotPassword } from '../module
 import { protectedRoutes, RouteConfig } from './routeConfig';
 import AppSkeleton from '../components/AppSkeleton';
 import PublicNotFound from '../components/PublicNotFound';
-// Components
-const NotFound = () => <div>Page Not Found</div>;
-
 // Auth Guard Component
 const AuthGuard = ({ allowedRoles }: { allowedRoles?: UserRole | UserRole[] }) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated());

@@ -3,10 +3,8 @@ import { Form, Input, Button, Typography, Checkbox, Card, Flex, message, Select 
 import { UserOutlined, LockOutlined, LoginOutlined } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
 import { LoginIllustration } from '../../../assets/auth-illustrations';
-import { useLogin } from '../hooks/useAuth';
+import { useLogin,UserRole ,authService } from '..';
 import styles from './Login.module.css';
-import { authService } from '../services/auth.service';
-import { UserRole } from '../store/authStore';
 
 const { Title, Text } = Typography;
 const { Option } = Select;

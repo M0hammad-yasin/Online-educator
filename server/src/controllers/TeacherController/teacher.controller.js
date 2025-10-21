@@ -100,6 +100,20 @@ export const logoutTeacher = asyncWrapper(async (req, res) => {
     data: null,
   });
 });
+//forgot password
+export const forgotPassword = asyncWrapper(async (req, res) => {
+  const {email} = req.body;
+
+  // Check if student exists
+  const teacher = await prisma.teacher.findUnique({ where: { email } });
+  if (!teacher) {
+    throw new NotFoundError("email is not registered");
+  }
+  sendSuccess(res, {
+    statusCode: 200,
+    message: "email send to your email",
+  });
+});
 // Update Teacher Profile
 export const updateTeacher = asyncWrapper(async (req, res) => {
   const { profilePicture, name, email, qualification, classRate, address } =

@@ -18,7 +18,7 @@ const PublicNotFound: React.FC = () => {
     navigate("/login")
    };
   const handleSignUp = () =>{
-    if(!user||!token) {
+    if(user&&token) {
         navigate('/dashboard');
         return;
     };

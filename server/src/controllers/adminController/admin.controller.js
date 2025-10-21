@@ -200,3 +200,17 @@ export const patchAdmin = asyncWrapper(async (req, res) => {
     data: _.omit(user,['passwordHash']),
   });
 });
+//forgot password
+export const forgotPassword = asyncWrapper(async (req, res) => {
+  const {email} = req.body;
+
+  // Check if student exists
+  const admin = await prisma.admin.findUnique({ where: { email } });
+  if (!admin) {
+    throw new NotFoundError("email is not registered");
+  }
+  sendSuccess(res, {
+    statusCode: 200,
+    message: "email send to your email",
+  });
+});

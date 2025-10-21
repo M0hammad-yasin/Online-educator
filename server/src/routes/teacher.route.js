@@ -9,6 +9,7 @@ import {
   classFilterQuerySchema,
   paginationSchema,
   searchQuerySchema,
+  emailSchema,
 } from "../validation/index.js";
 
 import {
@@ -27,6 +28,7 @@ import {
   getTeachersWithClassCount,
   modifyTeacherAccess,
   searchTeachers,
+  forgotPassword,
 } from "../controllers/TeacherController/teacher.controller.js";
 import auth from "../middleware/auth.js";
 import {
@@ -76,6 +78,7 @@ router.post(
 
 router.post("/register", validate(teacherSchema,(req) => req.body), registerTeacher);
 router.post("/login",validate(loginSchema, (req) => req.body), loginTeacher);
+router.post("/forgot-password",validate(emailSchema, (req) => req.body), forgotPassword);
 router.post("/logout", auth, logoutTeacher);
 
 router.get("/me", auth,hasRole(Role.TEACHER), getTeacher);

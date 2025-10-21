@@ -115,6 +115,20 @@ export const logoutStudent = asyncWrapper(async (req, res) => {
     data: null,
   });
 });
+//forgot password
+export const forgotPassword = asyncWrapper(async (req, res) => {
+  const {email} = req.body;
+
+  // Check if student exists
+  const student = await prisma.student.findUnique({ where: { email } });
+  if (!student) {
+    throw new NotFoundError("email is not registered");
+  }
+  sendSuccess(res, {
+    statusCode: 200,
+    message: "email send to your email",
+  });
+});
 // Get Student Profile
 export const getStudent = asyncWrapper(async (req, res) => {
   let filter = { id: req?.params.id };
