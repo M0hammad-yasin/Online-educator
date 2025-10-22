@@ -1,4 +1,4 @@
-import { Button, Flex, Layout, Menu, Space, theme } from "antd";
+import { Button, Flex, Layout, Menu, message, Space, theme } from "antd";
 import {
   DashboardOutlined,
   UserOutlined,
@@ -37,10 +37,19 @@ const Sidebar: React.FC = () => {
   // Get menu items based on user role
   const currenRole =useRole();
   const menuItems = SIDEBAR_MENU[currenRole as keyof typeof SIDEBAR_MENU] || SIDEBAR_MENU[Role.STUDENT];
-
-  // Handle menu item click
-  const handleMenuClick = async (item: { key: string }) => {
-    // Find the menu item in the flat structure (including children)
+const handleLogOut = () => {
+  logout(undefined, {
+    onSuccess: () => {
+      message.success('You are logged out successfully');
+    },
+    onError: (error: any) => {
+      message.error(`${error?.message ?? 'Logout failed.'}\nYou have been logged out`);
+    }
+  });
+};
+// Handle menu item click
+const handleMenuClick = async (item: { key: string }) => {
+  // Find the menu item in the flat structure (including children)
     const findMenuItem = (items: MenuItem[]): MenuItem | undefined => {
       for (const menuItem of items) {
         if (menuItem.key.toString() === item.key) {
@@ -62,12 +71,8 @@ const Sidebar: React.FC = () => {
         navigate('/dashboard');
         break;
       case '/logout':
-        try {
-          await logout();
-          navigate('/login');
-        } catch (error) {
-          console.error('Logout failed:', error);
-        }
+        handleLogOut();
+        navigate('/login');
         break;
       case '/profile':
         navigate('/profile')
@@ -127,6 +132,7 @@ const Sidebar: React.FC = () => {
         borderRightWidth: 1,
       }}
       trigger={null}
+      hidden={Boolean('true')}
       collapsible
       collapsed={collapsed}
     >

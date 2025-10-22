@@ -2,7 +2,6 @@ import {
   Badge,
   Button,
   Flex,
-  Input,
   Layout,
   Switch,
   theme,
@@ -10,7 +9,6 @@ import {
 } from "antd";
 import {
   BellOutlined,
-  SearchOutlined,
   SunOutlined,
   MoonOutlined,
 } from "@ant-design/icons";
