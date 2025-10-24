@@ -1,4 +1,5 @@
-import { Button, Flex, Layout, Menu, message, Space, theme } from "antd";
+// client/src/components/layout/sideBar/ResponsiveSidebar.tsx
+import { Button, Drawer, Flex, Layout, Menu, message, Space, theme } from "antd";
 import {
   DashboardOutlined,
   UserOutlined,
@@ -7,14 +8,17 @@ import {
   FileOutlined,
   SettingOutlined,
   LogoutOutlined,
+  CloseOutlined,
 } from "@ant-design/icons";
 import { useNavigate, useLocation } from "react-router-dom";
 import SIDEBAR_MENU from "../../../constants/menu";
-import { Role } from "../../../constants/role";
 import { useLogout } from "../../../module/authentication";
-import { FaChevronLeft, FaChevronRight,FaBookOpen } from "react-icons/fa";
+import { FaChevronLeft, FaChevronRight, FaBookOpen } from "react-icons/fa";
 import React from "react";
 import { useRole } from "../../../hooks";
+import { useResponsive } from "../../../hooks/useResponsive";
+import { useUIStore } from "../../../store/uiStore";
+
 const { Sider } = Layout;
 
 interface MenuItem {
@@ -28,33 +32,29 @@ interface MenuItem {
 const Sidebar: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const {mutate : logout }= useLogout();
-  const [collapsed, setCollapsed] = React.useState(false);
+  const { mutate: logout } = useLogout();
+  const { token } = theme.useToken();
+  const { isMobile } = useResponsive();
+  const currentRole = useRole();
+  const menuItems = SIDEBAR_MENU[currentRole as keyof typeof SIDEBAR_MENU] || SIDEBAR_MENU.STUDENT;
 
-  
-  const {token} = theme.useToken();
-
-  // Get menu items based on user role
-  const currenRole =useRole();
-  const menuItems = SIDEBAR_MENU[currenRole as keyof typeof SIDEBAR_MENU] || SIDEBAR_MENU[Role.STUDENT];
-const handleLogOut = () => {
-  logout(undefined, {
-    onSuccess: () => {
-      message.success('You are logged out successfully');
-    },
-    onError: (error: any) => {
-      message.error(`${error?.message ?? 'Logout failed.'}\nYou have been logged out`);
-    }
-  });
-};
-// Handle menu item click
-const handleMenuClick = async (item: { key: string }) => {
-  // Find the menu item in the flat structure (including children)
+  // Use UI store for sidebar state
+  const { sidebarCollapsed, setSidebarCollapsed, mobileMenuOpen, setMobileMenuOpen } = useUIStore();
+  const handleLogOut = () => {
+    logout(undefined, {
+      onSuccess: () => {
+        message.success('You are logged out successfully');
+      },
+      onError: (error: any) => {
+        message.error(`${error?.message ?? 'Logout failed.'}\nYou have been logged out`);
+      }
+    });
+  };
+  // Handle menu item click
+  const handleMenuClick = async (item: { key: string }) => {
     const findMenuItem = (items: MenuItem[]): MenuItem | undefined => {
       for (const menuItem of items) {
-        if (menuItem.key.toString() === item.key) {
-          return menuItem;
-        }
+        if (menuItem.key.toString() === item.key) return menuItem;
         if (menuItem.children) {
           const found = findMenuItem(menuItem.children);
           if (found) return found;
@@ -66,6 +66,11 @@ const handleMenuClick = async (item: { key: string }) => {
     const menuItem = findMenuItem(menuItems);
     if (!menuItem || !menuItem.path) return;
 
+    // Close mobile menu after navigation
+    if (isMobile) {
+      setMobileMenuOpen(false);
+    }
+
     switch (menuItem.path) {
       case '/dashboard':
         navigate('/dashboard');
@@ -75,7 +80,7 @@ const handleMenuClick = async (item: { key: string }) => {
         navigate('/login');
         break;
       case '/profile':
-        navigate('/profile')
+        navigate('/profile');
         break;
       default:
         navigate(menuItem.path);
@@ -86,24 +91,20 @@ const handleMenuClick = async (item: { key: string }) => {
   // Get current selected keys based on location
   const getSelectedKeys = () => {
     const currentPath = location.pathname;
-    
-    // Find main menu item
     const selectedKeys: string[] = [];
     
-    // Check for submenu items first
     menuItems.forEach((item: MenuItem) => {
       if (item.children) {
         const childItem = item.children.find((child) => child.path === currentPath);
         if (childItem) {
-          selectedKeys.push(item.key.toString()); // Parent key
-          selectedKeys.push(childItem.key.toString()); // Child key
+          selectedKeys.push(item.key.toString());
+          selectedKeys.push(childItem.key.toString());
         }
       } else if (item.path === currentPath) {
         selectedKeys.push(item.key.toString());
       }
     });
     
-    // If no match found, default to first item
     return selectedKeys.length > 0 ? selectedKeys : ["1"];
   };
 
@@ -124,59 +125,78 @@ const handleMenuClick = async (item: { key: string }) => {
     return openKeys;
   };
 
-  return (
-    <Sider
-      style={{
-        background: token.colorBgLayout,
-        borderRightColor: token.colorBorder,
-        borderRightWidth: 1,
-      }}
-      trigger={null}
-      hidden={Boolean('true')}
-      collapsible
-      collapsed={collapsed}
-    >
+  // Render menu content
+  const renderMenuContent = () => (
+    <>
       <Flex
-       justify='space-between'
-       align='center'
-       gap={4}
-        className="demo-logo-vertical"
+        justify="space-around"
+        align="center"
+        gap={4}
         style={{
-          margin:6,
-          paddingBlock:20,
+          margin: isMobile ? 4 : 6,
+          paddingBlock: isMobile ? 12 : 20,
           paddingInline: 8,
           background: "rgba(24, 144, 255, 0.2)",
           borderRadius: token.borderRadiusLG,
         }}
       >
-      <Button
-          type="text"
-          icon={collapsed ? <FaChevronRight /> : <FaChevronLeft />}
-          onClick={() => setCollapsed(!collapsed)}
-          style={{
-            borderRadius: "50%",
-            width: 25,
-            height: 25,
-            background: token.colorBgContainer,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: 0,
-            border: `1.4px solid ${token.colorBorderSecondary}`,
-          }}
-        />
-    <Flex justify='space-around' vertical>
-      
-    {collapsed?<Space style={{background:token.colorBgElevated,borderRadius:"100%",  alignContent:'center',padding:token.sizeXS, alignItems:'center',transition:'ease-in'}}><FaBookOpen/></Space>: <Space style={{ fontSize: "18px", fontWeight: "bold", alignContent:'center', alignItems:'center',transition:'ease-in'}}>
-          Online Educator
-        </Space>}
-    </Flex>
-        </Flex>
+        {!isMobile && (
+          <Button
+            type="text"
+            icon={sidebarCollapsed ? <FaChevronRight /> : <FaChevronLeft />}
+            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+            style={{
+              borderRadius: "50%",
+              width: 25,
+              height: 25,
+              background: token.colorBgContainer,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: 0,
+              border: `1.4px solid ${token.colorBorderSecondary}`,
+            }}
+          />
+        )}
+
+        {!isMobile && <Flex justify="space-around" vertical>
+          { sidebarCollapsed ? (
+            <Space
+              style={{
+                background: token.colorBgElevated,
+                borderRadius: "100%",
+                alignContent: "center",
+                padding: token.sizeXS,
+                alignItems: "center",
+                transition: "ease-in",
+              }}
+            >
+              <FaBookOpen />
+            </Space>
+          ) : (
+            <Space
+              style={{
+                fontSize: isMobile ? "16px" : "18px",
+                fontWeight: "bold",
+                alignContent: "center",
+                alignItems: "center",
+                transition: "ease-in",
+              }}
+            >
+              Online Educator
+            </Space>
+          )}
+        </Flex>}
+      </Flex>
+
       <Menu
         mode="inline"
         selectedKeys={getSelectedKeys()}
         defaultOpenKeys={getOpenKeys()}
         onClick={handleMenuClick}
+        style={{
+          fontSize: isMobile ? 13 : 14,
+        }}
         items={menuItems.map((item) => {
           const iconMap: { [key: string]: React.ComponentType<any> } = {
             DashboardOutlined,
@@ -199,9 +219,77 @@ const handleMenuClick = async (item: { key: string }) => {
           };
         })}
       />
+    </>
+  );
+
+  // Mobile: Render as Drawer
+  if (isMobile) {
+    return (
+      <Drawer
+        placement="left"
+        onClose={() => setMobileMenuOpen(false)}
+        title={ <Space
+          style={{
+            fontSize: isMobile ? "16px" : "18px",
+            fontWeight: "bold",
+            alignContent: "center",
+            alignItems: "center",
+            transition: "ease-in",
+          }}
+        >
+          Online Educator
+        </Space>}
+        open={mobileMenuOpen}
+        styles={{
+          header:{background:"rgba(24, 144, 255, 0.2)" ,
+                  display:'flex',
+                  justifyContent:'space-around',
+                  borderRadius:token.borderRadius,margin:token.marginXXS},
+          body: { padding: 0 },
+        }}
+        width={280}
+      >
+        <div
+          style={{
+            background: token.colorBgLayout,
+            height: "100%",
+          }}
+        >
+          {renderMenuContent()}
+        </div>
+      </Drawer>
+    );
+  }
+
+  // Desktop: Render as Sider
+  return (
+    <Sider
+      style={{
+        background: token.colorBgLayout,
+        borderRightColor: token.colorBorder,
+        borderRightWidth: 1,
+        overflow: 'auto',
+        height: '100vh',
+        position: 'sticky',
+        top: 0,
+        left: 0,
+      }}
+      trigger={null}
+      collapsible
+      collapsed={sidebarCollapsed}
+      width={240}
+      collapsedWidth={80}
+      breakpoint="lg"
+      onBreakpoint={(broken) => {
+        // Automatically collapse on smaller screens
+        if (broken && !sidebarCollapsed) {
+          setSidebarCollapsed(true);
+        }
+      }}
+    >
+      {renderMenuContent()}
     </Sider>
   );
 };
 
 export default Sidebar;
-

@@ -4,7 +4,7 @@ import { Navigate } from 'react-router-dom';
 
 
 // Page Components (these would be imported from their actual locations)
-import {Dashboard, Profile,ClassPage,ClassUpdatePage, StudentsPage, TeacherPage} from '../pages';
+import {DashboardPage, Profile,ClassPage,ClassUpdatePage, StudentsPage, TeacherPage} from '../pages';
 import AuthenticatedNotFound from '../components/AuthenticatedNotFound';
 
 // Placeholder components (replace with actual components)
@@ -25,7 +25,7 @@ export const protectedRoutes: RouteConfig[] = [
   // Common routes (all authenticated users)
   {
     path: '/dashboard',
-    component: Dashboard,
+    component: DashboardPage,
     title: 'Dashboard'
   },
   {

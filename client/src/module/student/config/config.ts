@@ -1,5 +1,5 @@
 import { Role } from "../../../constants/role";
-import { UserRole } from "../../authentication/store/authStore";
+import { UserRole } from "../../authentication";
 import { StudentWidget } from "../types/student.types";
 
 // Widget configuration based on roles

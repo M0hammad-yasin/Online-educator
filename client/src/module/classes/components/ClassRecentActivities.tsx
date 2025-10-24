@@ -33,8 +33,6 @@ const getStatusIcon = (status: ClassStatus): React.ReactNode => {
       return <FaCheck />;
     case 'CANCELLED':
       return <FaTimes />;
-    case 'LIVE':
-      return <FaPlay />;
     default:
       return <FaBookOpen />;
   }
@@ -45,13 +43,11 @@ const getStatusColor = (status: ClassStatus): string => {
     case 'SCHEDULED':
       return '#1890ff';
     case 'IN_PROGRESS':
-      return '#faad14';
+      return '#722ed1';
     case 'COMPLETED':
       return '#52c41a';
     case 'CANCELLED':
       return '#f5222d';
-    case 'LIVE':
-      return '#722ed1';
     default:
       return '#1890ff';
   }
@@ -83,8 +79,7 @@ const ClassRecentActivities: React.FC = () => {
   const { data: classesData, isLoading } = useClasses({
     limit: 10,
     page: 1,
-    sortBy: 'startTime',
-    order: 'desc',
+    orderBy:[{startTime:'asc'}]
   });
 
   const activities: ActivityItem[] = React.useMemo(() => {
@@ -92,12 +87,12 @@ const ClassRecentActivities: React.FC = () => {
 
     return classesData.data.map(classItem => ({
       id: classItem.id,
-      icon: getStatusIcon(classItem.classStatus),
+      icon: getStatusIcon(classItem.status),
       title: classItem.subject,
       description: getActivityDescription(classItem),
       time: dayjs(classItem.scheduledAt).fromNow(),
-      color: getStatusColor(classItem.classStatus),
-      status: classItem.classStatus,
+      color: getStatusColor(classItem.status),
+      status: classItem.status,
     }));
   }, [classesData]);
 
@@ -133,7 +128,6 @@ const ClassRecentActivities: React.FC = () => {
           <Title level={5} style={{ margin: 0 }}>
             Recent Class Activities
           </Title>
-          <Tag color="processing">Live</Tag>
         </Flex>
       }
       style={{

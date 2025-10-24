@@ -156,7 +156,7 @@ const ClassListCard: React.FC<ClassListCardProps> = ({
                   size="small"
                   icon={<FaBook />}
                   style={{
-                    backgroundColor: getStatusColor(classItem.classStatus),
+                    backgroundColor: getStatusColor(classItem.status),
                     marginRight: 12,
                     flexShrink: 0,
                   }}
@@ -175,10 +175,10 @@ const ClassListCard: React.FC<ClassListCardProps> = ({
                       {classItem.subject}
                     </Text>
                     <Tag
-                      color={getStatusColor(classItem.classStatus)}
+                      color={getStatusColor(classItem.status)}
                       style={{ fontSize: 11, marginLeft: 8 }}
                     >
-                      {getStatusText(classItem.classStatus)}
+                      {getStatusText(classItem.status)}
                     </Tag>
                   </Flex>
                   <Flex align="center" gap={8} style={{ marginTop: 4 }}>

@@ -4,7 +4,7 @@ import { UserOutlined, LockOutlined, MailOutlined, LoginOutlined } from '@ant-de
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useRegister } from '../hooks/useAuth';
 import styles from './Login.module.css';
-import { UserRole } from '../store/authStore';
+import { UserRole } from '..';
 import { authService } from '../services/auth.service';
 
 const { Title, Text } = Typography;
