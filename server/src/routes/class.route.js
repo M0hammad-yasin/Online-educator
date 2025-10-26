@@ -57,7 +57,7 @@ router.get(
 router.get('/search',
   validate(searchQuerySchema,(req)=>req.query),
   auth,
-  hasRole([Role.ADMIN,Role.MODERATOR,Role.TEACHER]),
+  hasRole([Role.ADMIN,Role.MODERATOR,Role.TEACHER,Role.STUDENT]),
   searchClasses
 );
 // ----------------- GET ClASSES FOR QUICK SELECTION --------------

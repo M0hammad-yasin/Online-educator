@@ -27,7 +27,8 @@ import {
   const AppHeader: React.FC = () => {
     const { toggleTheme, mode } = useThemeStore();
     const { isMobile, isTablet } = useResponsive();
-    const { toggleMobileMenu, toggleSearchModal } = useUIStore();
+    const toggleMobileMenu = useUIStore(state=>state.toggleMobileMenu);
+    const setSearchModalOpen  = useUIStore(state=>state.setSearchModalOpen);
   
     const {
       token: { colorBorderSecondary, borderRadius },
@@ -61,12 +62,9 @@ import {
         </Flex>
   
         {/* Center Section - Search (Desktop only) */}
-        {!isMobile && !isTablet && (
           <Flex style={{ flex: 1, justifyContent: "center", maxWidth: 400 }}>
             <SearchUI />
           </Flex>
-        )}
-  
         {/* Right Section */}
         <Flex
           style={{
@@ -76,18 +74,6 @@ import {
             justifyContent: "flex-end",
           }}
         >
-          {/* Mobile Search Button */}
-          {(isMobile || isTablet) && (
-            <Tooltip title="Search">
-              <Button
-                type="text"
-                icon={<SearchOutlined style={{ fontSize: 18 }} />}
-                onClick={toggleSearchModal}
-                style={{ padding: "4px 8px" }}
-              />
-            </Tooltip>
-          )}
-  
           {/* Notifications */}
           {!isMobile && (
             <Tooltip title="Notifications">

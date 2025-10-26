@@ -1,18 +1,23 @@
+// client/src/routes/ResponsiveAppRouter.tsx
 import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { Layout } from 'antd';
 import { AppHeader, MainContent, Sidebar } from '../components/layout';
-import {useAuthStore, Register, UserRole,Login, ForgotPassword } from '../module/authentication';
+import { useAuthStore, Register, UserRole, Login, ForgotPassword } from '../module/authentication';
 import { protectedRoutes, RouteConfig } from './routeConfig';
 import AppSkeleton from '../components/AppSkeleton';
 import PublicNotFound from '../components/PublicNotFound';
+import { useResponsive } from '../hooks/useResponsive';
+import { useUIStore } from '../store/uiStore';
+
 // Auth Guard Component
 const AuthGuard = ({ allowedRoles }: { allowedRoles?: UserRole | UserRole[] }) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated());
   const user = useAuthStore((state) => state.user);
   const isInitialized = useAuthStore((state) => state.isInitialized);
+
   if (!isInitialized) {
-    return <AppSkeleton/>;
+    return <AppSkeleton />;
   }
 
   if (!isAuthenticated) {
@@ -29,13 +34,28 @@ const AuthGuard = ({ allowedRoles }: { allowedRoles?: UserRole | UserRole[] }) =
   return <Outlet />;
 };
 
-// App Layout Component
+// Responsive App Layout Component
 const AppLayout = () => {
+  const { isMobile } = useResponsive();
+  const { sidebarCollapsed, mobileMenuOpen, setMobileMenuOpen } = useUIStore();
+
+  // Close mobile menu when route changes
+  useEffect(() => {
+    if (isMobile && mobileMenuOpen) {
+      setMobileMenuOpen(false);
+    }
+  }, [window.location.pathname]);
+
   return (
     <Layout style={{ minHeight: "100vh" }}>
       <Sidebar />
-      <Layout>
-        <AppHeader/>
+      <Layout
+        style={{
+          marginLeft: isMobile ? 0 : sidebarCollapsed ? 0 : 0,
+          transition: 'margin-left 0.2s',
+        }}
+      >
+        <AppHeader />
         <MainContent>
           <Outlet />
         </MainContent>
@@ -50,7 +70,7 @@ const RootRedirect = () => {
   const isInitialized = useAuthStore((state) => state.isInitialized);
 
   if (!isInitialized) {
-    return <AppSkeleton/>;
+    return <AppSkeleton />;
   }
 
   return isAuthenticated ? <Navigate to="/dashboard" replace /> : <Navigate to="/login" replace />;
@@ -73,26 +93,25 @@ const AuthInitializer = ({ children }: { children: React.ReactNode }) => {
 // Helper function to group routes by permissions
 const groupRoutesByPermissions = (routes: RouteConfig[]) => {
   const groups = new Map<string, RouteConfig[]>();
-  
+
   routes.forEach(route => {
-    const key = route.allowedRoles ? 
-      Array.isArray(route.allowedRoles) ? 
-        route.allowedRoles.sort().join(',') : 
-        route.allowedRoles.toString() 
+    const key = route.allowedRoles ?
+      Array.isArray(route.allowedRoles) ?
+        route.allowedRoles.sort().join(',') :
+        route.allowedRoles.toString()
       : 'public';
-    
+
     if (!groups.has(key)) {
       groups.set(key, []);
     }
     groups.get(key)!.push(route);
   });
-  
+
   return groups;
 };
 
-const AppRouter: React.FC = () => {
+const ResponsiveAppRouter: React.FC = () => {
   const routeGroups = groupRoutesByPermissions(protectedRoutes);
-  
 
   return (
     <BrowserRouter>
@@ -102,25 +121,26 @@ const AppRouter: React.FC = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
+          
           {/* Root redirect */}
           <Route path="/" element={<RootRedirect />} />
 
           {/* Protected Routes with Layout */}
           <Route element={<AppLayout />}>
             {Array.from(routeGroups.entries()).map(([permissions, routes]) => {
-              const allowedRoles = permissions === 'public' ? 
-                undefined : 
-                permissions.includes(',') ? 
-                  permissions.split(',') as UserRole[] : 
+              const allowedRoles = permissions === 'public' ?
+                undefined :
+                permissions.includes(',') ?
+                  permissions.split(',') as UserRole[] :
                   permissions as UserRole;
 
               return (
                 <Route key={permissions} element={<AuthGuard allowedRoles={allowedRoles} />}>
                   {routes.map(route => (
-                    <Route 
-                      key={route.path} 
-                      path={route.path} 
-                      element={<route.component />} 
+                    <Route
+                      key={route.path}
+                      path={route.path}
+                      element={<route.component />}
                     />
                   ))}
                 </Route>
@@ -136,4 +156,4 @@ const AppRouter: React.FC = () => {
   );
 };
 
-export default AppRouter;
+export default ResponsiveAppRouter;

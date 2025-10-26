@@ -32,7 +32,6 @@ interface ClassStoreState {
 const initialFilters: ClassFilters = {
   page: 1,
   limit: 10,
-  status: 'all-classes',
   // orderBy: [], 
 };
 

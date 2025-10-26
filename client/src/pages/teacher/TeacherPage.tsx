@@ -54,7 +54,7 @@ const TeacherPage: React.FC = () => {
   };
 
   return (
-    <div style={pageContainerStyle}>
+    <>
       {/* Page Header */}
       <Flex 
         justify="space-between" 
@@ -169,7 +169,7 @@ const TeacherPage: React.FC = () => {
           }
         `}
       </style>
-    </div>
+    </>
   );
 };
 

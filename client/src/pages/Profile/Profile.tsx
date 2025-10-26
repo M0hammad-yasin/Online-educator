@@ -281,7 +281,7 @@ const Profile: React.FC = () => {
         <Col xs={24} md={16}>
           <Card
             title="Profile Information"
-            bordered={false}
+            variant='borderless'
             style={{ 
               borderRadius: 16, 
               boxShadow: "0 4px 24px rgba(0,0,0,0.08)"

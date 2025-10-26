@@ -2,13 +2,14 @@
 import React, { useState, useMemo } from 'react';
 import { Input, Dropdown, Space, Typography, Avatar, Badge, Spin, Empty, Button, Tooltip } from 'antd';
 import { SearchOutlined, UserOutlined, BookOutlined, TeamOutlined, LoadingOutlined, FilterOutlined } from '@ant-design/icons';
-import { useGlobalSearch,useDebounce } from '../../hooks';
+import { useGlobalSearch,useDebounce, useResponsive } from '../../hooks';
 import { useNavigate } from 'react-router-dom';
 import useHighlightMatch from '../../hooks/useHighlightMatch';
 import { useAuthUser } from '../../module/authentication';
 import { Role } from '../../constants/role';
 import SearchModal from './SearchModal';
 import '../../style/searchUI.css';
+import useUIStore from '../../store/uiStore';
 
 const { Text } = Typography;
 
@@ -69,7 +70,7 @@ const SearchResultItem: React.FC<SearchResultItemProps> = ({
 const SearchUI: React.FC = () => {
   const [searchValue, setSearchValue] = useState('');
   const [isOpen, setIsOpen] = useState(false);
-  const [showAdvancedModal, setShowAdvancedModal] = useState(false);
+  const {setSearchModalOpen}=useUIStore();
   const debouncedSearch = useDebounce(searchValue, 400);
   const navigate = useNavigate();
   const user = useAuthUser();
@@ -224,7 +225,7 @@ const SearchUI: React.FC = () => {
             block
             icon={<FilterOutlined />}
             onClick={() => {
-              setShowAdvancedModal(true);
+              setSearchModalOpen(true);
               setIsOpen(false);
             }}
             style={{ textAlign: 'center' }}
@@ -271,15 +272,27 @@ const SearchUI: React.FC = () => {
 
     return null;
   };
+  const{isMobile,isTablet}=useResponsive();
 
+  // // if(isMobile || isTablet){
+  // //   return(
+  // //   <><Button
+  // //     type="text"
+  // //     icon={<SearchOutlined style={{ fontSize: 18 }} />}
+  // //     onClick={()=>setSearchModalOpen(true)}
+  // //     style={{ padding: "4px 8px" }}
+  // //   />
+  // //   <SearchModal/>
+  // //   </>
+  // //   )}
   return (
     <>
       <Dropdown
         menu={{ items: dropdownItems }}
         open={isOpen && (searchValue.length >= 2)}
         onOpenChange={setIsOpen}
-        placement="bottomLeft"
-        overlayClassName="global-search-dropdown"
+        placement={isMobile||isTablet  ? "bottomCenter": "bottomLeft"} 
+        overlayClassName={isMobile? "global-search-dropdown-mobile":"global-search-dropdown"}
         dropdownRender={(menu) => (
           <div className="global-search-dropdown-content">
             {dropdownRender() || menu}
@@ -297,7 +310,7 @@ const SearchUI: React.FC = () => {
               )}
               <Tooltip title="Advanced Search">
                 <FilterOutlined
-                  onClick={() => setShowAdvancedModal(true)}
+                  onClick={() => setSearchModalOpen(true)}
                   style={{ cursor: 'pointer', color: '#1890ff' }}
                 />
               </Tooltip>
@@ -311,7 +324,7 @@ const SearchUI: React.FC = () => {
           onFocus={() => setIsOpen(true)}
           onPressEnter={() => {
             if (searchValue.length >= 2) {
-              setShowAdvancedModal(true);
+              setSearchModalOpen(true);
               setIsOpen(false);
             }
           }}
@@ -319,11 +332,7 @@ const SearchUI: React.FC = () => {
           allowClear
         />
       </Dropdown>
-
-      <SearchModal
-        open={showAdvancedModal}
-        onClose={() => setShowAdvancedModal(false)}
-      />
+      <SearchModal/>
     </>
   );
 };

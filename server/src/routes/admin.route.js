@@ -30,9 +30,9 @@ router.post(
 );
 router.put(
   "/update",
+  validate(adminUpdateSchema, (req) => req.body),
   auth,
   isAdmin,
-  validate(adminUpdateSchema, (req) => req.body),
   updateAdmin
 );
 router.post(
@@ -44,9 +44,9 @@ router.put("/update-password", auth, isAdmin, verifyPassword, updatePassword);
 router.get("/me", auth, isAdmin, getAdmin);
 router.patch(
   "/me",
+  validate(adminUpdateSchema, (req) => req.body),
   auth,
   isAdmin,
-  validate(adminUpdateSchema, (req) => req.body),
   patchAdmin
 );
 router.get("/logout", auth, logOutAdmin);

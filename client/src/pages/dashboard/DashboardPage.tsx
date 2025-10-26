@@ -1,4 +1,4 @@
-// client/src/pages/dashboard/ResponsiveDashboard.tsx
+// client/src/pages/dashboard/DashboardPage.tsx
 import React from 'react';
 import {
   Card,
@@ -35,8 +35,6 @@ import {
   ClockCircleOutlined,
 } from '@ant-design/icons';
 import { useResponsive, useResponsiveColumns, useResponsiveFontSize, useResponsiveSpacing } from '../../hooks';
-import useThemeStore from '../../store/themeStore';
-import PageWrapper from '../../components/wrapper/pageWrapper';
 
 const { Title, Text } = Typography;
 
@@ -109,7 +107,7 @@ const DashboardPage: React.FC = () => {
   };
 
   return (
-    <PageWrapper>
+    <>
       {/* Header Section */}
       <Flex 
         justify="space-between" 
@@ -481,7 +479,7 @@ const DashboardPage: React.FC = () => {
           </Card>
         </Col>
       </Row>
-    </PageWrapper>
+    </>
   );
 };
 

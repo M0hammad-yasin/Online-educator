@@ -8,15 +8,13 @@ import {
   FileOutlined,
   SettingOutlined,
   LogoutOutlined,
-  CloseOutlined,
 } from "@ant-design/icons";
 import { useNavigate, useLocation } from "react-router-dom";
 import SIDEBAR_MENU from "../../../constants/menu";
 import { useLogout } from "../../../module/authentication";
 import { FaChevronLeft, FaChevronRight, FaBookOpen } from "react-icons/fa";
 import React from "react";
-import { useRole } from "../../../hooks";
-import { useResponsive } from "../../../hooks/useResponsive";
+import { useRole,useResponsive } from "../../../hooks";
 import { useUIStore } from "../../../store/uiStore";
 
 const { Sider } = Layout;

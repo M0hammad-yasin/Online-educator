@@ -26,7 +26,7 @@ const PageWrapper: React.FC<PageWrapperProps> = ({ children, className, style })
     minHeight: "100vh",
     background:
       mode === "dark"
-        ? "linear-gradient(180deg,rgb(16, 9, 25) 0%,rgb(15, 6, 21) 50%,rgb(11, 0, 25) 100%)"
+        ? "linear-gradient(180deg,rgb(43, 43, 43) 0%,rgb(56, 55, 56) 50%,rgb(71, 71, 71) 100%)"
         : "linear-gradient(180deg, #f0f9ff 0%, #e0f2fe 50%, #f8fafc 100%)",
     borderRadius: isMobile ? token.borderRadiusSM : isTablet ? token.borderRadiusXS : token.borderRadiusLG,
     transition: "all 0.3s ease",

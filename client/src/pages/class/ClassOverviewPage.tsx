@@ -2,7 +2,6 @@ import React from "react";
 import { Row, Col } from "antd";
 import ClassMiniStatsRow from "../../module/classes/components/ClassMiniStatsRow";
 import ClassPerDayChart from "../../module/classes/components/ClassGraph/ClassPerDayChart";
-import ClassRecentActivities from "../../module/classes/components/ClassRecentActivities";
 import ClassQuickActions from "../../module/classes/components/ClassQuickActions";
 import ClassLiveList from "../../module/classes/components/ClassLiveList";
 

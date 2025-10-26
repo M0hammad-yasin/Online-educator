@@ -95,7 +95,6 @@ export const protectedRoutes: RouteConfig[] = [
       allowedRoles: [Role.ADMIN,Role.MODERATOR, Role.TEACHER],
       title: 'Update Class'
     },
-  // Legacy route for backward compatibility
   {
     path: '/classes',
     component: () => <Navigate to="/classes/overview" replace />,

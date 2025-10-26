@@ -15,24 +15,15 @@ import { FilterOutlined, ClearOutlined } from "@ant-design/icons";
 import { useClassStore } from "../../store/useClassStore";
 import { useResponsive, useResponsiveColumns, useResponsiveSpacing } from "../../../../hooks/useResponsive";
 import dayjs from "dayjs";
-import { SearchBox } from "../../../../components/widgets";
-import { useStudentsForSelection } from "../../../student";
-import { useTeachersForSelection } from "../../../teacher";
-const {Option}= Select;
+
 const { RangePicker } = DatePicker;
 
 const ClassFilters: React.FC = () => {
   const { isMobile, isTablet } = useResponsive();
   const columns = useResponsiveColumns();
   const spacing = useResponsiveSpacing();
-
-
-  const [studentDropdownOpen, setStudentDropdownOpen] = useState(false);
-  const [teacherDropdownOpen, setTeacherDropdownOpen] = useState(false);
-  const { data: studentData, isLoading: isStudentLoading, error: studentError } =useStudentsForSelection({}, studentDropdownOpen);
-    const { data: teacherData, isLoading: isTeacherLoading, error: teacherError } =useTeachersForSelection({}, teacherDropdownOpen);
   
-    const [drawerVisible, setDrawerVisible] = useState(false);
+  const [drawerVisible, setDrawerVisible] = useState(false);
   
   const { filters, setFilters, resetFilters } = useClassStore();
 
@@ -59,14 +50,12 @@ const ClassFilters: React.FC = () => {
   };
 
   // Count active filters
-  const activeFilterCount = Object.entries(filters)
-  .filter(([key, value]) =>
-    !(key === 'page' || key === 'limit') &&
-    value !== undefined && value !== null && value !== ''
+  const activeFilterCount = Object.entries(filters).filter(
+    ([_, value]) => value !== undefined && value !== null && value !== ""
   ).length;
+
+  // Filter controls
   const filterControls = (
-  <>  
-    
     <Row gutter={columns.gutter as [number, number]}>
       {/* Status Filter */}
       <Col xs={24} sm={12} md={8} lg={6}>
@@ -78,7 +67,7 @@ const ClassFilters: React.FC = () => {
             allowClear
             value={filters.status}
             onChange={(value) => handleFilterChange("status", value)}
-            size={isMobile ? "small" : "middle"}
+            size={isMobile ? "middle" : "large"}
             options={[
               { label: "Scheduled", value: "SCHEDULED" },
               { label: "In Progress", value: "IN_PROGRESS" },
@@ -96,27 +85,13 @@ const ClassFilters: React.FC = () => {
           <Select
             style={{ width: "100%" }}
             placeholder="Select teacher"
-            loading={isTeacherLoading}
             allowClear
             showSearch
             value={filters.teacherId}
             onChange={(value) => handleFilterChange("teacherId", value)}
-            size={isMobile ? "small" : "middle"}
-            optionFilterProp="children"
-            onDropdownVisibleChange={setTeacherDropdownOpen}
-            filterOption={(input, option) =>
-              (option?.children?.toString().toLowerCase().includes(input.toLowerCase()) ?? false)
-            }
-            notFoundContent={
-              teacherError ? 'Error loading teachers' : isTeacherLoading ? 'Loading...' : 'No teachers found'
-            }
-          >
-             {teacherData?.data?.map((teacher) => (
-            <Option key={teacher.id} value={teacher.id}>
-              {teacher.name}
-            </Option>
-          ))}
-        </Select>
+            size={isMobile ? "middle" : "large"}
+            // Add teacher options here
+          />
         </Space>
       </Col>
 
@@ -127,28 +102,13 @@ const ClassFilters: React.FC = () => {
           <Select
             style={{ width: "100%" }}
             placeholder="Select student"
-            loading={isStudentLoading}
             allowClear
             showSearch
-            onDropdownVisibleChange={setStudentDropdownOpen}
-            optionFilterProp="children"
             value={filters.studentId}
-            notFoundContent={
-               studentError ? 'Error loading students' : isStudentLoading ? 'Loading...' : 'No students found'
-            }
-            filterOption={(input, option) =>
-              (option?.children?.toString().toLowerCase().includes(input.toLowerCase()) ?? false)
-            }
             onChange={(value) => handleFilterChange("studentId", value)}
-            size={isMobile ? "small" : "middle"}
+            size={isMobile ? "middle" : "large"}
             // Add student options here
-          >
- {studentData?.data?.map((student) => (
-            <Option key={student.id} value={student.id}>
-              {student.name}
-            </Option>
-          ))}
-            </Select>
+          />
         </Space>
       </Col>
 
@@ -164,41 +124,30 @@ const ClassFilters: React.FC = () => {
                 : null
             }
             onChange={handleDateRangeChange}
-            size={isMobile ? "small" : "middle"}
+            size={isMobile ? "middle" : "large"}
             format="YYYY-MM-DD"
           />
         </Space>
       </Col>
-    </Row>
-    <div style={{height:12}}/>
-    <Row gutter={columns.gutter as [number,number]}>
-      <Col xs={18} sm={18} md={18} lg={18}>
-      <SearchBox
-      placeholder="Search classes by subject, teacher, or student..."
-      onSearch={(val) => setFilters({ search: val, page: 1 })}
-      initialValue={filters.search}
-    />
-  </Col>
 
-  <Col xs={6} sm={6} md={6} lg={6}>
          {/* Reset Button */}
-         {!isMobile && (
-         <Space size="small" direction="vertical" align='end'>
-             <Button
-               icon={<ClearOutlined />}
-               onClick={handleReset}
-               size="small"
-               disabled={!activeFilterCount}
-               type="default"
-             >
-               Reset Filters
-             </Button>
-         </Space>
+      {!isMobile && (
+        <Col xs={24} sm={12} md={8} lg={6}>
+          <Space direction="vertical" size={4} style={{ width: "100%" }}>
+            <label style={{ fontSize: 13, fontWeight: 500, opacity: 0 }}>Action</label>
+            <Button
+              icon={<ClearOutlined />}
+              onClick={handleReset}
+              disabled={activeFilterCount === 0}
+              block
+              size="large"
+            >
+              Reset Filters
+            </Button>
+          </Space>
+        </Col>
       )}
-
-    </Col>
     </Row>
-    </>
   );
 
   // Mobile: Show filters in drawer
@@ -263,7 +212,7 @@ const ClassFilters: React.FC = () => {
   return (
     <Card
       variant="borderless"
-      styles={{ body: { padding: isMobile ? 6 : isTablet ? 10 : 14 } }}
+      styles={{ body: { padding: isMobile ? 12 : isTablet ? 16 : 20 } }}
     >
       {filterControls}
     </Card>
