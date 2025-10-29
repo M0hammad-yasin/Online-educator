@@ -70,14 +70,14 @@ const StudentStatsCards: React.FC = () => {
         .map((card) => (
           <Col xs={24} sm={12} lg={6} key={card.key}>
             <Card
-              bordered={false}
+              variant='borderless'
               style={{
                 borderRadius: '16px',
                 background: card.gradient,
                 overflow: 'hidden',
                 position: 'relative',
               }}
-              bodyStyle={{ padding: '24px' }}
+              styles={{body:{ padding: '24px'} }}
             >
               <div style={{ position: 'relative', zIndex: 1 }}>
                 <div style={{ 

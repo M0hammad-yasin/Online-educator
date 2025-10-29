@@ -14,7 +14,6 @@ Directory structure:
     │   └── src/
     │       ├── App.tsx
     │       ├── main.tsx
-    │       ├── routes.tsx
     │       ├── vite-env.d.ts
     │       ├── assets/
     │       │   └── auth-illustrations.tsx
@@ -26,14 +25,21 @@ Directory structure:
     │       │   │   ├── index.ts
     │       │   │   ├── MainContent.tsx
     │       │   │   ├── header/
-    │       │   │   │   └── Header.tsx
+    │       │   │   │   ├── AppHeader.tsx
+    │       │   │   │   └── NavigationKeeper.tsx
     │       │   │   └── sideBar/
     │       │   │       └── Sidebar.tsx
-    │       │   └── widgets/
-    │       │       ├── ErrorBoundary.tsx
-    │       │       ├── HighlightedText.tsx
-    │       │       ├── index.ts
-    │       │       └── SearchBox.tsx
+    │       │   ├── widgets/
+    │       │   │   ├── ErrorBoundary.tsx
+    │       │   │   ├── HighlightedText.tsx
+    │       │   │   ├── index.ts
+    │       │   │   ├── SearchBox.tsx
+    │       │   │   ├── SearchModal copy.tsx
+    │       │   │   ├── SearchModal.tsx
+    │       │   │   └── SearchUI.tsx
+    │       │   └── wrapper/
+    │       │       ├── pageWrapper.tsx
+    │       │       └── TableWrapper.tsx
     │       ├── constants/
     │       │   ├── classStatus.ts
     │       │   ├── menu.ts
@@ -41,9 +47,12 @@ Directory structure:
     │       │   └── statCardOptions.ts
     │       ├── hooks/
     │       │   ├── index.ts
+    │       │   ├── temp.ts
     │       │   ├── useDebounce.ts
     │       │   ├── useHighlightMatch.tsx
-    │       │   └── useRole.ts
+    │       │   ├── useResponsive.ts
+    │       │   ├── useRole.ts
+    │       │   └── useSearch.ts
     │       ├── module/
     │       │   ├── admin/
     │       │   │   ├── index.ts
@@ -95,6 +104,7 @@ Directory structure:
     │       │   │   │   │   ├── ClassChartFilter.tsx
     │       │   │   │   │   └── ClassPerDayChart.tsx
     │       │   │   │   ├── classList/
+    │       │   │   │   │   ├── ClassFilters copy.tsx
     │       │   │   │   │   ├── ClassFilters.tsx
     │       │   │   │   │   ├── ClassList.css
     │       │   │   │   │   ├── ClassList.tsx
@@ -171,6 +181,7 @@ Directory structure:
     │       │   │   ├── Dashboard.module.css
     │       │   │   ├── Dashboard.tsx
     │       │   │   ├── DashboardCopy1.tsx
+    │       │   │   ├── DashboardPage.tsx
     │       │   │   ├── ItemList.module.css
     │       │   │   ├── ItemList.tsx
     │       │   │   ├── RecentActivities.module.css
@@ -212,11 +223,13 @@ Directory structure:
     │       │       └── types.ts
     │       ├── store/
     │       │   ├── authStore.ts
-    │       │   └── themeStore.ts
+    │       │   ├── themeStore.ts
+    │       │   └── uiStore.ts
     │       ├── style/
     │       │   ├── App.css
     │       │   ├── header.css
-    │       │   └── index.css
+    │       │   ├── index.css
+    │       │   └── searchUI.css
     │       └── theme/
     │           ├── themeConfig.ts
     │           └── ThemeProvider.tsx
@@ -286,6 +299,7 @@ Directory structure:
                 ├── mongoId.validate.js
                 ├── pagination.validate.js
                 ├── role.validate.js
+                ├── search.validate.js
                 ├── student.validate.js
                 ├── teacher.validate.js
                 └── user.validate.js

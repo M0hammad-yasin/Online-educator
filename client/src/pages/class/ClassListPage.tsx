@@ -11,7 +11,7 @@ const ClassListPage: React.FC = () => {
           <ClassFilters />
         </Col>
       </Row>
-      <Row gutter={[16, 16]}>
+      <Row gutter={[16, 16]} style={{marginTop:4}}>
         <Col xs={24}>
           <ClassList />
         </Col>

@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { CaretUpOutlined, CaretDownOutlined } from '@ant-design/icons';
+import { theme } from 'antd';
 
 interface SortableHeaderProps {
   title: string;
@@ -11,7 +12,8 @@ interface SortableHeaderProps {
 
 const SortableHeader: React.FC<SortableHeaderProps> = ({ title, currentOrder, onClick }) => {
   const isActive = currentOrder !== null;
-
+  const {token : antdToken}=theme.useToken();
+  
   const getArrowIcon = () => {
     return currentOrder === 'desc' ? <CaretUpOutlined /> : <CaretDownOutlined />;
   };
@@ -34,7 +36,7 @@ const SortableHeader: React.FC<SortableHeaderProps> = ({ title, currentOrder, on
       }}
       onClick={onClick}
       onMouseEnter={(e) => {
-        e.currentTarget.style.backgroundColor = '#f5f5f5';
+        e.currentTarget.style.backgroundColor = antdToken.colorBgSpotlight;
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.backgroundColor = 'transparent';

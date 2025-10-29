@@ -1,6 +1,6 @@
 // client/src/routes/ResponsiveAppRouter.tsx
 import React, { useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Outlet, useLocation } from 'react-router-dom';
 import { Layout } from 'antd';
 import { AppHeader, MainContent, Sidebar } from '../components/layout';
 import { useAuthStore, Register, UserRole, Login, ForgotPassword } from '../module/authentication';
@@ -9,6 +9,7 @@ import AppSkeleton from '../components/AppSkeleton';
 import PublicNotFound from '../components/PublicNotFound';
 import { useResponsive } from '../hooks/useResponsive';
 import { useUIStore } from '../store/uiStore';
+import { AnimatePresence } from 'framer-motion';
 
 // Auth Guard Component
 const AuthGuard = ({ allowedRoles }: { allowedRoles?: UserRole | UserRole[] }) => {
@@ -38,13 +39,14 @@ const AuthGuard = ({ allowedRoles }: { allowedRoles?: UserRole | UserRole[] }) =
 const AppLayout = () => {
   const { isMobile } = useResponsive();
   const { sidebarCollapsed, mobileMenuOpen, setMobileMenuOpen } = useUIStore();
+  const location = useLocation();
 
   // Close mobile menu when route changes
   useEffect(() => {
     if (isMobile && mobileMenuOpen) {
       setMobileMenuOpen(false);
     }
-  }, [window.location.pathname]);
+  }, [location.pathname]);
 
   return (
     <Layout style={{ minHeight: "100vh" }}>
@@ -57,7 +59,9 @@ const AppLayout = () => {
       >
         <AppHeader />
         <MainContent>
-          <Outlet />
+          <AnimatePresence mode="wait">
+            <Outlet key={location.pathname} />
+          </AnimatePresence>
         </MainContent>
       </Layout>
     </Layout>
@@ -110,7 +114,7 @@ const groupRoutesByPermissions = (routes: RouteConfig[]) => {
   return groups;
 };
 
-const ResponsiveAppRouter: React.FC = () => {
+const AppRouter: React.FC = () => {
   const routeGroups = groupRoutesByPermissions(protectedRoutes);
 
   return (
@@ -156,4 +160,4 @@ const ResponsiveAppRouter: React.FC = () => {
   );
 };
 
-export default ResponsiveAppRouter;
+export default AppRouter;

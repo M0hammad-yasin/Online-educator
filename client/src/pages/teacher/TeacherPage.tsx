@@ -25,27 +25,6 @@ const TeacherPage: React.FC = () => {
   const currentRole = useRole();
   const dashboardSections = useMemo(() => getVisibleWidgets(currentRole), [currentRole]);
 
-  // Glass-morphism card style with theme awareness
-  const glassCardStyle: React.CSSProperties = {
-    background: mode === 'dark'
-      ? 'linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%)'
-      : 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%)',
-    backdropFilter: 'saturate(180%) blur(20px)',
-    borderRadius: token.borderRadiusLG,
-    boxShadow: mode === 'dark'
-      ? '0 8px 32px rgba(0, 0, 0, 0.3)'
-      : '0 8px 32px rgba(0, 0, 0, 0.08)',
-    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-  };
-
-  const pageContainerStyle: React.CSSProperties = {
-    padding: token.paddingLG,
-    minHeight: '100vh',
-    background: mode === 'dark'
-      ? 'linear-gradient(180deg, #0a0a0a 0%, #141414 50%, #1a1a1a 100%)'
-      : 'linear-gradient(180deg, #f0f9ff 0%, #e0f2fe 50%, #f8fafc 100%)',
-  };
-
   const headerGradientStyle: React.CSSProperties = {
     background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
     WebkitBackgroundClip: 'text',
@@ -107,15 +86,7 @@ const TeacherPage: React.FC = () => {
 
               // For other widgets, wrap in glass-morphism card
               return (
-                <Card
-                  key={widget.key}
-                  variant='borderless'
-                  style={glassCardStyle}
-                  styles={{ body: { padding: token.paddingSM } }}
-                  className="dashboard-card"
-                >
                   <WidgetComponent />
-                </Card>
               );
             })}
           </div>

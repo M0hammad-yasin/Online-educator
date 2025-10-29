@@ -51,6 +51,5 @@ export const widgetConfig = {
         return widgets[roleKey]?.includes(widgetName);
       }
     }
-
     return true;
   };

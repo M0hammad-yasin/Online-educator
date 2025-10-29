@@ -1,4 +1,5 @@
-import { Card, message } from 'antd';
+//studentPage.tsx
+import { Card} from 'antd';
 import {
   StudentStatsCards,
   StudentCharts,
