@@ -120,11 +120,7 @@ const TeacherList: React.FC = () => {
   }
 
   return (
-    <Card
-    variant='borderless'
-    styles={{title:{padding:6}}}
-    title={<FiltersBar/>}
-    >
+   <>
       <Row gutter={[token.size, token.size]}>
         {items.map((teacher: Teacher) => {
           return (
@@ -278,7 +274,7 @@ const TeacherList: React.FC = () => {
         }}
         teacher={selectedTeacher}
       />
-    </Card>
+    </>
   );
 };
 

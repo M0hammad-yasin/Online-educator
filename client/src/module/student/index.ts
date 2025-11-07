@@ -22,8 +22,9 @@ export {
   useStudentOperations,
 } from './hooks/useStudents';
 export {
-  hasAccess,widgetConfig
+  hasAccess,widgetConfig, 
 } from "./config/student.config";
+export {studentPageConfig} from "./config/student-page.config";
 export {
   useStudentStore,
   useStudentSelection,

@@ -1,7 +1,7 @@
 // src/module/teacher/services/teacher.service.ts
 
 import { BaseService } from '../../../services/api/base.service';
-import { ApiResponse, PaginatedResponse } from '../../../services/api/types';
+import { ApiResponse } from '../../../services/api/types';
 import {
   Teacher,
   TeacherWithClasses,

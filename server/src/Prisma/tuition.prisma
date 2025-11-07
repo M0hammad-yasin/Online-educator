@@ -1,3 +1,4 @@
+//mongod --replSet rs0 --bind_ip localhost
 generator client {
   provider = "prisma-client-js"
 }
@@ -25,7 +26,7 @@ model Moderator{
   email           String        @unique
   passwordHash    String
   address         String?
-  moderatorAccessControl   ModeratorAccessControl?
+  accessControl   ModeratorAccessControl?
   role            Role          @default(MODERATOR)
   profilePicture  String?       // Cloudinary URL
   isEmailVerified Boolean       @default(false)
@@ -44,7 +45,7 @@ model Teacher {
   role            Role        @default(TEACHER)  // ADMIN, TEACHER, or STUDENT
   passwordHash    String
   address         String?
-  teacherAccessControl   TeacherAccessControl?
+  accessControl   TeacherAccessControl?
   isEmailVerified Boolean       @default(false)
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
@@ -145,4 +146,3 @@ enum ClassStatus {
   IN_PROGRESS
   CANCELLED
   }
-//mongod --replSet rs0 --bind_ip localhost

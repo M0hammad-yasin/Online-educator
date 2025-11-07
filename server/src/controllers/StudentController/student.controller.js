@@ -2,7 +2,7 @@ import {asyncWrapper,controllerHelper, getPagination,buildPaginationMeta,sendSuc
 import prisma from "../../Prisma/prisma.client.js";
 import _ from "lodash";
 import { Role } from "../../constant.js";
-import config from "../../Config/config.js";
+import config from "../../config/config.js";
 import { classUtil } from "../../Services/class.services.js";
 // Register Student
 export const registerStudent = asyncWrapper(async (req, res) => {

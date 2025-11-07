@@ -3,7 +3,7 @@ import prisma from "../../Prisma/prisma.client.js";
 import {getPagination,buildPaginationMeta,asyncWrapper,controllerHelper,sendSuccess,BadRequestError,NotFoundError,comparePassword,hashPassword,generateToken} from "../../utils/index.js";
 import _ from "lodash";
 import { classUtil } from "../../Services/class.services.js";
-import config from "../../Config/config.js";
+import config from "../../config/config.js";
 import { Role } from "../../constant.js";
 // Register Teacher
 export const registerTeacher = asyncWrapper(async (req, res) => {

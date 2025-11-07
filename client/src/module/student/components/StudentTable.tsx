@@ -8,6 +8,7 @@ import {
   Badge,
   Dropdown,
   Button,
+  message,
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import {
@@ -23,10 +24,13 @@ import { Role } from '../../../constants/role';
 import { Student,useStudents ,useStudentFilters, hasAccess} from '../';
 import { HighlightedText, } from '../../../components/widgets';
 import {useRole} from '../../../hooks';
+import { usePermissions } from '../../../hooks/usePermissions';
+import { all } from 'axios';
 
 const StudentTable: React.FC = () => {
   // Color palette
   const currentRole=useRole();
+ const{getAllowedViewFields,canPerformAction}= usePermissions('student');
   const { filters, setFilters } = useStudentFilters();
   const { data: studentsResponse, isLoading } = useStudents(filters);
   const students = studentsResponse?.data;
@@ -146,10 +150,10 @@ const StudentTable: React.FC = () => {
         ),
       },
       actions: {
-        title: 'Actions',
+        // title: 'Actions',
         key: 'actions',
         fixed: 'right' as const,
-        width: 80,
+        width: 50,
         render: (_: unknown, _record: Student) => (
           <Dropdown
             menu={{
@@ -157,13 +161,15 @@ const StudentTable: React.FC = () => {
                 {
                   key: 'view',
                   icon: <EyeOutlined />,
+                  onClick:()=>(message.success('View Details')),
                   label: 'View Details',
+                  disabled: !canPerformAction('view'),
                 },
                 {
                   key: 'edit',
                   icon: <EditOutlined />,
                   label: 'Edit',
-                  disabled: currentRole === Role.TEACHER,
+                  disabled: !canPerformAction('edit'),
                 },
                 {
                   key: 'contact',
@@ -178,7 +184,7 @@ const StudentTable: React.FC = () => {
                   icon: <DeleteOutlined />,
                   label: 'Delete',
                   danger: true,
-                  disabled: currentRole === Role.TEACHER,
+                  disabled: !canPerformAction('delete'),
                 },
               ],
             }}
@@ -188,26 +194,9 @@ const StudentTable: React.FC = () => {
         ),
       },
     };
-
-    // Widget configuration for table columns
-    const widgetConfig = {
-      table: {
-        roles: [Role.ADMIN, Role.MODERATOR, Role.TEACHER] as UserRole[],
-        columns: {
-          [Role.ADMIN]: ['name', 'email', 'grade', 'region', 'attendance', 'performance', 'status', 'actions'],
-          [Role.MODERATOR]: ['name', 'email', 'grade', 'region', 'attendance', 'status', 'actions'],
-          [Role.TEACHER]: ['name', 'grade', 'attendance', 'performance', 'lastClass', 'actions'],
-        },
-      },
-    };
-
-    let roleColumns: string[] = [];
-    if (Object.prototype.hasOwnProperty.call(widgetConfig.table.columns, currentRole)) {
-      const roleKey = currentRole as keyof typeof widgetConfig.table.columns;
-      roleColumns = widgetConfig.table.columns[roleKey] || [];
-    }
-
-    return roleColumns.map(key => allColumns[key as keyof typeof allColumns]).filter(Boolean);
+    const fields= getAllowedViewFields(allColumns);
+    fields.push('actions');
+    return fields.map(key => allColumns[key as keyof typeof allColumns]).filter(Boolean);
   };
 
   if (!hasAccess(currentRole,'table')) {

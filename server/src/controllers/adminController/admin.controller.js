@@ -1,7 +1,7 @@
 //create admin crud operation
-import { comparePassword,hashPassword,BadRequestError,sendSuccess,generateToken,asyncWrapper } from "../../utils/index.js";
+import { comparePassword,hashPassword,BadRequestError,sendSuccess,generateToken,asyncWrapper, NotFoundError } from "../../utils/index.js";
 import prisma from "../../Prisma/prisma.client.js";
-import config from "../../Config/config.js";
+import config from "../../config/config.js";
 import _ from "lodash";
 
 export const createAdmin = asyncWrapper(async (req, res) => {

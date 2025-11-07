@@ -1,60 +1,79 @@
 // src/components/common/ErrorBoundary.tsx
-import { ErrorBoundary as ReactErrorBoundary } from "react-error-boundary";
-import { Result, Button, Typography } from "antd";
+
+import { ErrorBoundary as ReactErrorBoundary, FallbackProps } from "react-error-boundary";
+import { Result, Button, Typography, theme } from "antd";
 import { ReloadOutlined } from "@ant-design/icons";
-import type { ErrorInfo } from "react";
+import type { ErrorInfo, ReactNode } from "react";
+import { useResponsiveSpacing } from "../../hooks";
 
 const { Paragraph, Text } = Typography;
 
-function ErrorFallback({ error, resetErrorBoundary }: any) {
+function DefaultFallback({ error, resetErrorBoundary }: FallbackProps) {
+  const { token } = theme.useToken();
+  const padding=useResponsiveSpacing();
+
   return (
     <div
       style={{
-        height: "100vh",
+        height: 'fit-content',
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        backgroundColor: "#f9f9f9",
+        background: token.colorBgContainer, // Auto light/dark support
+        padding: padding.sm,
       }}
     >
       <Result
         status="error"
         title="Something went wrong"
         subTitle={
-          <Paragraph>
-            <Text type="secondary">
-              An unexpected error occurred in the application.
-            </Text>
+          <Paragraph style={{ color: token.colorTextSecondary }}>
+            An unexpected error occurred.
             <br />
-            <Text code>{error.message}</Text>
+            <Text code>{error?.message}</Text>
           </Paragraph>
         }
-        extra={[
+        extra={
           <Button
             type="primary"
             icon={<ReloadOutlined />}
-            key="reload"
             onClick={resetErrorBoundary}
           >
             Try Again
-          </Button>,
-        ]}
+          </Button>
+        }
       />
     </div>
   );
 }
 
-export function ErrorBoundary({ children }: { children: React.ReactNode }) {
-    const handleError = (error: Error, info: ErrorInfo) => {
-        console.error("❌ Caught by ErrorBoundary:", error);
-        console.log("🧱 Component Stack:", info.componentStack ?? "");
-      };
+interface ErrorBoundaryProps {
+  children: ReactNode;
+  FallbackComponent?: React.ComponentType<FallbackProps>;
+  onError?: (error: Error, info: ErrorInfo) => void;
+  onReset?: () => void;
+}
+
+export function ErrorBoundary({
+  children,
+  FallbackComponent = DefaultFallback,
+  onError,
+  onReset,
+}: ErrorBoundaryProps) {
+  const handleError = (error: Error, info: ErrorInfo) => {
+    onError?.(error, info);
+
+    if (!onError) {
+      console.error("❌ ErrorBoundary:", error);
+      console.log("🧱 Component Stack:", info.componentStack);
+    }
+  };
 
   return (
     <ReactErrorBoundary
-      FallbackComponent={ErrorFallback}
+      FallbackComponent={FallbackComponent}
       onError={handleError}
-      onReset={() => window.location.reload()}
+      onReset={onReset ?? (() => window.location.reload())}
     >
       {children}
     </ReactErrorBoundary>

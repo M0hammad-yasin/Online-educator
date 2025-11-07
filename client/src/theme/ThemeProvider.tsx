@@ -14,18 +14,20 @@ const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     algorithm:
       mode === "dark" ? antTheme.darkAlgorithm : antTheme.defaultAlgorithm,
     token: {
+      wireframe: import.meta.env.DEV,
       colorPrimary: "#1890ff",
       colorSuccess: "#52c41a",
       colorWarning: "#faad14",
       colorError: "#f5222d",
       colorInfo: "#1890ff",
       colorTextBase: mode === "dark" ? "#ffffff" : "#000000",
-      colorBgBase: mode === "dark" ? "#141414" : "#ffffff",
+      colorBgBase: mode === "dark" ? "#141414" : "#FDFDFD",
       borderRadius: 6,
+      colorBgLayout: mode === "dark" ? '#292529' :'#FAFAFA',
       borderRadiusLG: 12,
       fontFamily: '"Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
       fontSize: 14,
-      colorBgContainer: mode === "dark" ? "#1f1f1f" : "#FAFDFE",
+      colorBgContainer: mode === "dark" ? "#1f1f1f" : "#fff",
       boxShadow: "1px 5px 9px #00000027", // Added custom box shadow
     },
     components: {
@@ -51,8 +53,8 @@ const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
         borderRadius: 8,
       },
       card: {
-        padding: '24px',
-        borderRadius: '16px',
+        padding: '20px',
+        borderRadius: '1px',
         shadow: '0 1px 3px rgba(0, 0, 0, 0.08)',
         hoverShadow: '0 8px 24px rgba(0, 0, 0, 0.12)',
         hoverTransform: 'translateY(-4px)'

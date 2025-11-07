@@ -80,15 +80,15 @@ export const useResponsiveColumns = () => {
     },
     // Half width cards
     halfWidth: {
-      xs: 24,
-      sm: 24,
+      xs: 12,
+      sm: 12,
       md: 12,
       lg: 12,
       xl: 12,
     },
     // Third width cards
     thirdWidth: {
-      xs: 24,
+      xs: 12,
       sm: 12,
       md: 8,
       lg: 8,
@@ -109,6 +109,14 @@ export const useResponsiveColumns = () => {
       md: 8,
       lg: 8,
       xl: 8,
+    },
+    // Quarter width cards
+    quarterWidth: {
+      xs: 12,
+      sm: 12,
+      md: 6,
+      lg: 6,
+      xl: 6,
     },
     // Responsive padding
     padding: isMobile ? 12 : isTablet ? 16 : 24,

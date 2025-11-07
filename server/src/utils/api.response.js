@@ -1,6 +1,6 @@
 // src/utils/response.js
 
-import config from "../Config/config.js";
+import config from "../config/config.js";
 
 /**
  * Standardized success response handler

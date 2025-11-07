@@ -1,14 +1,13 @@
 // client/src/module/classes/components/ClassListCard.tsx
 
 import React, { useState } from 'react';
-import { Card, Typography, List, Avatar, Tag, Flex, Button, theme, Skeleton, DatePicker } from 'antd';
+import { Card, Typography, List, Avatar, Tag, Flex, Button, theme, Skeleton, DatePicker, Select } from 'antd';
 import { useClasses } from '../hooks/useClasses';
 import { ClassFilters, ClassStatus } from '../types/class.type';
-import { FaClock, FaUser, FaAngleDown, FaBook } from 'react-icons/fa';
+import { FaClock, FaUser,  FaBook } from 'react-icons/fa';
 import dayjs from 'dayjs';
 import {CalendarOutlined} from '@ant-design/icons'
-import { IconBaseProps } from 'react-icons';
- const { Title, Text } = Typography;
+ const { Text } = Typography;
 
 interface SelectOption {
   value: string;
@@ -77,9 +76,12 @@ const ClassListCard: React.FC<ClassListCardProps> = ({
       title={
         <Flex justify='space-between' align='center' vertical>
         <Flex justify="space-between" align="center">
-          <Title level={5} style={{ margin: 0 }}>
-            {selectedTitle}
-          </Title>
+          <Select
+          onChange={(value) =>{ setSelectedTitle(value)}}
+          options={titleOptions}
+          value={selectedTitle}
+          >
+          </Select>
           <div
             style={{
               display: "flex",

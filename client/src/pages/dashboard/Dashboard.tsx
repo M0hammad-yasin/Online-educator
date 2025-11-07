@@ -8,15 +8,9 @@ import {
   Button,
   Tag,
   Avatar,
-  Statistic,
-  Progress,
-  Select,
   DatePicker,
   List,
-  Badge,
-  Tooltip,
   Dropdown,
-  theme
 } from 'antd';
 import {
   BarChart,
@@ -43,13 +37,11 @@ import {
   CalendarOutlined,
   DownOutlined,
   CheckCircleOutlined,
-  SyncOutlined,
   CloseCircleOutlined,
-  PlayCircleOutlined
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
 
-const { Title, Text, Paragraph } = Typography;
+const { Title, Text } = Typography;
 
 // Modern Design System Colors
 const COLORS = {
@@ -231,7 +223,6 @@ const recentActivities = [
 ];
 
 const Dashboard: React.FC = () => {
-  const { token } = theme.useToken();
   const [dateRange, setDateRange] = useState('week');
   const [selectedPeriod, setSelectedPeriod] = useState(dayjs());
 

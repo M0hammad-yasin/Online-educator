@@ -4,7 +4,7 @@ import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useClassesCountByGroup } from '../hooks/useClasses';
 import { ClassStatus } from '../types/class.type';
-import { Skeleton, Empty } from 'antd';
+import { Skeleton} from 'antd';
 import dayjs from 'dayjs';
 
 interface ClassBarChartProps {
@@ -19,7 +19,7 @@ const ClassBarChart: React.FC<ClassBarChartProps> = ({
   height = 300,
 }) => {
   const { data: chartData, isLoading } = useClassesCountByGroup({
-    groupBy,
+    groupBy,status
   });
 
   // Transform data for the chart

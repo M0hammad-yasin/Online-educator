@@ -72,7 +72,6 @@ const DashboardCopy: React.FC = () => {
           <ClassStatsCard
             icon={<FaBookOpen />}
             titleOptions={CLASS_TITLE_OPTIONS}
-            statType="total"
             onPeriodChange={handlePeriodChange}
           />
         </Col>

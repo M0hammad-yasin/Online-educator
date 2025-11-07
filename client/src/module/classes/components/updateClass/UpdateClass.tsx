@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Form, Input, Select, DatePicker, InputNumber, Button, Space, message, Spin } from 'antd';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useClass, useUpdateClass } from '../../hooks/useClasses';
 import { ClassStatus } from '../../index';
 import dayjs from 'dayjs';

@@ -1,47 +1,15 @@
 //studentPage.tsx
-import { Card} from 'antd';
-import {
-  StudentStatsCards,
-  StudentCharts,
-  StudentTable,
-  AddStudentModal,
-  StudentPageHeader,
-  StudentFilterBar,
-  hasAccess
-} from '../../module/student';
+import  { useMemo } from 'react';
+import DashboardRenderer from '../../components/DashboardRenderer/DashboardRenderer';
+import { studentPageConfig } from '../../module/student';
 import { useRole } from '../../hooks';
-
+import { useAuthStore } from '../../module/authentication/store';
 
 const StudentsPage = () => {
-  const  currentRole  = useRole() ;
-  return (
-    <>
-      {/* Header Section */}
-      <StudentPageHeader/>
-
-      {/* Stats Cards Section */}
-      <StudentStatsCards/>
-
-      {/* Charts Section */}
-      <StudentCharts/>
-
-      {/* Students Table Section */}
-      {hasAccess(currentRole,'table') && (
-        <Card
-          variant='borderless'
-          style={{ borderRadius: '16px' }}
-          title={
-           <StudentFilterBar/>
-          }
-        >
-          <StudentTable/>
-        </Card>
-      )}
-
-      {/* Add Student Modal */}
-      <AddStudentModal/>
-    </>
-  );
+  const role = useRole();
+  const { user } = useAuthStore();
+  const context = useMemo(() => ({ role, userId: user?.id || '', permissions:  [] }), [role, user]);
+  return <DashboardRenderer config={studentPageConfig} context={context} />;
 };
 
 export default StudentsPage;

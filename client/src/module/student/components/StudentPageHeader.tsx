@@ -2,7 +2,7 @@ import React from 'react';
 import { Button, Space } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { Role } from '../../../constants/role';
-import { StudentWidget ,useStudentModals,hasAccess} from '../';
+import { useStudentModals,hasAccess} from '../';
 import {useRole} from '../../../hooks';
 
 const StudentPageHeader: React.FC = () => {

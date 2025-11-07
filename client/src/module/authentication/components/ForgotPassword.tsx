@@ -1,5 +1,5 @@
-import React, { FormEvent } from 'react';
-import { Form, Input, Button, Typography, Card, message, Result } from 'antd';
+import React from 'react';
+import { Form, Input, Button, Typography, Card, message } from 'antd';
 import { MailOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
 import { ForgotPasswordIllustration, SuccessCheckmark } from '../../../assets/auth-illustrations';

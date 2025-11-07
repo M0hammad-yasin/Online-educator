@@ -4,7 +4,7 @@ import React from 'react';
 import { Card, Typography, theme, Flex, Select, DatePicker, Skeleton } from 'antd';
 import dayjs from 'dayjs';
 import { useClassesCount } from '../hooks/useClasses';
-import { ClassFilters, ClassStatus } from '../types/class.type';
+import {  ClassStatus } from '../types/class.type';
 import { useClassStore } from '../store/useClassStore';
 
 const { Title } = Typography;
@@ -25,7 +25,6 @@ const ClassStatsCard: React.FC<ClassStatsCardProps> = ({
   icon,
   titleOptions,
   onPeriodChange,
-  statType = 'total',
 }) => {
   const { token } = theme.useToken();
   const [selectedTitle, setSelectedTitle] = React.useState<SelectClassOption>(

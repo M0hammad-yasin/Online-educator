@@ -169,7 +169,7 @@ const EditableField: React.FC<EditableFieldProps> = ({
 const Profile: React.FC = () => {
   const { user: authUser } = useAuthStore();
   const { data: userRaw, isLoading, isError, error, refetch } = useProfile();
-  const { mutate: patchProfile ,isPending,error:patchError} = usePatchProfile();
+  const { mutate: patchProfile ,isPending} = usePatchProfile();
   const [editingField, setEditingField] = useState<string | null>(null);
 
   // Narrow user type based on authUser.role

@@ -109,7 +109,7 @@ const useAuthStore = create<AuthState>()(
   )
 );
 
-if (process.env.NODE_ENV === 'development') {
+if (import.meta.env.DEV) {
   mountStoreDevtool('AuthStore', useAuthStore);
 }
 

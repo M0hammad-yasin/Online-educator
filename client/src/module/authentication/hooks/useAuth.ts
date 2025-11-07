@@ -107,11 +107,12 @@ export const usePatchProfile = () => {
     onSuccess: (response) => {
       if (response.data) {
         const { id = '', name = '', email = '', role = 'STUDENT', profilePicture = '' } = response.data as User;
+        const accessControl = response.data.accessControl;
         setAuth({
           token: useAuthStore.getState().token!,
-          user: { id, name, email, role, profilePicture },
+          user: { id, name, email, role, profilePicture, accessControl },
         });
-        queryClient.setQueryData(['auth', 'user'], { id, name, email, role, profilePicture });
+        queryClient.setQueryData(['auth', 'user'], { id, name, email, role, profilePicture, accessControl }); 
         queryClient.setQueryData(['auth', 'profile'], response.data);
       }
     },
