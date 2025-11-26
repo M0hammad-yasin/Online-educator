@@ -3,7 +3,6 @@ import {
   teacherSchema,
   teacherUpdateSchema,
   accessControlSchemaBody,
-  accessControlSchemaQuery,
   mongoIdSchema,
   loginSchema,
   classFilterQuerySchema,
@@ -26,6 +25,7 @@ import {
   patchTeacher,
   getTeachersWithClasses,
   getTeachersWithClassCount,
+  getTeacherAccessControl,
   modifyTeacherAccess,
   searchTeachers,
   forgotPassword,
@@ -135,10 +135,16 @@ router.get(
   hasRole([Role.ADMIN, Role.MODERATOR]),
   getTeacher
 );
+router.get(
+  "/:id/access-control",
+  validate(mongoIdSchema, (req) => req.params),
+  auth,
+  hasRole([Role.ADMIN, Role.MODERATOR]),
+  getTeacherAccessControl
+)
 router.put(
   "/:id/access-control",
   validate(mongoIdSchema, (req) => req.params),
-  validate(accessControlSchemaQuery, (req) => req.query),
   validate(accessControlSchemaBody, (req) => req.body),
   auth,
   isAdmin,

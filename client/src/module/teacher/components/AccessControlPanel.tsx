@@ -19,6 +19,7 @@ import {
   DeleteOutlined,
 } from '@ant-design/icons';
 import { accessControlService } from '../../admin';
+import { TeacherAccessControl } from '../types';
 
 const { Text } = Typography;
 
@@ -37,12 +38,7 @@ const AccessControlPanel: React.FC<AccessControlPanelProps> = ({ teacherId }) =>
   const { token } = antdTheme.useToken();
   const [loading, setLoading] = useState(false);
   const [updating, setUpdating] = useState(false);
-  const [accessControl, setAccessControl] = useState<AccessControl>({
-    canSeeClass: false,
-    canAddClass: false,
-    canUpdateClass: false,
-    canDeleteClass: false,
-  });
+  const [accessControl, setAccessControl] = useState<TeacherAccessControl>();
 
   useEffect(() => {
     fetchAccessControl();
@@ -53,22 +49,10 @@ const AccessControlPanel: React.FC<AccessControlPanelProps> = ({ teacherId }) =>
     try {
       const response = await accessControlService.getAccessControl(teacherId);
       if (response.success && response.data) {
-        setAccessControl({
-          canSeeClass: response.data.canSeeClass ?? false,
-          canAddClass: response.data.canAddClass ?? false,
-          canUpdateClass: response.data.canUpdateClass ?? false,
-          canDeleteClass: response.data.canDeleteClass ?? false,
-        });
+        setAccessControl(response.data);
       }
     } catch (error: any) {
-      console.error('Failed to fetch access control:', error);
-      // Initialize with default values if fetch fails
-      setAccessControl({
-        canSeeClass: false,
-        canAddClass: false,
-        canUpdateClass: false,
-        canDeleteClass: false,
-      });
+      message.error(error?.message || 'Failed to fetch access control');
     } finally {
       setLoading(false);
     }
@@ -77,14 +61,11 @@ const AccessControlPanel: React.FC<AccessControlPanelProps> = ({ teacherId }) =>
   const handleToggle = async (permission: keyof AccessControl, value: boolean) => {
     setUpdating(true);
     try {
-      await accessControlService.updateAccessControl(teacherId, {
+      const access=await accessControlService.updateAccessControl(teacherId, {
         [permission]: value,
       });
       
-      setAccessControl((prev) => ({
-        ...prev,
-        [permission]: value,
-      }));
+      setAccessControl(access.data);
       
       message.success(`Permission ${value ? 'granted' : 'revoked'} successfully`);
     } catch (error: any) {
@@ -163,7 +144,7 @@ const AccessControlPanel: React.FC<AccessControlPanelProps> = ({ teacherId }) =>
                   </Text>
                 </Space>
                 <Switch
-                  checked={accessControl[permission.key]}
+                  checked={accessControl?.[permission.key] ?? false}
                   onChange={(checked) => handleToggle(permission.key, checked)}
                   loading={updating}
                   checkedChildren={<UnlockOutlined />}

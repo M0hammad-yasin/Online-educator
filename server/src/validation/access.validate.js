@@ -1,10 +1,5 @@
 // ✅ access control Validation Schema
 import { z } from "zod";
-export const accessControlSchemaQuery = z.object({
-  model: z.enum(["teacher", "moderator"], {
-    message: "model should be either 'Teacher' or 'Moderator'",
-  }),
-});
 export const accessControlSchemaBody = z.object({
   canSeeUser: z.boolean({ message: "canSeeUser is required" }).optional(),
   canAddUser: z.boolean().optional(),

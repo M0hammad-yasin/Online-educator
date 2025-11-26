@@ -2,16 +2,10 @@
 
 import { ApiResponse } from '../../../services/api/types';
 import { BaseService } from '../../../services/api/base.service';
-
-interface AccessControl {
-  canSeeClass?: boolean;
-  canAddClass?: boolean;
-  canUpdateClass?: boolean;
-  canDeleteClass?: boolean;
-}
+import { TeacherAccessControl } from '../../teacher';
 
 // Extend BaseEntity shape to satisfy BaseService generic constraint
-type TeacherAccessControlEntity = AccessControl & {
+type TeacherAccessControlEntity = TeacherAccessControl & {
   id: string;
   createdAt: string;
   updatedAt: string;
@@ -23,24 +17,17 @@ class AccessControlService extends BaseService<TeacherAccessControlEntity> {
   }
 
   // Get access control for a teacher
-  async getAccessControl(teacherId: string): Promise<ApiResponse<AccessControl>> {
-    return this.customGet<AccessControl>(`/${teacherId}/access-control`);
+  async getAccessControl(teacherId: string): Promise<ApiResponse<TeacherAccessControl>> {
+    return this.customGet<TeacherAccessControl>(`/${teacherId}/access-control`);
   }
 
   // Update access control for a teacher
   async updateAccessControl(
     teacherId: string,
-    data: Partial<AccessControl>
-  ): Promise<ApiResponse<AccessControl>> {
-    return this.customPut<AccessControl>(`/${teacherId}/access-control`, data,{params:{
-      model: 'teacher',
-      canSeeClass: data.canSeeClass,
-      canAddClass: data.canAddClass,
-      canUpdateClass: data.canUpdateClass,
-      canDeleteClass: data.canDeleteClass,
-    }});
+    data: Partial<TeacherAccessControl>
+  ): Promise<ApiResponse<TeacherAccessControl>> {
+    return this.customPut<TeacherAccessControl>(`/${teacherId}/access-control`, data);
   }
 }
-
 export const accessControlService = new AccessControlService();
 export default accessControlService;

@@ -469,15 +469,47 @@ export const getTeacherClassCountForDay = asyncWrapper(async (req, res) => {
 ////////////////////////////////////////////////
 //////////////////access control////////////////////////
 /////////////////////////////////////////////////
-export const modifyTeacherAccess = asyncWrapper(async (req, res) => {
+/**
+ * Get teacher access control
+ * @route GET /api/teacher/:id/access-control
+ */
+export const getTeacherAccessControl = asyncWrapper(async (req, res) => {
   const id = req.params.id;
 
   // 1️⃣ Find teacher
-  const teacher = await prisma.teacher.findUnique({ where: { id } });
+  const teacher = await prisma.teacher.findUnique(
+    { where: { id },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        profilePicture: true,
+        qualification: true,
+        accessControl: true,
+      },
+  });
   if (!teacher) {
     throw new BadRequestError("Teacher not found");
   }
+  const accessControl = await prisma.teacherAccessControl.findUnique({
+    where: { teacherId: id },
 
+  });
+  // 3️⃣ Return teacher with access control
+  sendSuccess(res, {
+    statusCode: 200,
+    message: "Teacher access control fetched successfully",
+    data: {
+         ...accessControl || {},
+    },
+  });
+});
+/**
+ * Modify teacher access control
+ * @route PUT /api/teacher/:id/access-control
+ */
+export const modifyTeacherAccess = asyncWrapper(async (req, res) => {
+  const id = req.params.id;
   // 2️⃣ Extract permission fields (teacher relevant)
   const {
     canSeeClass,
@@ -490,7 +522,6 @@ export const modifyTeacherAccess = asyncWrapper(async (req, res) => {
     canDeleteStudent,
   } = req.body;
 
-  // 3️⃣ Build update object (ignore undefined)
   const updatedAccess = {
     ...(canSeeClass !== undefined && { canSeeClass }),
     ...(canAddClass !== undefined && { canAddClass }),
@@ -518,23 +549,10 @@ export const modifyTeacherAccess = asyncWrapper(async (req, res) => {
     });
   }
 
-  // 5️⃣ Return updated teacher with access
-  const updatedTeacher = await prisma.teacher.findUnique({
-    where: { id },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      profilePicture: true,
-      qualification: true,
-      teacherAccessControl: true,
-    },
-  });
-
   sendSuccess(res, {
     statusCode: 200,
     message: "Teacher access modified successfully",
-    data: _.omit(updatedTeacher, ["passwordHash"]),
+    data: access,
   });
 });
 // Search Teachers
