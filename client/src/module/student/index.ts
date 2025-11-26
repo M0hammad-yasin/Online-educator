@@ -22,7 +22,7 @@ export {
   useStudentOperations,
 } from './hooks/useStudents';
 export {
-  hasAccess,widgetConfig
+  hasAccess,widgetConfig, 
 } from "./config/student.config";
 export {
   useStudentStore,

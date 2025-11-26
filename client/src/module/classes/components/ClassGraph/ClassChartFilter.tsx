@@ -1,7 +1,7 @@
 // client/src/module/classes/components/ClassChartFilter.tsx
 
 import React from 'react';
-import { Space, Select, Button, Typography } from 'antd';
+import { Space, Select, Button } from 'antd';
 import dayjs from 'dayjs';
 import weekOfYear from 'dayjs/plugin/weekOfYear';
 import { ClassFilters, ClassStatus } from '../../types/class.type';

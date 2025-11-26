@@ -33,7 +33,6 @@ import TeacherDetailDrawer from './TeacherDetailDrawer';
 import TeacherEditModal from './TeacherEditModal';
 import { Teacher } from '../types/teacher.types';
 import useThemeStore from '../../../store/themeStore';
-import FiltersBar from './FiltersBar';
 
 const { Text } = Typography;
 
@@ -120,11 +119,7 @@ const TeacherList: React.FC = () => {
   }
 
   return (
-    <Card
-    variant='borderless'
-    styles={{title:{padding:6}}}
-    title={<FiltersBar/>}
-    >
+   <>
       <Row gutter={[token.size, token.size]}>
         {items.map((teacher: Teacher) => {
           return (
@@ -278,7 +273,7 @@ const TeacherList: React.FC = () => {
         }}
         teacher={selectedTeacher}
       />
-    </Card>
+    </>
   );
 };
 

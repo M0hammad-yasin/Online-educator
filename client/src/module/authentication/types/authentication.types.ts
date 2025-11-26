@@ -1,8 +1,8 @@
 import { Role } from "../../../constants/role";
 import { Admin } from "../../admin";
-import { Moderator } from "../../moderator/types";
+import { Moderator, ModeratorAccessControl } from "../../moderator/types";
 import { Student } from "../../student";
-import { Teacher } from "../../teacher";
+import { Teacher, TeacherAccessControl } from "../../teacher";
 
 export type UserRole = (typeof Role)[keyof typeof Role];
 export interface User {
@@ -11,6 +11,7 @@ export interface User {
     email: string;
     role: UserRole;
     profilePicture: string;
+    accessControl?: ModeratorAccessControl|TeacherAccessControl;
   }
 
   export type AllUserProps = {

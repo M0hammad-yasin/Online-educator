@@ -1,11 +1,10 @@
 // client/src/module/classes/components/classDetail/ClassDetail.tsx
 
 import React from 'react';
-import { Card, Typography, Descriptions, Tag, Button, Skeleton, Result, Row, Col, Avatar, Space, Divider, Badge, Spin } from 'antd';
+import { Card, Typography,  Button, Skeleton, Result, Row, Col, Avatar, Space,  } from 'antd';
 import { format } from 'date-fns';
 import { ArrowLeftOutlined, CalendarOutlined, ClockCircleOutlined, UserOutlined, BookOutlined, VideoCameraOutlined } from '@ant-design/icons';
 import { useClass } from '../../hooks/useClasses';
-import { ClassStatus } from '../../index';
 import { motion } from 'framer-motion';
 import './ClassDetail.css';
 

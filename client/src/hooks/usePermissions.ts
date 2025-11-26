@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import useRole from './useRole';
-import { useAuthStore } from '../module/authentication/store';
+import { useAuthStore } from '../module/authentication';
 import { ModelName, PermissionContext } from '../config/rbac-types';
 import {
   canViewField,
@@ -72,7 +72,5 @@ export function usePermissions(model: ModelName): UsePermissionsReturn {
     filterRecords: filterMultipleRecords,
     canPerformAction: canPerform,
     getContext,
-  };
-}
-
-
+  }
+};

@@ -13,7 +13,6 @@ import {
     MenuOutlined,
     SunOutlined,
     MoonOutlined,
-    SearchOutlined,
   } from "@ant-design/icons";
   import useThemeStore from "../../../store/themeStore";
   import UserManagement from "../../../module/authentication/components/UserManagement";
@@ -28,7 +27,6 @@ import {
     const { toggleTheme, mode } = useThemeStore();
     const { isMobile, isTablet } = useResponsive();
     const toggleMobileMenu = useUIStore(state=>state.toggleMobileMenu);
-    const setSearchModalOpen  = useUIStore(state=>state.setSearchModalOpen);
   
     const {
       token: { colorBorderSecondary, borderRadius },

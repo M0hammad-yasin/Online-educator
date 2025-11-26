@@ -3,7 +3,7 @@
 // Supports role-based widget visibility with glass-morphism design
 
 import React, { useMemo } from 'react';
-import { Card, Space, Typography, theme as antdTheme, Flex } from 'antd';
+import { Space, Typography, theme as antdTheme, Flex } from 'antd';
 import { TeamOutlined } from '@ant-design/icons';
 import useThemeStore from '../../store/themeStore';
 import { SummaryCards,PerformanceCharts,FiltersBar,TeacherList, getVisibleWidgets, } from '../../module/teacher';

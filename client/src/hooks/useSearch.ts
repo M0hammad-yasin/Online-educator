@@ -1,7 +1,6 @@
 // client/src/hooks/useGlobalSearch.ts
 
 import { useQuery } from '@tanstack/react-query';
-import { useAuthUser } from '../module/authentication/store/authStore';
 import { Role } from '../constants/role';
 import useRole from './useRole';
 import { classService } from '../module/classes';

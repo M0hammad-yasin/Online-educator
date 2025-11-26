@@ -6,7 +6,6 @@ import {
   CreateClassRequest, 
   UpdateClassRequest, 
   ClassFilters, 
-  ClassCountByGroup 
 } from '../index';
 
 // Query Keys

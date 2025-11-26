@@ -7,6 +7,7 @@ const themeConfig: ThemeConfig = {
   algorithm: theme.defaultAlgorithm,
   // Customize token values
   token: {
+   wireframe: import.meta.env.DEV,
     // Colors
     colorPrimary: "#1890ff", // Primary brand color
     colorSuccess: "#52c41a", // Success state color

@@ -100,3 +100,21 @@ export interface TeacherAuthData {
   qualification?: string;
   classRate?: number;
 }
+
+export interface TeacherAccessControl{
+   id:string ;
+  teacher: Teacher;
+  teacherId:string;
+  // Permissions for class and student management
+  canSeeClass:boolean;
+  canAddClass:boolean;
+  canUpdateClass:boolean;
+  canDeleteClass:boolean;
+
+  canSeeStudent:boolean;
+  canAddStudent:boolean;
+  canUpdateStudent:boolean;
+  canDeleteStudent:boolean;
+  createdAt:Date; 
+  updatedAt:Date ;
+}
