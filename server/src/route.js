@@ -1,5 +1,5 @@
 import express from "express";
-import error from "../src/Middleware/error.middleware.js";
+import error from "./middleware/error.middleware.js";
 import studentRoutes from "./routes/student.route.js";
 import teacherRoutes from "./routes/teacher.route.js";
 import classRoutes from "./routes/class.route.js";

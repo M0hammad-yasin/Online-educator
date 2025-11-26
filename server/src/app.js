@@ -4,7 +4,7 @@ import morgan from "morgan";
 
 import initializeRoutes from "./route.js";
 import { NotFoundError } from "./utils/index.js";
-import config from "./Config/config.js";
+import config from "./config/config.js";
 const app = express();
 
 // Middleware
