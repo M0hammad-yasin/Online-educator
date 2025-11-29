@@ -9,27 +9,27 @@ export interface Moderator {
   profilePicture?: string;
   isEmailVerified: boolean;
   createdAt: string;
-} 
-export interface ModeratorAccessControl{
-   id:string ;
-  teacher: Moderator;
-  teacherId:string;
+}
+export interface ModeratorAccessControl {
+  id: string;
+  moderator: Moderator;
+  moderatorId: string;
   // Permissions for class , teacher and student management
 
-  canSeeTeacher:   boolean;
-  canAddTeacher:   boolean;
+  canSeeTeacher: boolean;
+  canAddTeacher: boolean;
   canUpdateTeacher: boolean;
   canDeleteTeacher: boolean;
 
-  canSeeClass:boolean;
-  canAddClass:boolean;
-  canUpdateClass:boolean;
-  canDeleteClass:boolean;
+  canSeeClass: boolean;
+  canAddClass: boolean;
+  canUpdateClass: boolean;
+  canDeleteClass: boolean;
 
-  canSeeStudent:boolean;
-  canAddStudent:boolean;
-  canUpdateStudent:boolean;
-  canDeleteStudent:boolean;
-  createdAt:Date; 
-  updatedAt:Date ;
+  canSeeStudent: boolean;
+  canAddStudent: boolean;
+  canUpdateStudent: boolean;
+  canDeleteStudent: boolean;
+  createdAt: Date;
+  updatedAt: Date;
 }

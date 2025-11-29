@@ -101,20 +101,20 @@ export interface TeacherAuthData {
   classRate?: number;
 }
 
-export interface TeacherAccessControl{
-   id:string ;
+export interface TeacherAccessControl {
+  id: string;
   teacher: Teacher;
-  teacherId:string;
+  teacherId: string;
   // Permissions for class and student management
-  canSeeClass:boolean;
-  canAddClass:boolean;
-  canUpdateClass:boolean;
-  canDeleteClass:boolean;
+  canSeeClass: boolean;
+  canAddClass: boolean;
+  canUpdateClass: boolean;
+  canDeleteClass: boolean;
 
-  canSeeStudent:boolean;
-  canAddStudent:boolean;
-  canUpdateStudent:boolean;
-  canDeleteStudent:boolean;
-  createdAt:Date; 
-  updatedAt:Date ;
+  canSeeStudent: boolean;
+  canAddStudent: boolean;
+  canUpdateStudent: boolean;
+  canDeleteStudent: boolean;
+  createdAt: Date;
+  updatedAt: Date;
 }
