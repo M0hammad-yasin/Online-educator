@@ -1,11 +1,12 @@
 // client/src/module/classes/hooks/useClasses.ts
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, UseQueryOptions } from '@tanstack/react-query';
 import { classService } from '../services/class.service';
-import { 
-  CreateClassRequest, 
-  UpdateClassRequest, 
-  ClassFilters, 
+import {
+  CreateClassRequest,
+  UpdateClassRequest,
+  ClassFilters,
+  Class,
 } from '../index';
 
 // Query Keys
@@ -15,7 +16,7 @@ export const CLASS_QUERY_KEYS = {
   list: (filters?: ClassFilters) => [...CLASS_QUERY_KEYS.lists(), { filters }] as const,
   details: () => [...CLASS_QUERY_KEYS.all, 'detail'] as const,
   detail: (id: string) => [...CLASS_QUERY_KEYS.details(), id] as const,
-  selection: (filters: ClassFilters) => [...CLASS_QUERY_KEYS.all, 'selection',{filters}] as const,
+  selection: (filters: ClassFilters) => [...CLASS_QUERY_KEYS.all, 'selection', { filters }] as const,
   count: (filters?: ClassFilters) => [...CLASS_QUERY_KEYS.all, 'count', { filters }] as const,
   countByGroup: (filters: ClassFilters) => [...CLASS_QUERY_KEYS.all, 'countByGroup', filters] as const,
   grouped: (filters?: ClassFilters) => [...CLASS_QUERY_KEYS.all, 'grouped', { filters }] as const,
@@ -23,11 +24,12 @@ export const CLASS_QUERY_KEYS = {
 };
 
 // Fetch Classes
-export const useClasses = (filters?: ClassFilters) => {
+export const useClasses = (filters?: ClassFilters, options?: Partial<UseQueryOptions<any, any, any, any>>) => {
   return useQuery({
     queryKey: CLASS_QUERY_KEYS.list(filters),
     queryFn: () => classService.getAllClasses(filters),
     staleTime: 5 * 60 * 1000, // 5 minutes
+    ...options,
   });
 };
 
@@ -41,7 +43,7 @@ export const useClass = (id: string) => {
 };
 
 // Fetch Classes for Selection
-export const useClassesForSelection = (filters:ClassFilters) => {
+export const useClassesForSelection = (filters: ClassFilters) => {
   return useQuery({
     queryKey: CLASS_QUERY_KEYS.selection(filters),
     queryFn: () => classService.getClassesForSelection(filters),
@@ -59,7 +61,7 @@ export const useClassesCount = (filters?: ClassFilters) => {
 };
 
 // Fetch Classes Count by Group
-export const useClassesCountByGroup = (filters: ClassFilters={}) => {
+export const useClassesCountByGroup = (filters: ClassFilters = {}) => {
   return useQuery({
     queryKey: CLASS_QUERY_KEYS.countByGroup(filters),
     queryFn: () => classService.getClassesCountByGroup(filters),
@@ -88,7 +90,7 @@ export const useCalendarClasses = (filters?: ClassFilters) => {
 // Create Class Mutation
 export const useCreateClass = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: (data: CreateClassRequest) => classService.createClass(data),
     onSuccess: () => {
@@ -101,9 +103,9 @@ export const useCreateClass = () => {
 // Update Class Mutation
 export const useUpdateClass = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: UpdateClassRequest }) => 
+    mutationFn: ({ id, data }: { id: string; data: UpdateClassRequest }) =>
       classService.updateClass(id, data),
     onSuccess: (_, { id }) => {
       // Invalidate specific class and all lists
@@ -119,7 +121,7 @@ export const useUpdateClass = () => {
 // Delete Class Mutation
 export const useDeleteClass = () => {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: (id: string) => classService.deleteClass(id),
     onSuccess: (_, id) => {
@@ -131,4 +133,56 @@ export const useDeleteClass = () => {
       queryClient.invalidateQueries({ queryKey: CLASS_QUERY_KEYS.calendar() });
     },
   });
+};
+export const useClassStats = (filters?: ClassFilters) => {
+  return useClasses(
+    filters,
+    {
+      select: (response) => {
+        const classes = response?.data ?? [];
+
+        // Single-pass reducer (3–4x faster than multiple .filter calls)
+        const stats = classes.reduce(
+          (acc: any, c: Class) => {
+            acc.total++;
+            switch (c.status) {
+              case "COMPLETED":
+                acc.completed++;
+                break;
+              case "IN_PROGRESS":
+                acc.active++;
+                break;
+              case "SCHEDULED":
+                acc.scheduled++;
+                break;
+            }
+
+            return acc;
+          },
+          {
+            total: 0,
+            completed: 0,
+            active: 0,
+            scheduled: 0,
+          }
+        );
+
+        const completionRate =
+          stats.total > 0
+            ? Number(((stats.completed / stats.total) * 100).toFixed(1))
+            : 0;
+
+        return {
+          totalClasses: stats.total,
+          completedClasses: stats.completed,
+          activeClasses: stats.active,
+          scheduledClasses: stats.scheduled,
+          completionRate,
+        };
+      },
+
+      // Prevent unnecessary re-renders
+      notifyOnChangeProps: ["data", "isLoading"],
+    }
+  );
 };

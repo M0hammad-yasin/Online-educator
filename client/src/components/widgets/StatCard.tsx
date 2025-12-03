@@ -1,6 +1,5 @@
 import React from 'react';
-import { Card, Flex, Skeleton, Space,  Typography, theme as antdTheme } from 'antd';
-import useThemeStore from '../../store/themeStore';
+import { Card, Flex, Skeleton, Space, Tag, Typography, theme as antdTheme } from 'antd';
 import { useResponsive } from '../../hooks';
 const { Title, Text } = Typography;
 
@@ -10,6 +9,10 @@ interface StatCardProps {
   loading: boolean;
   icon: React.ReactNode;
   iconBg: string;
+  tag?: {
+    change: number;
+    isIncrease: boolean;
+  };
 }
 
 const StatCard: React.FC<StatCardProps> = ({
@@ -18,15 +21,15 @@ const StatCard: React.FC<StatCardProps> = ({
   loading,
   icon,
   iconBg,
+  tag,
 }) => {
   const { token } = antdTheme.useToken();
-  const { mode } = useThemeStore();
   const { isMobile } = useResponsive();
 
   const cardStyle: React.CSSProperties = {
     height: '100%',
     borderRadius: token.borderRadiusLG,
-    background: mode=='light'? `radial-gradient(circle at center,${token.colorBgBase} 0%, ${token.colorBgContainer} 100%)` : `radial-gradient(circle at center,${token.colorBgElevated} 0%, ${token.colorBgContainer} 100%)`,
+    background: `radial-gradient(circle at center,${token.colorBgElevated} 0%, ${token.colorBgContainer} 100%)`,
     backdropFilter: 'blur(10px)',
     border: token.colorBorder,
     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -74,13 +77,29 @@ const StatCard: React.FC<StatCardProps> = ({
       ) :
         (
           <Space direction="vertical" size={isMobile ? 12 : 16} style={{ width: '100%', position: 'relative', zIndex: 1 }}>
-            <Flex justify='flex-start' align='center'>
+            <Flex justify='space-between' align='flex-start'>
               <div style={iconStyle}>
                 {icon}
               </div>
+              {
+                tag && (
+                  <Tag
+                    color={tag.isIncrease ? 'success' : 'error'}
+                    style={{
+                      borderRadius: 6,
+                      padding: '2px 8px',
+                      border: 'none',
+                      fontWeight: 600,
+                      fontSize: isMobile ? 11 : 12,
+                    }}
+                  >
+                    {tag.isIncrease ? `+${tag.change}%` : `${tag.change}%`}
+                  </Tag>
+                )
+              }
             </Flex>
             <Flex vertical justify='center' align='flex-start' >
-              <Text style={{ fontSize: isMobile ? 14 : 16, fontWeight: 700, color: token.colorTextSecondary, display: 'block' }}>
+              <Text style={{ fontSize: isMobile ? 14 : 16, color: token.colorTextSecondary, display: 'block' }}>
                 {title}
               </Text>
               <Title level={3} style={{ margin: 0, fontSize: isMobile ? 20 : 28, fontWeight: 700 }}>

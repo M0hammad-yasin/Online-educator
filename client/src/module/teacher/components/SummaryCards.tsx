@@ -37,8 +37,8 @@ const SummaryCards: React.FC = () => {
 
   return (
     <Row gutter={[token.size, token.size]}>
-      {cards.map((card, index) => (
-        <Col xs={12} sm={12} md={12} lg={6} key={index}>
+      {cards.map((card) => (
+        <Col xs={12} sm={12} md={12} lg={6} key={card.title}>
           <StatCard
             title={card.title}
             value={card.value}

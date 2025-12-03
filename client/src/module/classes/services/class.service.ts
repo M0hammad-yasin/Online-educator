@@ -1,14 +1,14 @@
 // client/src/module/classes/services/class.service.ts
 
 import { BaseService } from '../../../services/api/base.service';
-import { 
-  Class, 
-  CreateClassRequest, 
-  UpdateClassRequest, 
-  ClassFilters, 
-  ClassSelection, 
-  GroupedClass, 
-  CalendarClass, 
+import {
+  Class,
+  CreateClassRequest,
+  UpdateClassRequest,
+  ClassFilters,
+  ClassSelection,
+  GroupedClass,
+  CalendarClass,
   ClassSearchResult
 } from '..';
 import { ApiResponse } from '../../../services/api/types';
@@ -27,7 +27,7 @@ class ClassService extends BaseService<Class> {
   }
 
   async getClassesForSelection(filters: ClassFilters): Promise<ApiResponse<ClassSelection[]>> {
-    return this.customGet<ClassSelection[]>('/select',filters);
+    return this.customGet<ClassSelection[]>('/select', filters);
   }
 
   async getClassesCountByGroup(filters: ClassFilters): Promise<ApiResponse<any>> {
@@ -44,7 +44,6 @@ class ClassService extends BaseService<Class> {
 
   async getClassesCount(filters?: ClassFilters): Promise<ApiResponse<Number>> {
     const response = await this.customGet<Number>('/count', filters);
-    console.log(response);
     return response;
   }
 

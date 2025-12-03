@@ -1,5 +1,5 @@
 // client/src/pages/dashboard/DashboardPage.tsx
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   Card,
   Row,
@@ -35,6 +35,9 @@ import {
   ClockCircleOutlined,
 } from '@ant-design/icons';
 import { useResponsive, useResponsiveColumns, useResponsiveFontSize, useResponsiveSpacing } from '../../hooks';
+import StatCard from '../../components/widgets/StatCard';
+import { useStudentCount } from '../../module/student';
+import { useClassStats } from '../../module/classes';
 
 const { Title, Text } = Typography;
 
@@ -47,14 +50,6 @@ const COLORS = {
   info: { main: '#3b82f6', lighter: '#dbeafe', gradient: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)' },
   neutral: { 50: '#fafafa', 200: '#e5e5e5', 600: '#525252', 800: '#262626' },
 };
-
-// Mock Data
-const statsData = [
-  { title: 'Total Students', value: 1248, change: 12.5, isIncrease: true, icon: <TeamOutlined />, color: COLORS.primary.main, bgGradient: COLORS.primary.gradient },
-  { title: 'Active Classes', value: 42, change: 8.2, isIncrease: true, icon: <BookOutlined />, color: COLORS.success.main, bgGradient: COLORS.success.gradient },
-  { title: 'Total Revenue', value: '$48,352', change: -3.4, isIncrease: false, icon: <RiseOutlined />, color: COLORS.warning.main, bgGradient: COLORS.warning.gradient },
-  { title: 'Completion Rate', value: '94.3%', change: 2.1, isIncrease: true, icon: <CheckCircleOutlined />, color: COLORS.info.main, bgGradient: COLORS.info.gradient },
-];
 
 const classesPerDayData = [
   { day: 'Mon', scheduled: 8, completed: 7, cancelled: 1 },
@@ -96,6 +91,65 @@ const DashboardPage: React.FC = () => {
   const fontSize = useResponsiveFontSize();
   const spacing = useResponsiveSpacing();
 
+  // Fetch Data
+  const { data: studentCountData, isLoading: isLoadingStudents } = useStudentCount();
+  // const { data: activeClassesCount, isLoading: isLoadingActiveClasses } = useClassesCount({ status: 'IN_PROGRESS' });
+  const { data: classData, isLoading: isClassLoading } = useClassStats({ limit: 1000 }); // For completion rate calculation
+  const statsData = useMemo(() => {
+    if (!studentCountData?.data || !classData) return [];
+    const totalStudents = studentCountData?.data?.total ?? 0;
+    const activeClasses = classData?.activeClasses;
+    const totalClasses = classData?.totalClasses;
+    const completedClasses = classData?.completedClasses;
+    const completionRate =
+      totalClasses > 0
+        ? Number(((completedClasses / totalClasses) * 100).toFixed(1))
+        : 0;
+
+    return [
+      {
+        title: 'Total Students',
+        value: totalStudents,
+        change: 12.5, // Keep hardcoded for now as per instructions (or no data available)
+        isIncrease: true,
+        icon: <TeamOutlined />,
+        color: COLORS.primary.main,
+        bgGradient: COLORS.primary.gradient,
+        loading: isLoadingStudents,
+      },
+      {
+        title: 'Active Classes',
+        value: activeClasses,
+        change: 8.2,
+        isIncrease: true,
+        icon: <BookOutlined />,
+        color: COLORS.success.main,
+        bgGradient: COLORS.success.gradient,
+        loading: isClassLoading,
+      },
+      {
+        title: 'Total Revenue',
+        value: '$48,352',
+        change: -3.4,
+        isIncrease: false,
+        icon: <RiseOutlined />,
+        color: COLORS.warning.main,
+        bgGradient: COLORS.warning.gradient,
+        loading: isLoadingStudents,
+      },
+      {
+        title: 'Completion Rate',
+        value: `${completionRate}%`,
+        change: 2.1,
+        isIncrease: true,
+        icon: <CheckCircleOutlined />,
+        color: COLORS.info.main,
+        bgGradient: COLORS.info.gradient,
+        loading: isClassLoading,
+      },
+    ];
+  }, [studentCountData, classData]);
+
   const getStatusConfig = (status: string) => {
     switch (status) {
       case 'scheduled': return { color: COLORS.primary.main, bg: COLORS.primary.lighter, text: 'Scheduled' };
@@ -109,8 +163,8 @@ const DashboardPage: React.FC = () => {
   return (
     <>
       {/* Header Section */}
-      <Flex 
-        justify="space-between" 
+      <Flex
+        justify="space-between"
         align={isMobile ? "flex-start" : "center"}
         style={{ marginBottom: spacing.lg }}
         vertical={isMobile}
@@ -120,7 +174,7 @@ const DashboardPage: React.FC = () => {
           <Title level={isMobile ? 3 : 2} style={{ margin: 0, fontSize: fontSize.h2, fontWeight: 700 }}>
             Dashboard Overview
           </Title>
-          <Text style={{ fontSize: fontSize.body, color: COLORS.neutral[600] }}>
+          <Text style={{ fontSize: fontSize.body, color: COLORS.neutral[600], opacity: 0.7 }}>
             {isMobile ? "Today's overview" : "Welcome back! Here's what's happening today."}
           </Text>
         </Space>
@@ -128,72 +182,19 @@ const DashboardPage: React.FC = () => {
 
       {/* Stats Cards */}
       <Row gutter={columns.gutter as [number, number]} style={{ marginBottom: spacing.lg }}>
-        {statsData.map((stat, index) => (
-          <Col {...columns.statCard} key={index}>
-            <Card
-              variant='borderless'
-              style={{
-                borderRadius: token.borderRadiusLG,
-                background: '#fff',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
-                overflow: 'hidden',
-                position: 'relative',
-                transition: 'all 0.3s ease',
+        {statsData.map((stat) => (
+          <Col {...columns.quarterWidth} key={stat.title}>
+            <StatCard
+              title={stat.title}
+              value={stat.value}
+              loading={stat.loading}
+              icon={stat.icon}
+              iconBg={stat.bgGradient}
+              tag={{
+                change: stat.change,
+                isIncrease: stat.isIncrease,
               }}
-              styles={{ body: { padding: isMobile ? 16 : 20 } }}
-            >
-              <div style={{
-                position: 'absolute',
-                top: 0,
-                right: 0,
-                width: isMobile ? 80 : 120,
-                height: isMobile ? 80 : 120,
-                background: stat.bgGradient,
-                opacity: 0.08,
-                borderRadius: `0 ${token.borderRadiusLG}px 0 100%`
-              }} />
-              
-              <Space direction="vertical" size={isMobile ? 12 : 16} style={{ width: '100%', position: 'relative', zIndex: 1 }}>
-                <Flex justify="space-between" align="flex-start">
-                  <div
-                    style={{
-                      width: isMobile ? 40 : 56,
-                      height: isMobile ? 40 : 56,
-                      borderRadius: token.borderRadiusLG,
-                      background: stat.bgGradient,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: isMobile ? 18 : 24,
-                      color: '#fff',
-                      boxShadow: `0 4px 12px ${stat.color}40`
-                    }}
-                  >
-                    {stat.icon}
-                  </div>
-                  <Tag
-                    color={stat.isIncrease ? 'success' : 'error'}
-                    style={{
-                      borderRadius: 6,
-                      padding: '2px 8px',
-                      border: 'none',
-                      fontWeight: 600,
-                      fontSize: isMobile ? 11 : 12,
-                    }}
-                  >
-                    {Math.abs(stat.change)}%
-                  </Tag>
-                </Flex>
-                <div>
-                  <Text style={{ fontSize: isMobile ? 12 : 14, color: COLORS.neutral[600], display: 'block', marginBottom: 4 }}>
-                    {stat.title}
-                  </Text>
-                  <Title level={3} style={{ margin: 0, fontSize: isMobile ? 20 : 28, fontWeight: 700 }}>
-                    {stat.value}
-                  </Title>
-                </div>
-              </Space>
-            </Card>
+            />
           </Col>
         ))}
       </Row>
@@ -203,7 +204,7 @@ const DashboardPage: React.FC = () => {
         {/* Classes Bar Chart */}
         <Col {...columns.twoThirds}>
           <Card
-            bordered={false}
+            variant='borderless'
             title={
               <Flex justify="space-between" align="center" wrap="wrap" gap={spacing.sm}>
                 <div>
@@ -258,7 +259,7 @@ const DashboardPage: React.FC = () => {
         {/* Student Distribution Pie Chart */}
         <Col {...columns.oneThird}>
           <Card
-            bordered={false}
+            variant='borderless'
             title={
               <div>
                 <Title level={4} style={{ margin: 0, fontSize: fontSize.h4, fontWeight: 600 }}>
@@ -392,7 +393,7 @@ const DashboardPage: React.FC = () => {
       <Row gutter={columns.gutter as [number, number]}>
         <Col {...columns.fullWidth}>
           <Card
-            bordered={false}
+            variant='borderless'
             title={
               <Flex justify="space-between" align="center">
                 <div>
