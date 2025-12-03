@@ -1,4 +1,4 @@
-import { sendSuccess,asyncWrapper } from "../../utils/index.js";
+import { sendSuccess, asyncWrapper } from "../../utils/index.js";
 import { classService, classUtil } from "../../Services/class.services.js";
 import { Role } from "../../constant.js";
 
@@ -16,7 +16,7 @@ export const createClass = asyncWrapper(async (req, res) => {
   sendSuccess(res, {
     statusCode: 201,
     message: "Class created successfully",
-    data:newClass
+    data: newClass
   });
 });
 
@@ -26,8 +26,8 @@ export const updateClass = asyncWrapper(async (req, res) => {
   };
   if (Role.TEACHER === req.user?.role) filter.teacherId = req.user.userId;
   console.log(req.user);
-console.log(req.body);
-  const updatedClass  = await classService.updateClass(filter, req.body);
+  console.log(req.body);
+  const updatedClass = await classService.updateClass(filter, req.body);
   sendSuccess(res, {
     statusCode: 200,
     message: "Class updated successfully",
@@ -49,7 +49,7 @@ export const deleteClass = asyncWrapper(async (req, res) => {
   sendSuccess(res, {
     statusCode: 200,
     message: "Class deleted successfully",
-    data: deletedClass ,
+    data: deletedClass,
   });
 });
 export const getClassCount = asyncWrapper(async (req, res) => {
@@ -65,14 +65,13 @@ export const getClassCount = asyncWrapper(async (req, res) => {
   });
 });
 export const getClassCountForAdmin = asyncWrapper(async (req, res) => {
-  const { classCount, paginationData } = await classService.getClassCountForAdmin(
+  const { classCount } = await classService.getClassCountForAdmin(
     req.query
   );
   sendSuccess(res, {
     statusCode: 200,
     message: "Class count fetched successfully",
     data: classCount,
-    pagination: paginationData,
   });
 });
 export const getClassById = asyncWrapper(async (req, res) => {
@@ -85,7 +84,7 @@ export const getClassById = asyncWrapper(async (req, res) => {
   sendSuccess(res, {
     statusCode: 200,
     message: "Class fetched successfully",
-    data: classData ,
+    data: classData,
   });
 });
 export const getAllClasses = asyncWrapper(async (req, res) => {
@@ -153,7 +152,7 @@ export const getGroupedClasses = asyncWrapper(async (req, res) => {
     data: groupedClassData,
     pagination: paginationData,
   });
-      });
+});
 export const calendarViewClassData = asyncWrapper(async (req, res) => {
   const { classes, paginationData } = [Role.TEACHER, Role.STUDENT].includes(
     req.user.role
@@ -199,6 +198,6 @@ export const searchClasses = asyncWrapper(async (req, res) => {
     statusCode: 200,
     message: "Classes search results",
     data: classes,
-    pagination:paginationData,
+    pagination: paginationData,
   });
 });

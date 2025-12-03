@@ -1,7 +1,7 @@
 import { format } from "date-fns";
 import prisma from "../Prisma/prisma.client.js";
 import { Role } from "../constant.js";
-import {parseOrderBy,BadRequestError,buildPaginationMeta,getPagination,ValidationError,ConflictError,NotFoundError} from "../utils/index.js";
+import { parseOrderBy, BadRequestError, buildPaginationMeta, getPagination, ValidationError, ConflictError, NotFoundError } from "../utils/index.js";
 class ClassUtilities {
 
   /**
@@ -13,74 +13,72 @@ class ClassUtilities {
     return `${hours}h ${minutes}m`;
   }
 
-/**
- * Build class filters for Prisma queries
- * @param {Object} query - Query parameters
- * @param {Object} [user] - Current user (optional)
- * @returns {Object} Prisma-compatible filter object
- */
-buildClassFilters(query, user = null) {
-  let { teacherId, studentId, subject, status, grade, startDate, endDate, search, hour ,groupBy} = query;
+  /**
+   * Build class filters for Prisma queries
+   * @param {Object} query - Query parameters
+   * @param {Object} [user] - Current user (optional)
+   * @returns {Object} Prisma-compatible filter object
+   */
+  buildClassFilters(query, user = null) {
+    let { teacherId, studentId, subject, status, grade, startDate, endDate, search, hour, groupBy } = query;
+    if (status === "all-classes") status = null;
 
-  if (status === "all-classes") status = null;
+    const filter = {};
 
-  const filter = {};
-
-  // Role-based filtering
-  if (user) {
-    if (user.role === Role.ADMIN || user.role === Role.MODERATOR) {
-      teacherId = studentId = undefined;
-    } else if (user.role === Role.TEACHER) {
-      teacherId = user.userId;
-      studentId = undefined;
-    } else if (user.role === Role.STUDENT) {
-      studentId = user.userId;
-      teacherId = undefined;
-    }
-  }
-
-  // Date filters (UTC start/end of day)
-  if (startDate || endDate) {
-    filter.startTime = {};
-
-    // If grade exists and equals hour, set extreme minutes
-    if (groupBy && groupBy === "hour") {
-      if (startDate) {
-        const sd = new Date(`${startDate}T00:00:00.000Z`);
-        sd.setMinutes(0, 0, 0);
-        filter.startTime.gte = sd;
+    // Role-based filtering
+    if (user) {
+      if (user.role === Role.ADMIN || user.role === Role.MODERATOR) {
+        teacherId = studentId = undefined;
+      } else if (user.role === Role.TEACHER) {
+        teacherId = user.userId;
+        studentId = undefined;
+      } else if (user.role === Role.STUDENT) {
+        studentId = user.userId;
+        teacherId = undefined;
       }
-      if (endDate) {
-        const ed = new Date(`${endDate}T23:59:59.999Z`);
-        ed.setMinutes(59, 59, 999);
-        filter.startTime.lte = ed;
-      }
-    } else {
-      if (startDate) filter.startTime.gte = new Date(`${startDate}T00:00:00.000Z`);
-      if (endDate) filter.startTime.lte = new Date(`${endDate}T23:59:59.999Z`);
     }
+
+    // Date filters (UTC start/end of day)
+    if (startDate || endDate) {
+      filter.startTime = {};
+
+      // If grade exists and equals hour, set extreme minutes
+      if (groupBy && groupBy === "hour") {
+        if (startDate) {
+          const sd = new Date(`${startDate}T00:00:00.000Z`);
+          sd.setMinutes(0, 0, 0);
+          filter.startTime.gte = sd;
+        }
+        if (endDate) {
+          const ed = new Date(`${endDate}T23:59:59.999Z`);
+          ed.setMinutes(59, 59, 999);
+          filter.startTime.lte = ed;
+        }
+      } else {
+        if (startDate) filter.startTime.gte = new Date(`${startDate}T00:00:00.000Z`);
+        if (endDate) filter.startTime.lte = new Date(`${endDate}T23:59:59.999Z`);
+      }
+    }
+    // Additional filters
+    Object.assign(filter, {
+      ...(teacherId && { teacherId }),
+      ...(studentId && { studentId }),
+      ...(subject && { subject }),
+      ...(status && { status }),
+      ...(grade && { student: { grade: Number(grade) } }),
+    });
+
+    // Search filter across subject, teacher name, and student name
+    if (search) {
+      filter.OR = [
+        { subject: { contains: search, mode: "insensitive" } },
+        { teacher: { name: { contains: search, mode: "insensitive" } } },
+        { student: { name: { contains: search, mode: "insensitive" } } },
+      ];
+    }
+
+    return filter;
   }
-
-  // Additional filters
-  Object.assign(filter, {
-    ...(teacherId && { teacherId }),
-    ...(studentId && { studentId }),
-    ...(subject && { subject }),
-    ...(status && { status }),
-    ...(grade && { student: { grade: Number(grade) } }),
-  });
-
-  // Search filter across subject, teacher name, and student name
-  if (search) {
-    filter.OR = [
-      { subject: { contains: search, mode: "insensitive" } },
-      { teacher: { name: { contains: search, mode: "insensitive" } } },
-      { student: { name: { contains: search, mode: "insensitive" } } },
-    ];
-  }
-
-  return filter;
-}
 
   /**
    * Get pagination parameters from query
@@ -167,7 +165,7 @@ class ClassService {
     if (!teacher) {
       throw new NotFoundError("Teacher not found");
     }
-        classData.scheduledAt = new Date(classData.scheduledAt);
+    classData.scheduledAt = new Date(classData.scheduledAt);
     classData.startTime = new Date(classData.startTime);
     classData.endTime = new Date(classData.endTime);
 
@@ -205,13 +203,13 @@ class ClassService {
     if (updateData.endTime) {
       updateData.endTime = new Date(updateData.endTime);
     }
-    if(updateData.classStatus){ 
-      updateData.status=updateData.classStatus;
+    if (updateData.classStatus) {
+      updateData.status = updateData.classStatus;
       delete updateData.classStatus;
     }
     console.log(updateData);
     // Check that the difference between startTime and endTime is >= updateData.duration or >= 59 minutes
-    if ( updateData.endTime && updateData.startTime) {
+    if (updateData.endTime && updateData.startTime) {
       const startTime = updateData.startTime ? new Date(updateData.startTime) : classData.startTime;
       const endTime = updateData.endTime ? new Date(updateData.endTime) : classData.endTime;
       const diffMs = endTime - startTime;
@@ -269,7 +267,7 @@ class ClassService {
         },
       },
     });
-    return updatedClass ;
+    return updatedClass;
   }
   async getAllClassesForAdmin(query) {
     const orderBy = parseOrderBy(query);
@@ -278,8 +276,7 @@ class ClassService {
     const [classes, totalClasses] = await Promise.all([
       prisma.class.findMany({
         where: filter,
-        skip,
-        take,
+        ...(query.pagination ? { skip, take } : {}),
         orderBy: orderBy && orderBy.length > 0 ? orderBy : undefined,
         include: {
           teacher: {
@@ -303,63 +300,61 @@ class ClassService {
       }),
       prisma.class.count({ where: filter }),
     ]);
-  
+
     // calculate pagination range
     const paginationData = buildPaginationMeta(totalClasses, page, limit)
-  
-  
-    return {
-      classes,
-      paginationData,
-  }
-}
-  
 
-  async getAllClasses(query, user) {
-    const orderBy = parseOrderBy(query);
-    const filter = this.#cu.buildClassFilters(query, user);
-    const { skip, take, page, limit } = this.#cu.getPaginationParams(query);
-  
-    const [classes, totalClasses] = await Promise.all([
-      prisma.class.findMany({
-        where: filter,
-        skip,
-        take,
-        orderBy: orderBy && orderBy.length > 0 ? orderBy : undefined,
-        include: {
-          teacher: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-              profilePicture: true,
-            },
-          },
-          student: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-              profilePicture: true,
-              grade: true,
-            },
-          },
-        },
-      }),
-      prisma.class.count({ where: filter }),
-    ]);
-  
-    const from = totalClasses === 0 ? 0 : skip + 1;
-    const to = Math.min(skip + classes.length, totalClasses);
-  
-      const paginationData = buildPaginationMeta(totalClasses,page,limit)
-  
+
     return {
       classes,
       paginationData,
     }
   }
-  
+
+
+  async getAllClasses(query, user) {
+    const orderBy = parseOrderBy(query);
+    const filter = this.#cu.buildClassFilters(query, user);
+    const { skip, take, page, limit } = this.#cu.getPaginationParams(query);
+    const [classes, totalClasses] = await Promise.all([
+      prisma.class.findMany({
+        where: filter,
+        ...(query.pagination ? { skip, take } : {}),
+        orderBy: orderBy && orderBy.length > 0 ? orderBy : undefined,
+        include: {
+          teacher: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              profilePicture: true,
+            },
+          },
+          student: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              profilePicture: true,
+              grade: true,
+            },
+          },
+        },
+      }),
+      prisma.class.count({ where: filter }),
+    ]);
+
+    const from = totalClasses === 0 ? 0 : skip + 1;
+    const to = Math.min(skip + classes.length, totalClasses);
+
+    const paginationData = buildPaginationMeta(totalClasses, page, limit)
+
+    return {
+      classes,
+      paginationData,
+    }
+  }
+
 
   async deleteClass(filter) {
     if (!filter.id) throw new ValidationError("Class ID is required");
@@ -402,8 +397,7 @@ class ClassService {
     const { skip, take, page, limit } = this.#cu.getPaginationParams(query);
     const [classCount, totalClasses] = await Promise.all([
       prisma.class.count({
-        ...(take && { take }),
-        ...(skip && { skip }),
+        ...(query.pagination ? { skip, take } : {}),
         where: filter,
       }),
       prisma.class.count({ where: filter }),
@@ -412,28 +406,27 @@ class ClassService {
 
     const from = skip + 1;
     const to = Math.min(skip + classCount, totalClasses);
-    const paginationData = buildPaginationMeta(totalClasses,page,limit)
+    const paginationData = buildPaginationMeta(totalClasses, page, limit)
     return {
       classCount,
-        paginationData,
+      paginationData,
     };
   }
   async getClassCountForAdmin(query) {
     const filter = this.#cu.buildClassFilters(query);
-    const { skip, take, page, limit } = this.#cu.getPaginationParams(query);
+    // const { skip, take, page, limit } = this.#cu.getPaginationParams(query);
     const [classCount, totalClasses] = await Promise.all([
       prisma.class.count({
-        ...(take && { take }),
-        ...(skip && { skip }),
+        ...(query.pagination ? { skip, take } : {}),
         where: filter,
       }),
       prisma.class.count({ where: filter }),
     ]);
 
-    const paginationData = buildPaginationMeta(totalClasses,page,limit)
+    // const paginationData = buildPaginationMeta(totalClasses, page, limit)
     return {
       classCount,
-      paginationData,
+      // paginationData,
     };
   }
   async getClassesForSelection(query, user = null) {
@@ -454,8 +447,7 @@ class ClassService {
 
     const classes = await prisma.class.findMany({
       where: filter,
-      skip,
-      take,
+      ...(query.pagination ? { skip, take } : {}),
       select: {
         id: true,
         subject: true,
@@ -478,7 +470,7 @@ class ClassService {
     });
 
     const totalClasses = await prisma.class.count({ where: filter });
-    const paginationData = buildPaginationMeta(totalClasses,page,limit)
+    const paginationData = buildPaginationMeta(totalClasses, page, limit)
     return {
       classes,
       paginationData,
@@ -515,7 +507,7 @@ class ClassService {
   countClassesByGroup = (classes, groupBy) => {
     if (!groupBy) throw new BadRequestError("group by is required");
     let groupedClassesCount = {};
-  
+
     // 📘 Group by Grade
     if (groupBy === "grade") {
       groupedClassesCount = classes.reduce((acc, cls) => {
@@ -524,7 +516,7 @@ class ClassService {
         return acc;
       }, {});
     }
-  
+
     // 📘 Group by Day, Hour, or Month
     const validGroupBys = ["day", "hour", "month"];
     if (validGroupBys.includes(groupBy.toLowerCase())) {
@@ -532,25 +524,25 @@ class ClassService {
         groupBy.toLowerCase() === "day"
           ? "yyyy-MM-dd"
           : groupBy.toLowerCase() === "hour"
-          ? "yyyy-MM-dd HH:00"
-          : "yyyy-MM";
-  
+            ? "yyyy-MM-dd HH:00"
+            : "yyyy-MM";
+
       groupedClassesCount = classes.reduce((acc, cls) => {
         const groupKey = format(new Date(cls.scheduledAt), groupKeyFormat);
         acc[groupKey] = (acc[groupKey] || 0) + 1;
         return acc;
       }, {});
     }
-  
+
     // ✅ Convert to array for Recharts
     const rechartsData = Object.entries(groupedClassesCount).map(([key, value]) => ({
       class: key,
       total: typeof value === "number" ? value : value.classCount || 0
     }));
-  
+
     return rechartsData;
   };
-  
+
   getCalanderViewClasses(classes) {
     // Format data for calendar view
     const calendarData = classes.map((cls) => ({

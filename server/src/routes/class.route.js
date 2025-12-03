@@ -5,7 +5,7 @@ import {
   classFilterQuerySchema,
   classSchema,
   updateClassSchema,
-    mongoIdSchema,
+  mongoIdSchema,
   paginationSchema,
   searchQuerySchema,
 } from "../validation/index.js"; // Consolidated validators
@@ -27,7 +27,7 @@ import {
 } from "../controllers/classController/class.controller.js";
 import { hasRole, roleBasedController } from "../middleware/roleCheck.js";
 import { Role } from "../constant.js";
-import {asyncWrapper} from "../utils/index.js";
+import { asyncWrapper } from "../utils/index.js";
 
 const router = express.Router();
 
@@ -55,9 +55,9 @@ router.get(
   })
 );
 router.get('/search',
-  validate(searchQuerySchema,(req)=>req.query),
+  validate(searchQuerySchema, (req) => req.query),
   auth,
-  hasRole([Role.ADMIN,Role.MODERATOR,Role.TEACHER,Role.STUDENT]),
+  hasRole([Role.ADMIN, Role.MODERATOR, Role.TEACHER, Role.STUDENT]),
   searchClasses
 );
 // ----------------- GET ClASSES FOR QUICK SELECTION --------------
@@ -102,6 +102,7 @@ router.get(
 router.get(
   "/count",
   validate(paginationSchema, (req) => req.query),
+  validate(classFilterQuerySchema, (req) => req.query),
   auth,
   hasRole([Role.ADMIN, Role.MODERATOR, Role.TEACHER, Role.STUDENT]),
   roleBasedController({

@@ -23,6 +23,7 @@ import {
   getStudentsWithClassCount,
   getStudentsWithClasses,
   searchStudents,
+  getStudentsCount,
   forgotPassword
 } from "../controllers/StudentController/student.controller.js";
 import auth from "../middleware/auth.js";
@@ -55,15 +56,15 @@ router.patch(
   hasRole(Role.STUDENT),
   patchStudent
 );
-router.post("/login",validate(loginSchema,req=>req.body) ,loginStudent);
+router.post("/login", validate(loginSchema, req => req.body), loginStudent);
 router.post("/logout", auth, hasRole(Role.STUDENT), logoutStudent);
-router.post("/forgot-password",validate(emailSchema,(req)=>req.body), auth, hasRole(Role.STUDENT),forgotPassword);
+router.post("/forgot-password", validate(emailSchema, (req) => req.body), auth, hasRole(Role.STUDENT), forgotPassword);
 
 router.get("/me", auth, isStudent, getStudent);
 router.get('/search',
-  validate(searchQuerySchema,(req)=>req.query),
+  validate(searchQuerySchema, (req) => req.query),
   auth,
-  hasRole([Role.ADMIN,Role.MODERATOR,Role.TEACHER]),
+  hasRole([Role.ADMIN, Role.MODERATOR, Role.TEACHER]),
   searchStudents
 )
 router.get(
@@ -92,6 +93,14 @@ router.get(
   hasRole([Role.ADMIN, Role.MODERATOR]),
   getStudentsWithClassCount
 );
+router.get(
+  "/count",
+  validate(paginationSchema, (req) => req.query),
+  validate(classFilterQuerySchema, (req) => req.query),
+  auth,
+  hasRole([Role.ADMIN, Role.TEACHER, Role.MODERATOR]),
+  getStudentsCount
+)
 router.get(
   "/:id",
   validate(mongoIdSchema, (req) => req.params),

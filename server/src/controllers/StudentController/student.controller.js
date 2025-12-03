@@ -1,4 +1,4 @@
-import {asyncWrapper,controllerHelper, getPagination,buildPaginationMeta,sendSuccess,BadRequestError,NotFoundError,comparePassword,hashPassword,generateToken} from "../../utils/index.js";
+import { asyncWrapper, controllerHelper, getPagination, buildPaginationMeta, sendSuccess, BadRequestError, NotFoundError, comparePassword, hashPassword, generateToken } from "../../utils/index.js";
 import prisma from "../../Prisma/prisma.client.js";
 import _ from "lodash";
 import { Role } from "../../constant.js";
@@ -29,7 +29,7 @@ export const registerStudent = asyncWrapper(async (req, res) => {
   sendSuccess(res, {
     statusCode: 201,
     message: "Student registered successfully",
-    data: student ,
+    data: student,
   });
 });
 export const updateStudent = asyncWrapper(async (req, res) => {
@@ -117,7 +117,7 @@ export const logoutStudent = asyncWrapper(async (req, res) => {
 });
 //forgot password
 export const forgotPassword = asyncWrapper(async (req, res) => {
-  const {email} = req.body;
+  const { email } = req.body;
 
   // Check if student exists
   const student = await prisma.student.findUnique({ where: { email } });
@@ -144,7 +144,7 @@ export const getStudent = asyncWrapper(async (req, res) => {
   sendSuccess(res, {
     statusCode: 200,
     message: "Student fetched Successfully",
-    data:  _.omit(student, ["passwordHash"]),
+    data: _.omit(student, ["passwordHash"]),
   });
 });
 export const getAllStudent = asyncWrapper(async (req, res) => {
@@ -159,11 +159,11 @@ export const getAllStudent = asyncWrapper(async (req, res) => {
   const whereClause =
     Object.keys(classFilter).length > 0
       ? {
-          AND: [
-            studentFilter,
-            { classes: { some: classFilter } },
-          ],
-        }
+        AND: [
+          studentFilter,
+          { classes: { some: classFilter } },
+        ],
+      }
       : studentFilter;
 
   // Fetch students
@@ -191,7 +191,7 @@ export const getAllStudent = asyncWrapper(async (req, res) => {
   ]);
 
   // Pagination object
-  const paginationData =buildPaginationMeta(total, page, limit );
+  const paginationData = buildPaginationMeta(total, page, limit);
 
   // Response
   sendSuccess(res, {
@@ -199,6 +199,74 @@ export const getAllStudent = asyncWrapper(async (req, res) => {
     message: "Students fetched successfully",
     data: students,
     pagination: paginationData,
+  });
+});
+
+export const getStudentsCount = asyncWrapper(async (req, res) => {
+  const classFilter = classUtil.buildClassFilters(req.query);
+  const studentFilter = controllerHelper.buildFilter(req.user.role, req.query);
+
+  const whereClause =
+    Object.keys(classFilter).length > 0
+      ? {
+        AND: [
+          studentFilter,
+          { classes: { some: classFilter } },
+        ],
+      }
+      : studentFilter;
+
+  // ---- TOTAL ----
+  const total = await prisma.student.count({
+    where: whereClause,
+  });
+
+  // ---- BY GRADE ----
+  const gradeGroups = await prisma.student.groupBy({
+    by: ["grade"],
+    where: whereClause,
+    _count: { grade: true },
+  });
+
+  const byGrade = gradeGroups.reduce((acc, g) => {
+    acc[g.grade ?? "Unknown"] = g._count.grade;
+    return acc;
+  }, {});
+
+  // ---- BY REGION ----
+  const regionGroups = await prisma.student.groupBy({
+    by: ["region"],
+    where: whereClause,
+    _count: { region: true },
+  });
+
+  const byRegion = regionGroups.reduce((acc, r) => {
+    acc[r.region ?? "Unknown"] = r._count.region;
+    return acc;
+  }, {});
+
+  // ---- EMAIL VERIFIED ----
+  const emailVerified = await prisma.student.count({
+    where: { ...whereClause, isEmailVerified: true },
+  });
+
+  const emailUnverified = await prisma.student.count({
+    where: { ...whereClause, isEmailVerified: false },
+  });
+
+  // ---- RETURN THE STRUCTURE ----
+  const result = {
+    total,
+    byGrade,
+    byRegion,
+    emailVerified,
+    emailUnverified,
+  };
+
+  sendSuccess(res, {
+    statusCode: 200,
+    message: "Students count fetched successfully",
+    data: result,
   });
 });
 
@@ -221,7 +289,7 @@ export const getStudentsForSelection = asyncWrapper(async (req, res) => {
       grade: true,
     },
   });
-  const paginationData = buildPaginationMeta(students.length, page, limit );
+  const paginationData = buildPaginationMeta(students.length, page, limit);
 
   sendSuccess(res, {
     statusCode: 200,
@@ -275,21 +343,21 @@ export const deleteStudentByAdmin = asyncWrapper(async (req, res) => {
   if (!student) {
     throw new BadRequestError("student not found");
   }
-  if(student.isDeleted) {
+  if (student.isDeleted) {
     throw new BadRequestError("student already deleted");
   }
-  const hasClasses = await prisma.class.count({ where: { studentId: id,status: {in: ["IN_PROGRESS", "SCHEDULED"] } } });
+  const hasClasses = await prisma.class.count({ where: { studentId: id, status: { in: ["IN_PROGRESS", "SCHEDULED"] } } });
   if (hasClasses > 0) {
     throw new BadRequestError("Cannot delete student with ongoing or scheduled classes");
   }
   const updatedStudent = await prisma.student.update({
-      where: { id },
+    where: { id },
     data: { isDeleted: true },
   });
   sendSuccess(res, {
     statusCode: 201,
     message: "student deleted Successfully",
-    data:  _.omit(updatedStudent, ["passwordHash"]) ,
+    data: _.omit(updatedStudent, ["passwordHash"]),
   });
 });
 
@@ -324,12 +392,12 @@ export const patchStudent = asyncWrapper(async (req, res) => {
 export const searchStudents = asyncWrapper(async (req, res) => {
   const { search, limit = 10 } = req.query;
   const filter = {
-        OR: [
-          { name: { contains: search, mode: "insensitive" } },
-          { email: { contains: search, mode: "insensitive" } },
-          { parentEmail: { contains: search, mode: "insensitive" } },
-        ],
-      };
+    OR: [
+      { name: { contains: search, mode: "insensitive" } },
+      { email: { contains: search, mode: "insensitive" } },
+      { parentEmail: { contains: search, mode: "insensitive" } },
+    ],
+  };
   const students = await prisma.student.findMany({
     where: filter,
     take: parseInt(limit),
@@ -360,7 +428,7 @@ export const searchStudents = asyncWrapper(async (req, res) => {
 export const getStudentsWithClassCount = asyncWrapper(async (req, res) => {
   // Extract pagination parameters
   const { page, limit, take, skip } = getPagination(req.query);
-  
+
   // Build class filter from query parameters
   const classFilter = classUtil.buildClassFilters(req.query);
   // Fetch students with pagination and include class count
@@ -386,8 +454,8 @@ export const getStudentsWithClassCount = asyncWrapper(async (req, res) => {
   ]);
 
   // Calculate pagination metadata
-  const paginationData = buildPaginationMeta(totalStudents, page, limit );
-      // Response
+  const paginationData = buildPaginationMeta(totalStudents, page, limit);
+  // Response
   return sendSuccess(res, {
     statusCode: 200,
     message: "Students with class count fetched successfully",
@@ -403,10 +471,10 @@ export const getStudentsWithClassCount = asyncWrapper(async (req, res) => {
 export const getStudentsWithClasses = asyncWrapper(async (req, res) => {
   // Extract pagination parameters
   const { page, limit, take, skip } = getPagination(req.query);
-  
+
   // Build class filter from query parameters
   const classFilter = classUtil.buildClassFilters(req.query);
-  
+
   // Fetch students with pagination and include classes
   const [students, totalStudents] = await Promise.all([
     prisma.student.findMany({
@@ -426,8 +494,8 @@ export const getStudentsWithClasses = asyncWrapper(async (req, res) => {
   ]);
 
   // Calculate pagination metadata
-  const paginationData = buildPaginationMeta(totalStudents, page, limit );
-    // Response with standardized format
+  const paginationData = buildPaginationMeta(totalStudents, page, limit);
+  // Response with standardized format
   return sendSuccess(res, {
     statusCode: 200,
     message: "Students with classes fetched successfully",
