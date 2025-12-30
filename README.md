@@ -149,49 +149,34 @@ graph TB
 ### Authentication Flow
 
 ```mermaid
-graph TB
-    subgraph Client["Client (React + TypeScript)"]
-        UI[User Interface]
-        AuthStore["Zustand Store (token + user)"]
-        API_Client[API Client]
-        Router[React Router]
-        ReactQuery["React Query Cache (classes, teachers, students, etc.)"]
-    end
+sequenceDiagram
+    participant User
+    participant Client
+    participant API
+    participant Auth
+    participant DB
     
-    subgraph Server["Server (Node.js + Express)"]
-        Routes[Express Routes]
-        Middleware[Auth & Validation Middleware]
-        Controllers[Controllers]
-        Services[Business Logic]
-    end
+    %% Login Flow
+    User->>Client: Login (email, password)
+    Client->>API: POST /api/{role}/login
+    API->>Auth: Validate credentials
+    Auth->>DB: Check user & password
+    DB-->>Auth: User data
+    Auth->>Auth: Generate JWT token
+    Auth-->>API: Token + User data
+    API-->>Client: { token, user }
+    Client->>Client: Store token (localStorage)
+    Client->>Client: Set auth state (Zustand)
     
-    subgraph Database["Database (MongoDB)"]
-        Prisma[Prisma ORM]
-        MongoDB[(MongoDB)]
-    end
-    
-    %% Client Flow
-    UI --> Router
-    Router --> AuthStore
-    UI --> ReactQuery
-    AuthStore --> API_Client
-    ReactQuery --> API_Client
-
-    %% API Communication
-    API_Client -->|HTTP/REST| Routes
-    Routes --> Middleware
-    Middleware --> Controllers
-    Controllers --> Services
-    Services --> Prisma
-    Prisma --> MongoDB
-    MongoDB --> Prisma
-    Prisma --> Services
-    Services --> Controllers
-    Controllers --> Middleware
-    Middleware --> Routes
-    Routes -->|JSON Response| API_Client
-    API_Client --> ReactQuery
-    ReactQuery --> UI
+    %% Subsequent requests
+    Note over Client,API: Subsequent Requests
+    Client->>API: Request with Authorization header
+    API->>Auth: Verify JWT token
+    Auth-->>API: Decoded user data
+    API->>API: Check role permissions
+    API->>DB: Fetch/Update data
+    DB-->>API: Response data
+    API-->>Client: JSON response
 ```
 
 ### API Request Flow
