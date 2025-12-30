@@ -104,9 +104,10 @@
 graph TB
     subgraph Client["Client (React + TypeScript)"]
         UI[User Interface]
-        State[Zustand Store]
+        AuthStore[Zustand Store<br/>(token + user)]
         API_Client[API Client]
         Router[React Router]
+        ReactQuery[React Query Cache<br/>(classes, teachers, students, etc.)]
     end
     
     subgraph Server["Server (Node.js + Express)"]
@@ -122,8 +123,11 @@ graph TB
     end
     
     UI --> Router
-    Router --> State
-    State --> API_Client
+    Router --> AuthStore
+    UI --> ReactQuery
+    ReactQuery --> API_Client
+    AuthStore --> API_Client
+    
     API_Client -->|HTTP/REST| Routes
     Routes --> Middleware
     Middleware --> Controllers
@@ -136,47 +140,67 @@ graph TB
     Controllers --> Middleware
     Middleware --> Routes
     Routes -->|JSON Response| API_Client
-    API_Client --> State
-    State --> UI
+    API_Client --> ReactQuery
+    ReactQuery --> UI
 ```
 
 ### Authentication Flow
 
 ```mermaid
-sequenceDiagram
-    participant User
-    participant Client
-    participant API
-    participant Auth
-    participant DB
+graph TB
+    subgraph Client["Client (React + TypeScript)"]
+        UI[User Interface]
+        AuthStore[Zustand Store<br/>(token + user)]
+        API_Client[API Client]
+        Router[React Router]
+        ReactQuery[React Query Cache<br/>(classes, teachers, students, etc.)]
+    end
     
-    User->>Client: Login (email, password)
-    Client->>API: POST /api/{role}/login
-    API->>Auth: Validate credentials
-    Auth->>DB: Check user & password
-    DB-->>Auth: User data
-    Auth->>Auth: Generate JWT token
-    Auth-->>API: Token + User data
-    API-->>Client: { token, user }
-    Client->>Client: Store token (localStorage)
-    Client->>Client: Set auth state (Zustand)
+    subgraph Server["Server (Node.js + Express)"]
+        Routes[Express Routes]
+        Middleware[Auth & Validation Middleware]
+        Controllers[Controllers]
+        Services[Business Logic]
+    end
     
-    Note over Client,API: Subsequent Requests
-    Client->>API: Request with Authorization header
-    API->>Auth: Verify JWT token
-    Auth-->>API: Decoded user data
-    API->>API: Check role permissions
-    API->>DB: Fetch/Update data
-    DB-->>API: Response data
-    API-->>Client: JSON response
+    subgraph Database["Database (MongoDB)"]
+        Prisma[Prisma ORM]
+        MongoDB[(MongoDB)]
+    end
+    
+    %% Client Flow
+    UI --> Router
+    Router --> AuthStore
+    UI --> ReactQuery
+    AuthStore --> API_Client
+    ReactQuery --> API_Client
+
+    %% API Communication
+    API_Client -->|HTTP/REST| Routes
+    Routes --> Middleware
+    Middleware --> Controllers
+    Controllers --> Services
+    Services --> Prisma
+    Prisma --> MongoDB
+    MongoDB --> Prisma
+    Prisma --> Services
+    Services --> Controllers
+    Controllers --> Middleware
+    Middleware --> Routes
+    Routes -->|JSON Response| API_Client
+    API_Client --> ReactQuery
+    ReactQuery --> UI
 ```
 
 ### API Request Flow
 
 ```mermaid
 flowchart TD
+    %% Client Side
     Start([Client Request]) --> Interceptor{Request Interceptor}
-    Interceptor -->|Add Token| Route[Route Handler]
+    Interceptor -->|Attach Token from AuthStore| Route[Route Handler]
+
+    %% Server Side
     Route --> Auth{Authentication Middleware}
     Auth -->|Valid Token| Role{Role Check}
     Auth -->|Invalid/No Token| Error401[401 Unauthorized]
@@ -184,16 +208,24 @@ flowchart TD
     Role -->|Unauthorized| Error403[403 Forbidden]
     Validate -->|Valid| Controller[Controller]
     Validate -->|Invalid| Error400[400 Validation Error]
+
+    %% Business Logic & Database
     Controller --> Service[Service Layer]
     Service --> DB[(Database)]
     DB --> Service
     Service --> Controller
+
+    %% Response Handling
     Controller --> Response[Response Formatter]
     Response --> Success[200/201 Success]
+
+    %% Error Handling
     Error401 --> ErrorHandler[Error Middleware]
     Error403 --> ErrorHandler
     Error400 --> ErrorHandler
     ErrorHandler --> ErrorResponse[Error Response]
+
+    %% Back to Client
     Success --> End([Client])
     ErrorResponse --> End
 ```
@@ -298,7 +330,7 @@ Before you begin, ensure you have the following installed:
 ### 1. Clone the Repository
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/M0hammad-yasin/Online-educator.git
 cd Online-educator
 ```
 
@@ -599,9 +631,9 @@ For complete API documentation, see [`documentations/api_contract.md`](./documen
 
 ```mermaid
 erDiagram
-    Admin ||--o{ Class : manages
-    Teacher ||--o{ Class : teaches
-    Student ||--o{ Class : enrolls
+    Admin ||--o{ `Class` : manages
+    Teacher ||--o{ `Class` : teaches
+    Student ||--o{ `Class` : enrolls
     Teacher ||--|| TeacherAccessControl : has
     Moderator ||--|| ModeratorAccessControl : has
     
@@ -663,7 +695,7 @@ erDiagram
         datetime updatedAt
     }
     
-    Class {
+    `Class` {
         string id PK
         string subject
         string title
@@ -953,6 +985,7 @@ VITE_API_BASE_URL=http://localhost:3000/api
 ```mermaid
 sequenceDiagram
     participant C as Client
+    participant AuthStore as AuthStore (Zustand)
     participant I as Interceptor
     participant R as Route
     participant A as Auth Middleware
@@ -962,9 +995,13 @@ sequenceDiagram
     participant DB as Database
     participant E as Error Handler
     
+    %% Client prepares request
+    C->>AuthStore: Read Token
     C->>I: HTTP Request
-    I->>I: Add Authorization Header
+    I->>I: Add Authorization Header from AuthStore
     I->>R: Forward Request
+    
+    %% Server authentication & validation
     R->>A: Verify Token
     alt Token Valid
         A->>A: Extract User Data
@@ -997,18 +1034,18 @@ flowchart TD
     Auth -->|Valid| RoleCheck{Role Check}
     Auth -->|Invalid| Error401[401 Unauthorized]
     
-    RoleCheck -->|Admin| AdminRoutes[Admin Routes]
-    RoleCheck -->|Moderator| ModRoutes[Moderator Routes]
-    RoleCheck -->|Teacher| TeacherRoutes[Teacher Routes]
-    RoleCheck -->|Student| StudentRoutes[Student Routes]
+    RoleCheck -->|Admin| Admin_Routes[Admin Routes]
+    RoleCheck -->|Moderator| Mod_Routes[Moderator Routes]
+    RoleCheck -->|Teacher| Teacher_Routes[Teacher Routes]
+    RoleCheck -->|Student| Student_Routes[Student Routes]
     RoleCheck -->|Unauthorized| Error403[403 Forbidden]
     
-    AdminRoutes --> Process[Process Request]
-    ModRoutes --> PermCheck{Permission Check}
+    Admin_Routes --> Process[Process Request]
+    Mod_Routes --> PermCheck{Permission Check}
     PermCheck -->|Allowed| Process
     PermCheck -->|Denied| Error403
-    TeacherRoutes --> Process
-    StudentRoutes --> Process
+    Teacher_Routes --> Process
+    Student_Routes --> Process
     
     Process --> Response[Success Response]
 ```
