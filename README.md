@@ -104,10 +104,10 @@
 graph TB
     subgraph Client["Client (React + TypeScript)"]
         UI[User Interface]
-        AuthStore[Zustand Store<br/>(token + user)]
+        AuthStore["Zustand Store (token + user)"]
         API_Client[API Client]
         Router[React Router]
-        ReactQuery[React Query Cache<br/>(classes, teachers, students, etc.)]
+        ReactQuery["React Query Cache (classes, teachers, students, etc.)"]
     end
     
     subgraph Server["Server (Node.js + Express)"]
@@ -122,12 +122,14 @@ graph TB
         MongoDB[(MongoDB)]
     end
     
+    %% Client Flow
     UI --> Router
     Router --> AuthStore
     UI --> ReactQuery
-    ReactQuery --> API_Client
     AuthStore --> API_Client
-    
+    ReactQuery --> API_Client
+
+    %% API Communication
     API_Client -->|HTTP/REST| Routes
     Routes --> Middleware
     Middleware --> Controllers
@@ -150,10 +152,10 @@ graph TB
 graph TB
     subgraph Client["Client (React + TypeScript)"]
         UI[User Interface]
-        AuthStore[Zustand Store<br/>(token + user)]
+        AuthStore["Zustand Store (token + user)"]
         API_Client[API Client]
         Router[React Router]
-        ReactQuery[React Query Cache<br/>(classes, teachers, students, etc.)]
+        ReactQuery["React Query Cache (classes, teachers, students, etc.)"]
     end
     
     subgraph Server["Server (Node.js + Express)"]
@@ -631,9 +633,9 @@ For complete API documentation, see [`documentations/api_contract.md`](./documen
 
 ```mermaid
 erDiagram
-    Admin ||--o{ `Class` : manages
-    Teacher ||--o{ `Class` : teaches
-    Student ||--o{ `Class` : enrolls
+    Admin ||--o{ ClassModel : manages
+    Teacher ||--o{ ClassModel : teaches
+    Student ||--o{ ClassModel : enrolls
     Teacher ||--|| TeacherAccessControl : has
     Moderator ||--|| ModeratorAccessControl : has
     
@@ -695,7 +697,7 @@ erDiagram
         datetime updatedAt
     }
     
-    `Class` {
+    ClassModel {
         string id PK
         string subject
         string title
